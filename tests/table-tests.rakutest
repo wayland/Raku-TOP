@@ -1,0 +1,67 @@
+#!/usr/bin/raku
+
+use v6.c;
+
+use	Test;
+use CSV::Parser;
+
+use	lib 'lib/raku';
+use	TOP;
+
+say "Prepping for tests";
+
+my $full_filename = 'tests/data/all-countries.csv';
+my $file_handle = open $full_filename, :r;
+my $parser = CSV::Parser.new(
+                :$file_handle,
+                :contains_header_row,
+                );
+my @rows;
+until $file_handle.eof {
+        my %data= %( $parser.get_line() );
+        @rows.push(%data);
+}
+
+plan 2;
+
+my $pgdb = Database.new(
+	backend => 'Postgres',
+	parameters => {
+		database-name => 'stock_trading',
+	}
+);
+isa-ok($pgdb, Database, 'Database.new() returns a Database');
+
+my %tables = %(
+	Memory => Table.new(
+		action => 'fromfile',
+	),
+	Postgres => $pgdb.useTable(name => 'quotes/AU/ASX');
+);
+
+use-ok 'TOP';
+
+done-testing;
+
+plan 10 * %tables.elems;
+
+for %tables.kv -> $type, $table {
+	say "===== Testing $type =====";
+	lives-ok({ $table.fill_from_aoh(@rows) }, "Didn't die when filling from array-of-hash");
+	isa-ok($table, Table, 'Creating $type table without database works');
+	does-ok($table, Relation, 'Table is a Relation');
+
+	is($table[0]<name>, 'Afghanistan', 'Test access by row, then column');
+	is($table<name>[0], 'Afghanistan', 'Test access by column,then row');
+
+	# Now need to test setting
+	lives-ok({ $table[0]<name> = 'Narnia' }, "Didn't die when setting by row, then column");
+	is($table<name>[0], 'Narnia', "...and when fetching by column, then row, got the same result");
+
+	lives-ok({ $table<name>[0] = 'Middle-Earth' }, "Didn't die when setting by column, then row");
+	is($table[0]<name>, 'Middle-Earth', "...and when fetching by row, then column, got the same result");
+
+	is($table.fields.elems, 11, "Found 11 fields in the CSV file");
+}
+
+done-testing;
