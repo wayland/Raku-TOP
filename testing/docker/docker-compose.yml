@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  # Docker for TOP
+  raku:
+    build:
+      context: .
+      dockerfile: testing/docker/raku.dockerfile
+
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_DB: raku_top
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres

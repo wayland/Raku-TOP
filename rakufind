@@ -1,0 +1,18 @@
+#!/usr/bin/raku
+
+sub	MAIN(@paths?) {
+	# Ignoring @paths for now
+
+	my @lines = ".findignore".IO.lines.map({ .chomp; });
+
+	my $cmd = "find . -not ( ( " ~ @lines.map({ qq{-path "$_"} }).join(' -o ') ~ " ) -type d -prune )";
+
+	docmd($cmd);
+}
+
+sub	docmd($cmd) {
+	my $usecmd = $cmd;
+	$usecmd ~~ s:g/(<[()]>)/\\$0/;
+	say '+ ' ~ $cmd;
+	shell $usecmd;
+}

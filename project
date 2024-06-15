@@ -1,0 +1,23 @@
+#!/bin/bash
+
+action=$1
+
+docker_compose_command="docker-compose -f testing/docker/docker-compose.yml --project-directory ."
+case $action in
+	test)
+		set -o errexit
+		set -o xtrace
+		$docker_compose_command up -d
+		docker exec raku_raku_1 ./table-tests.rakutest
+#		set +o xtrace
+#		$docker_compose_command run raku ls -laF
+#		$docker_compose_command down
+		;;
+	build)
+		$docker_compose_command build raku
+		;;
+	*)
+		echo "Unknown action '$action'" >&2
+		exit 1
+		;;
+esac
