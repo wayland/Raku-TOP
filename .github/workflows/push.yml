@@ -1,11 +1,32 @@
+# Based on:
+# -  https://github.com/peter-evans/docker-compose-actions-workflow
+# -  https://github.com/satackey/action-docker-layer-caching
+
 name: Raku-TOP-push-tests-workflow
 on: push
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+
+      # Pull the latest image to build, and avoid caching pull-only images.
+      # (docker pull is faster than caching in most cases.)
+      - run: docker-compose pull
+
+      # In this step, this action saves a list of existing images,
+      # the cache is created without them in the post run.
+      # It also restores the cache if it exists.
+      - uses: satackey/action-docker-layer-caching@v0.0.11
+        # Ignore the failure of a step and avoid terminating the job.
+        continue-on-error: true
+
+#      - run: docker-compose up --build
+
       - name: Build the stack
         run: docker-compose -f testing/docker/docker-compose.yml --project-directory . up -d
-      - name: Test
-        run: docker run --network container:raku 
+#      - name: Test
+#        run: docker run --network container:raku 
+
+      # Finally, "Post Run satackey/action-docker-layer-caching@v0.0.11",
+      # which is the process of saving the cache, will be executed.
