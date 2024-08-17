@@ -8,13 +8,16 @@ case $action in
 		set -o errexit
 		set -o xtrace
 		$docker_compose_command up -d
-		docker exec raku_raku_1 ./table-tests.rakutest
+		docker exec raku_raku_1 /bin/bash -lc ./table-tests.rakutest
 #		set +o xtrace
 #		$docker_compose_command run raku ls -laF
 #		$docker_compose_command down
 		;;
 	build)
 		$docker_compose_command build raku
+		;;
+	stop)
+		$docker_compose_command down
 		;;
 	*)
 		echo "Unknown action '$action'" >&2

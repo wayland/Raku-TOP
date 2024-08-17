@@ -2,8 +2,6 @@ use     Database::Driver;
 use     TOP;
 
 class	Table::Driver::Memory does Table::Driver is export {
-	has	Relation	$!frontend-object	is built is required;
-
 	# Currently public for access by Database object -- make protected/friend if useful
 	has		$.backend is rw;
 
@@ -18,6 +16,11 @@ class	Table::Driver::Memory does Table::Driver is export {
 	# -	'overflow': extra fields get stuck in a JSON hash/object/assoc field; the name of the field is in $!overflow-field-name
 	has	Str	$!field-mode = 'lax';
 	has	Str	$!overflow-field-name;
+
+	method	exists(Str :$true-error, Str :$false-error) {
+		$false-error.defined and die $false-error ~ " in Memory";
+		return False;
+	}
 
 	multi	method	makeTuple(%items) {
 
@@ -136,16 +139,6 @@ class	Table::Driver::Memory does Table::Driver is export {
 		'Str-needs-fixing' ~ self.pairs.join(" ")
 	}
 
-	method raku() {
-#		'raku-needs-fixing' ~ self.perlseen(self.^name, {
-#			~ self.^name
-#			~ '.new('
-#			~ self.pairs.map({$_<>.perl}).join(',')
-#			~ ')'
-#		})
-		self.^name ~ " \{...\}" ~ ' .raku-needs-fixing';
-	}
-
 	##### Other methods
 	method	fill_from_aoh(@rows) {
 		for @rows -> $row {
@@ -155,14 +148,35 @@ class	Table::Driver::Memory does Table::Driver is export {
 }
 
 class	Database::Driver::Memory does Database::Driver {
+	my	Database::Driver::Memory	$primary-instance;	# Implement Singleton
+	my	%tables;
+
+	# Singleton pattern
+	method	new(:$name) {
+		say "new DDM";
+		if $name {
+			say "new DDM 3";
+			nextsame;
+		} else {
+			say "new DDM 4";
+			$primary-instance or $primary-instance = callsame;
+			say "new DDM 5";
+			return $primary-instance;
+		}
+	}
+
 	method	useTable(Table :$table, *%params) {
+		%tables{$table.name} and return %tables{$table.name};
+
 		my Table::Driver::Memory $backend-table = Table::Driver::Memory.new(
 			frontend-object => $table,
 			|%params
 		);
 		say "uTM1" ~ $backend-table.raku;
 
+		%tables{$table.name} = $backend-table;
+
 		return $backend-table;
-	}	
+	}
 }
 
