@@ -12,26 +12,11 @@ role	Table::Driver does Associative does Positional {
 	has	Bool		$!init-alter = False;
 	has 			%.init-fields;		# Field definitions to be used during initialisation
 
-	# Only required because Hash::Agnostic is broken
-	method	new(*%parameters) {
-		say "Creating driver";
-		my $rv = callsame;
-		say "Created driver";
-		dd $rv;
-		$rv.TWEAK(|%parameters);
-
-		return $rv;
-	}
-
 	submethod	TWEAK(
 			Table :$frontend-object,
 			Str :$action,
 			:%fields
 	) {
-		# Only required because Hash::Agnostic is broken
-		defined $frontend-object and $!frontend-object = $frontend-object;
-		defined %fields and %!init-fields = %fields;
-		# End Hash::Agnostic breakage
 		my $name = $frontend-object.name;
 
 		# Existence check, & set InitCreate
@@ -41,7 +26,7 @@ role	Table::Driver does Associative does Positional {
 				$!init-create = True;
 			}
 			when /^(alter|use)$/ {
-				self.exists(false-error => "Error: Can't find relation '$name'");
+				self.exists(false-error => "Error: Can't find Relation '$name'");
 			}
 			when /^(can\-create|ensure)$/ {
 				self.exists() or $!init-create = True;

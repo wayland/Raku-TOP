@@ -19,6 +19,14 @@ case $action in
 	stop)
 		$docker_compose_command down
 		;;
+	build-docs)
+		for sourcefile in `find lib \( -name '*.raku' -o -name '*.rakumod' \)`; do
+			basename=`basename $sourcefile .rakumod`
+			for out_type in Markdown HTML Text; do
+				(set -x ; RAKULIB=lib/raku raku --doc=$out_type $sourcefile > docs/$out_type/${basename}.md)
+			done
+		done
+		;;
 	*)
 		echo "Unknown action '$action'" >&2
 		exit 1

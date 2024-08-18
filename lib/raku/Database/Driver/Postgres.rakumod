@@ -96,19 +96,16 @@ say "found";
 }
 
 class	Tuple::Postgres is Tuple {
-	has	Table::Driver::Postgres	$.table is built is required; # Needs to be public because Hash::Agnostic is broken
+	has	Table::Driver::Postgres	$!table is built is required;
 	has	Int						$.position;	# Position within the table
 	has	Bool					$.auto-update-database = True; # Indicates whether AT-KEY should update the database when written
 	has	Proxy					$!proxy;
 
 	submethod	TWEAK(:%initial-values) {
-		dd %initial-values;
 		# Set up hash values
 		%initial-values.kv.map: -> $key, $value { self.Tuple::AT-KEY($key) = $value };
-		say "===== TWEAK 3 =====";
-		say "Testing:";
-		%initial-values.kv.map: -> $key, $value { say "$key : " ~ self{$key} };
-		say "Tested:";
+
+		return True;
 	}
 
 	method	AT-KEY($key) is raw {
@@ -139,13 +136,9 @@ class	Table::Driver::Postgres does Table::Driver does Hash::Agnostic {
 	# Currently public for access by Field object -- make protected/friend if useful
 #	has	Tuple		@.cache handles <EXISTS-POS DELETE-POS ASSIGN-POS BIND-POS>;
 
-	# Only required because Hash::Agnostic is broken
+	# Required to resolve between parent classes
 	method	new(:$database) {
-		say "TDP n1";
 		my $rv = callsame;
-		say "TDP n2";
-		#$rv.TWEAK(:$database);
-		say "TDP n3";
 
 		return $rv;
 	}
@@ -153,10 +146,6 @@ class	Table::Driver::Postgres does Table::Driver does Hash::Agnostic {
 	submethod	TWEAK(
 		Database::Driver::Postgres :$database
 	) {
-		# Only required because Hash::Agnostic is broken
-		defined $database and $!database = $database;
-		# End Hash::Agnostic breakage
-		say "TDP TWEAK";
 		# Set up object
 		if $!init-create {
 			die "Create not implemented yet";

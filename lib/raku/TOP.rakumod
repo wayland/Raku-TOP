@@ -1,16 +1,47 @@
-
-# Things to check after upgrading from Raku 2022.04
-# -	Can I uncomment the stuff in gist without crashing?  
-# -	Can I use the pre-initialised $!field-mode variable?  
-
 use v6.e.PREVIEW;
 
-#use	Hash::Agnostic:ver<0.0.13>:auth<zef:lizmat>;
 use	Hash::Ordered;
+
+=begin pod
+
+=head1 TOP::Core
+
+=begin code
 
 role	TOP::Core {}
 
+=end code
+
+This is the common code that's shared across all TOP objects; this is intended
+to be a role on all TOP classes.
+
+=end pod
+
+role	TOP::Core {}
+
+=begin pod
+=head1 Tuple
+
+	class	Tuple is Hash::Ordered {}
+
+This is the Tuple class from which all other Tuple classes descend.
+
+It's descended from Hash::Ordered because the columns may well need to be
+ordered.  In the case of SQL, it's less important, but in the case of a
+spreadsheet, it's important.
+
+=end pod
+
 class	Tuple is Hash::Ordered {}
+
+=begin pod
+=head1 Database
+
+	class	Database {...}
+
+This is the Database class from which all other Database classes descend.
+
+=end pod
 
 class	Database {...}
 
@@ -95,12 +126,13 @@ class	Table does Relation is export {
 
 	# Hash::Agnostic overrides new and doesn't do TWEAK et. al. -- if that gets fixed, this can go away
 	multi method new(Database :$database, Str :$backend, Str :$name, Str :$action = 'use', *%parameters) {
-		say "new Table";
+		my $n = nextcallee;
+		say "=== nextcallee ===";
+		dd $n;
+		say $n.raku;
+		say $n.WHAT;
 		my $rv = callsame;
 		$rv.TWEAK(:$database, :$backend, :$name, :$action, |%parameters);
-		say "new2" ~ $rv.raku;
-		$rv.PHASE2(frontend-object => $rv, :$action, |%parameters);
-		say $rv.name;
 		return $rv;
 	}
 
@@ -142,17 +174,14 @@ class	Table does Relation is export {
 		dd $!database;
 		say "Name is $!name";
 		say "returning";
-	}
-	submethod	PHASE2(Table :$frontend-object, Str :$action, *%parameters) {
-		say "PHASE2" ~ $frontend-object.raku;
-		say "PHASE2" ~ $frontend-object.name;
+
 		$!backend-object = $!database.backend-object.useTable(
-			table => $frontend-object,
+			table => self,
 			:$action,
 			|%parameters
 		);
 		# Has to be after the backend creation because some object types derive the name from other attributes
-		defined $frontend-object.name or die "Error: all tables must be named!";
+		defined self.name or die "Error: all tables must be named!";
 	}
 
 	method  of() { return Mu; }
