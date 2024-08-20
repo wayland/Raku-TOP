@@ -1,34 +1,44 @@
-#!/bin/bash
+#!/usr/bin/raku
 
-action=$1
+sub	MAIN($action) {
+	my $docker_compose_command = "docker-compose -f testing/docker/docker-compose.yml --project-directory .";
 
-docker_compose_command="docker-compose -f testing/docker/docker-compose.yml --project-directory ."
-case $action in
-	test)
-		set -o errexit
-		set -o xtrace
-		$docker_compose_command up -d
-		docker exec raku_raku_1 /bin/bash -lc ./table-tests.rakutest
-#		set +o xtrace
-#		$docker_compose_command run raku ls -laF
-#		$docker_compose_command down
-		;;
-	build)
-		$docker_compose_command build raku
-		;;
-	stop)
-		$docker_compose_command down
-		;;
-	build-docs)
-		for sourcefile in `find lib \( -name '*.raku' -o -name '*.rakumod' \)`; do
-			basename=`basename $sourcefile .rakumod`
-			for out_type in Markdown HTML Text; do
-				(set -x ; RAKULIB=lib/raku raku --doc=$out_type $sourcefile > docs/$out_type/${basename}.md)
-			done
-		done
-		;;
-	*)
-		echo "Unknown action '$action'" >&2
-		exit 1
-		;;
-esac
+	given ($action) {
+		when 'test' {
+			do_cmd("docker exec raku_raku_1 /bin/bash -lc ./table-tests.rakutest");
+		}
+		when 'build' {
+			do_cmd("$docker_compose_command build raku");
+		}
+		when 'stop' {
+			do_cmd("$docker_compose_command down");
+		}
+		when 'build-docs' {
+			my %doc-types = %(
+				Markdown => 'md',
+				HTML => 'html',
+				Text => 'txt',
+			);
+
+			my (@sourcefiles) = qx{find lib \( -name '*.raku' -o -name '*.rakumod' \)}.lines;
+			for @sourcefiles -> $sourcefile {
+				my $basename = $sourcefile.IO.basename;
+				$basename ~~ s/\.rakumod$//;
+				for %doc-types.kv -> $format-name, $format-extension {
+					do_cmd("RAKULIB=lib/raku raku --doc=$format-name $sourcefile > docs/$format-name/$basename.$format-extension");
+				}
+			}
+		}
+		default {
+			die "Unknown action '$action'";
+		}
+	}
+}
+
+sub	do_cmd($cmd, $level = 1) {
+	print "+" x $level;
+	say " $cmd";
+	print qqx{$cmd};
+
+	return $!;
+}
