@@ -25,7 +25,7 @@ sub	MAIN($action) {
 				my $basename = $sourcefile.IO.basename;
 				$basename ~~ s/\.rakumod$//;
 				for %doc-types.kv -> $format-name, $format-extension {
-					do_cmd("RAKULIB=lib/raku raku --doc=$format-name $sourcefile > docs/$format-name/$basename.$format-extension");
+					build_doc($format-name, $format-extension, 'Class', $sourcefile, $basename);
 				}
 			}
 		}
@@ -41,4 +41,9 @@ sub	do_cmd($cmd, $level = 1) {
 	print qqx{$cmd};
 
 	return $!;
+}
+
+sub	build_doc(Str $format-name, Str $format-extension, Str $type, Str $sourcefile, Str $basename) {
+	my $target-file = "docs/$format-name/$type/$basename.$format-extension";
+	do_cmd("RAKULIB=lib/raku raku --doc=$format-name $sourcefile > $target-file");
 }
