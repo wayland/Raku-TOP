@@ -14,20 +14,33 @@ sub	MAIN($action) {
 			do_cmd("$docker_compose_command down");
 		}
 		when 'build-docs' {
+			# Set up
 			my %doc-types = %(
 				Markdown => 'md',
 				HTML => 'html',
 				Text => 'txt',
 			);
 
+			# Generate Class References
 			my (@sourcefiles) = qx{find lib \( -name '*.raku' -o -name '*.rakumod' \)}.lines;
+			my (@class-pod);
 			for @sourcefiles -> $sourcefile {
-				my $basename = $sourcefile.IO.basename;
-				$basename ~~ s/\.rakumod$//;
-				for %doc-types.kv -> $format-name, $format-extension {
-					build_doc($format-name, $format-extension, 'Class', $sourcefile, $basename);
-				}
+				my %returns = build-docs(%doc-types, 'Class', $sourcefile);
+
+				my ($basename, $target-file) = %returns<HTML>;
+				push @class-pod, "=item L<class {$basename}|{$target-file}>"
 			}
+
+			# Generate Introductory Docs
+
+			# Generate READMEs
+			my $readme-text = 'README.rakudoc'.IO.slurp;
+			my %includes = %(
+				class-refs => join("\n", @class-pod),
+				intro-docs => 'ids',
+			);
+			$readme-text ~~ s:g/\#include\s+(<[\w\-]>+)/{%includes{$0}}/;
+			build-docs(%doc-types, 'README', 'README.rakudoc', source-text => $readme-text);
 		}
 		default {
 			die "Unknown action '$action'";
@@ -43,7 +56,25 @@ sub	do_cmd($cmd, $level = 1) {
 	return $!;
 }
 
-sub	build_doc(Str $format-name, Str $format-extension, Str $type, Str $sourcefile, Str $basename) {
-	my $target-file = "docs/$format-name/$type/$basename.$format-extension";
-	do_cmd("RAKULIB=lib/raku raku --doc=$format-name $sourcefile > $target-file");
+sub	build-docs(%doc-types, $type, $sourcefile, :$source-text = Nil) {
+	my $basename = $sourcefile.IO.basename;
+	$basename ~~ s/\.raku(mod|doc)$// or die "File with unrecognised extension: $basename";
+
+	my %returns;
+	for %doc-types.kv -> $format-name, $format-extension {
+		my $target-file = $type eq 'README' 
+			?? "README.$format-extension"
+			!! "docs/$format-name/$type/$basename.$format-extension";
+		if ($source-text ~~ Nil) {
+			do_cmd("cat $sourcefile | RAKULIB=lib/raku raku --doc=$format-name - > $target-file");
+		} else {
+			my $p = shell "RAKULIB=lib/raku raku --doc=$format-name - > $target-file", :in;
+			$p.in.say: $source-text;
+			$p.in.close;
+			say "Generated $target-file from source text";
+		}
+		%returns{$format-name} = [$basename, $target-file];
+	}
+
+	return %returns;
 }
