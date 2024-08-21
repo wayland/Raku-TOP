@@ -1,6 +1,45 @@
 #!/usr/bin/raku
 
-sub	MAIN($action) {
+multi	MAIN('build-docs', @filenames?) {
+	# Set up
+	my %doc-types = %(
+		Markdown => 'md',
+		HTML => 'html',
+		Text => 'txt',
+	);
+
+	# Generate lists of source files
+	my (@class-source-files) = qx{find lib \( -name '*.raku' -o -name '*.rakumod' \)}.lines;
+
+	# Set up for processing READMEs
+	my $readme-text = 'README.rakudoc'.IO.slurp;
+
+	# Generate documentation
+	for %doc-types.kv -> $format-name, $format-extension {
+		# Generate Class References
+		my (@class-pod);
+		for @class-source-files -> $sourcefile {
+			my ($basename, $target-file) = build-docs($format-name, $format-extension, 'Class', $sourcefile);
+
+			push @class-pod, "=item L<class {$basename}|{$target-file}>"
+		}
+
+		# Generate Introductory Docs
+
+		# Generate READMEs
+		my %includes = %(
+			class-refs => join("\n", @class-pod),
+			intro-docs => 'ids',
+		);
+
+		my $this-readme-text = $readme-text;
+		$this-readme-text ~~ s:g/\#include\s+(<[\w\-]>+)/{%includes{$0}}/;
+		build-docs($format-name, $format-extension, 'README', 'README.rakudoc', source-text => $this-readme-text);
+	}
+
+}
+
+multi	MAIN($action) {
 	my $docker_compose_command = "docker-compose -f testing/docker/docker-compose.yml --project-directory .";
 
 	given ($action) {
@@ -12,35 +51,6 @@ sub	MAIN($action) {
 		}
 		when 'stop' {
 			do_cmd("$docker_compose_command down");
-		}
-		when 'build-docs' {
-			# Set up
-			my %doc-types = %(
-				Markdown => 'md',
-				HTML => 'html',
-				Text => 'txt',
-			);
-
-			# Generate Class References
-			my (@sourcefiles) = qx{find lib \( -name '*.raku' -o -name '*.rakumod' \)}.lines;
-			my (@class-pod);
-			for @sourcefiles -> $sourcefile {
-				my %returns = build-docs(%doc-types, 'Class', $sourcefile);
-
-				my ($basename, $target-file) = %returns<Markdown>;
-				push @class-pod, "=item L<class {$basename}|{$target-file}>"
-			}
-
-			# Generate Introductory Docs
-
-			# Generate READMEs
-			my $readme-text = 'README.rakudoc'.IO.slurp;
-			my %includes = %(
-				class-refs => join("\n", @class-pod),
-				intro-docs => 'ids',
-			);
-			$readme-text ~~ s:g/\#include\s+(<[\w\-]>+)/{%includes{$0}}/;
-			build-docs(%doc-types, 'README', 'README.rakudoc', source-text => $readme-text);
 		}
 		default {
 			die "Unknown action '$action'";
@@ -56,25 +66,21 @@ sub	do_cmd($cmd, $level = 1) {
 	return $!;
 }
 
-sub	build-docs(%doc-types, $type, $sourcefile, :$source-text = Nil) {
+sub	build-docs($format-name, $format-extension, $type, $sourcefile, :$source-text = Nil) {
 	my $basename = $sourcefile.IO.basename;
 	$basename ~~ s/\.raku(mod|doc)$// or die "File with unrecognised extension: $basename";
 
-	my %returns;
-	for %doc-types.kv -> $format-name, $format-extension {
-		my $target-file = $type eq 'README' 
-			?? "README.$format-extension"
-			!! "docs/$format-name/$type/$basename.$format-extension";
-		if ($source-text ~~ Nil) {
-			do_cmd("cat $sourcefile | RAKULIB=lib/raku raku --doc=$format-name - > $target-file");
-		} else {
-			my $p = shell "RAKULIB=lib/raku raku --doc=$format-name - > $target-file", :in;
-			$p.in.say: $source-text;
-			$p.in.close;
-			say "Generated $target-file from source text";
-		}
-		%returns{$format-name} = [$basename, $target-file];
+	my $target-file = $type eq 'README' 
+		?? "README.$format-extension"
+		!! "docs/$format-name/$type/$basename.$format-extension";
+	if ($source-text ~~ Nil) {
+		do_cmd("cat $sourcefile | RAKULIB=lib/raku raku --doc=$format-name - > $target-file");
+	} else {
+		my $p = shell "RAKULIB=lib/raku raku --doc=$format-name - > $target-file", :in;
+		$p.in.say: $source-text;
+		$p.in.close;
+		say "Generated $target-file from source text";
 	}
 
-	return %returns;
+	return [$basename, $target-file];
 }
