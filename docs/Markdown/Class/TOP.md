@@ -26,7 +26,7 @@ The elements in the Field can be accessed positionally. So $field[0] returns the
 Attributes
 ----------
 
-Pod::Defn<3241247061680>
+Pod::Defn<6323478346680>
 
 Methods
 -------
@@ -35,9 +35,9 @@ Methods
 
 Parameters to .new are:
 
-Pod::Defn<3241247078424>
+Pod::Defn<6323478349088>
 
-Pod::Defn<3241247078480>
+Pod::Defn<6323478349144>
 
 ### type
 
@@ -82,11 +82,11 @@ The Table class is one of the main drivers of TOP. It represents the various bac
 Attributes
 ----------
 
-Pod::Defn<3241383340592>
+Pod::Defn<6323489844544>
 
 Holds the backend object (Table::Driver::Postgres, Table::Driver::Memory, etc) that talks to the table in its backend store; the translation layer between Table and the datastore.
 
-Pod::Defn<3241380988520>
+Pod::Defn<6323479365728>
 
 The table name.
 
@@ -95,17 +95,26 @@ Methods
 
 ### .new Parameters to .new include:
 
-Pod::Defn<3241380988632>
+Pod::Defn<6323479365840>
 
 The database to which this table should be attached.
 
-Pod::Defn<3241380988688>
+Pod::Defn<6323479365896>
 
 The name of the backend to use when creating this table. The default is that it's an in-memory table.
 
-Pod::Defn<3241380649976>
+Pod::Defn<6323491731984>
 
-What kind of action to take when creating the table. See method `Database::useTable` (below) for more information.
+What kind of action to take when creating the table.
+
+<table class="pod-table">
+<thead><tr>
+<th>action</th> <th>definition</th> <th>Error if</th> <th>Will alter</th> <th>Fields</th>
+</tr></thead>
+<tbody>
+<tr> <td>create</td> <td>force create</td> <td>Present</td> <td>No</td> <td>Yes</td> </tr> <tr> <td>alter</td> <td>alter existing</td> <td>Absent</td> <td>Yes</td> <td>Yes</td> </tr> <tr> <td>use</td> <td>no creation</td> <td>Absent</td> <td>No</td> <td>No</td> </tr> <tr> <td>can-create</td> <td>create if not existing</td> <td>No</td> <td>No</td> <td>If Absent</td> </tr> <tr> <td>ensure</td> <td>create or alter</td> <td>No</td> <td>Yes</td> <td>If not conformant</td> </tr>
+</tbody>
+</table>
 
 Database
 ========
@@ -117,29 +126,24 @@ This is the Database class from which all other Database classes descend.
 Attributes
 ----------
 
-Pod::Defn<3241383340592>
+Pod::Defn<6323489844544>
 
 The backend object that talks to the data store for us.
 
 Methods
 -------
 
-### .new() Parameters to .new() are:
+### .new()
 
-Pod::Defn<3241380623768>
+Parameters to .new() are:
+
+Pod::Defn<6323480254896>
 
 The backend that will be used by this database. The default is that it's the in-memory backend.
 
 ### method useTable
 
-    method	useTable(Table :$table, Bool :$action, %fields => {})
+    method	useTable(:$name)
 
-<table class="pod-table">
-<thead><tr>
-<th>action</th> <th>definition</th> <th>Error if</th> <th>Will alter</th> <th>Fields</th>
-</tr></thead>
-<tbody>
-<tr> <td>create</td> <td>force create</td> <td>Present</td> <td>No</td> <td>Yes</td> </tr> <tr> <td>alter</td> <td>alter existing</td> <td>Absent</td> <td>Yes</td> <td>Yes</td> </tr> <tr> <td>use</td> <td>no creation</td> <td>Absent</td> <td>No</td> <td>No</td> </tr> <tr> <td>can-create</td> <td>create if not existing</td> <td>No</td> <td>No</td> <td>If Absent</td> </tr> <tr> <td>ensure</td> <td>create or alter</td> <td>No</td> <td>Yes</td> <td>If not conformant</td> </tr>
-</tbody>
-</table>
+Creates and returns and object representing the named table in this database. 
 

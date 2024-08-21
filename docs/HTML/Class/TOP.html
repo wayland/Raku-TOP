@@ -382,12 +382,12 @@ hr {
    <tr class="toc-level-2"><td class="toc-number">5.1</td><td class="toc-text"><a href="#Attributes">Attributes</a></td></tr>
       <tr class="toc-level-2"><td class="toc-number">5.2</td><td class="toc-text"><a href="#Methods">Methods</a></td></tr>
  <tr class="toc-level-3"><td class="toc-number">5.2.1</td><td class="toc-text"><a href="#.new_Parameters_to_.new_include:">.new Parameters to .new include:</a></td></tr>
-         <tr class="toc-level-1"><td class="toc-number">6</td><td class="toc-text"><a href="#Database">Database</a></td></tr>
+                                <tr class="toc-level-1"><td class="toc-number">6</td><td class="toc-text"><a href="#Database">Database</a></td></tr>
    <tr class="toc-level-2"><td class="toc-number">6.1</td><td class="toc-text"><a href="#Attributes">Attributes</a></td></tr>
    <tr class="toc-level-2"><td class="toc-number">6.2</td><td class="toc-text"><a href="#Methods">Methods</a></td></tr>
- <tr class="toc-level-3"><td class="toc-number">6.2.1</td><td class="toc-text"><a href="#.new()_Parameters_to_.new()_are:">.new() Parameters to .new() are:</a></td></tr>
-   <tr class="toc-level-3"><td class="toc-number">6.2.2</td><td class="toc-text"><a href="#method_useTable">method useTable</a></td></tr>
-                          
+ <tr class="toc-level-3"><td class="toc-number">6.2.1</td><td class="toc-text"><a href="#.new()">.new()</a></td></tr>
+    <tr class="toc-level-3"><td class="toc-number">6.2.2</td><td class="toc-text"><a href="#method_useTable">method useTable</a></td></tr>
+  
 </table>
 </nav>
 
@@ -489,8 +489,15 @@ hr {
 <dd></dd>
 
 </dl>
-<p>What kind of action to take when creating the table. See method <code>Database::useTable</code> (below) for more information.</p>
-<h1 id="Database"><a class="u" href="#___top" title="go to top of document">Database</a></h1>
+<p>What kind of action to take when creating the table.</p>
+<table class="pod-table">
+<thead><tr>
+<th>action</th> <th>definition</th> <th>Error if</th> <th>Will alter</th> <th>Fields</th>
+</tr></thead>
+<tbody>
+<tr> <td>create</td> <td>force create</td> <td>Present</td> <td>No</td> <td>Yes</td> </tr> <tr> <td>alter</td> <td>alter existing</td> <td>Absent</td> <td>Yes</td> <td>Yes</td> </tr> <tr> <td>use</td> <td>no creation</td> <td>Absent</td> <td>No</td> <td>No</td> </tr> <tr> <td>can-create</td> <td>create if not existing</td> <td>No</td> <td>No</td> <td>If Absent</td> </tr> <tr> <td>ensure</td> <td>create or alter</td> <td>No</td> <td>Yes</td> <td>If not conformant</td> </tr>
+</tbody>
+</table><h1 id="Database"><a class="u" href="#___top" title="go to top of document">Database</a></h1>
 <pre class="pod-block-code">class	Database {...}</pre>
 <p>This is the Database class from which all other Database classes descend.</p>
 <h2 id="Attributes"><a class="u" href="#___top" title="go to top of document">Attributes</a></h2>
@@ -501,7 +508,8 @@ hr {
 </dl>
 <p>The backend object that talks to the data store for us.</p>
 <h2 id="Methods"><a class="u" href="#___top" title="go to top of document">Methods</a></h2>
-<h3 id=".new()_Parameters_to_.new()_are:"><a class="u" href="#___top" title="go to top of document">.new() Parameters to .new() are:</a></h3>
+<h3 id=".new()"><a class="u" href="#___top" title="go to top of document">.new()</a></h3>
+<p>Parameters to .new() are:</p>
 <dl>
 <dt>Str $.backend = &#39;Memory&#39;</dt>
 <dd></dd>
@@ -509,15 +517,9 @@ hr {
 </dl>
 <p>The backend that will be used by this database. The default is that it&#39;s the in-memory backend.</p>
 <h3 id="method_useTable"><a class="u" href="#___top" title="go to top of document">method useTable</a></h3>
-<pre class="pod-block-code">method	useTable(Table :$table, Bool :$action, %fields =&gt; {})</pre>
-<table class="pod-table">
-<thead><tr>
-<th>action</th> <th>definition</th> <th>Error if</th> <th>Will alter</th> <th>Fields</th>
-</tr></thead>
-<tbody>
-<tr> <td>create</td> <td>force create</td> <td>Present</td> <td>No</td> <td>Yes</td> </tr> <tr> <td>alter</td> <td>alter existing</td> <td>Absent</td> <td>Yes</td> <td>Yes</td> </tr> <tr> <td>use</td> <td>no creation</td> <td>Absent</td> <td>No</td> <td>No</td> </tr> <tr> <td>can-create</td> <td>create if not existing</td> <td>No</td> <td>No</td> <td>If Absent</td> </tr> <tr> <td>ensure</td> <td>create or alter</td> <td>No</td> <td>Yes</td> <td>If not conformant</td> </tr>
-</tbody>
-</table>
+<pre class="pod-block-code">method	useTable(:$name)</pre>
+<p>Creates and returns and object representing the named table in this database. </p>
+
     </div>
 
     

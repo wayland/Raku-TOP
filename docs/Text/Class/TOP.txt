@@ -125,8 +125,15 @@ that it's an in-memory table.
 Str :$action = 'use'
 
 
-What kind of action to take when creating the table. See method
-Database::useTable (below) for more information.
+What kind of action to take when creating the table.
+
+  action      definition              Error if  Will alter  Fields
+  create      force create            Present   No          Yes
+  alter       alter existing          Absent    Yes         Yes
+  use         no creation             Absent    No          No
+  can-create  create if not existing  No        No          If Absent
+  ensure      create or alter         No        Yes         If not conformant
+
 
 Database
 
@@ -143,7 +150,9 @@ The backend object that talks to the data store for us.
 
   Methods
 
-    .new() Parameters to .new() are:
+    .new()
+
+Parameters to .new() are:
 
 Str $.backend = 'Memory'
 
@@ -153,12 +162,7 @@ the in-memory backend.
 
     method useTable
 
-    method	useTable(Table :$table, Bool :$action, %fields => {})
+    method	useTable(:$name)
 
-  action      definition              Error if  Will alter  Fields
-  create      force create            Present   No          Yes
-  alter       alter existing          Absent    Yes         Yes
-  use         no creation             Absent    No          No
-  can-create  create if not existing  No        No          If Absent
-  ensure      create or alter         No        Yes         If not conformant
-
+Creates and returns and object representing the named table in this
+database. 

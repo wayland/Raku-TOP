@@ -230,8 +230,17 @@ class	Table does Relation is export {
 	=begin pod
 	=defn Str :$action = 'use'
 
-	What kind of action to take when creating the table.  See method C<Database::useTable>
-	(below) for more information.
+	What kind of action to take when creating the table.
+
+	=begin table
+	action     | definition             | Error if | Will alter | Fields
+	================================================================================
+	create     | force create           | Present  | No         | Yes
+	alter	   | alter existing         | Absent   | Yes        | Yes
+	use        | no creation            | Absent   | No         | No
+	can-create | create if not existing | No       | No         | If Absent
+	ensure     | create or alter        | No       | Yes        | If not conformant
+	=end table
 
 	=end pod
 	# Hash::Agnostic overrides new and doesn't do TWEAK et. al. -- if that gets fixed, this can go away
@@ -308,6 +317,7 @@ class	Database {
 	=begin pod
 	=head2 Methods
 	=head3 .new()
+
 	Parameters to .new() are:
 
 	=defn Str $.backend = 'Memory'
@@ -348,17 +358,10 @@ class	Database {
 
 	=head3 method useTable
 
-	    method	useTable(Table :$table, Bool :$action, %fields => {})
+	    method	useTable(:$name)
 
-	=begin table
-	action     | definition             | Error if | Will alter | Fields
-	================================================================================
-	create     | force create           | Present  | No         | Yes
-	alter	   | alter existing         | Absent   | Yes        | Yes
-	use        | no creation            | Absent   | No         | No
-	can-create | create if not existing | No       | No         | If Absent
-	ensure     | create or alter        | No       | Yes        | If not conformant
-	=end table
+	Creates and returns and object representing the named table in this database.  
+
 	=end pod
 
 	method	useTable(:$name, *%params) {
