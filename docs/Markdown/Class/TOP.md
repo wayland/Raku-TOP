@@ -26,7 +26,7 @@ The elements in the Field can be accessed positionally. So $field[0] returns the
 Attributes
 ----------
 
-Pod::Defn<6323478346680>
+Pod::Defn<3852339002464>
 
 Methods
 -------
@@ -35,9 +35,9 @@ Methods
 
 Parameters to .new are:
 
-Pod::Defn<6323478349088>
+Pod::Defn<3852339004872>
 
-Pod::Defn<6323478349144>
+Pod::Defn<3852339004928>
 
 ### type
 
@@ -82,11 +82,11 @@ The Table class is one of the main drivers of TOP. It represents the various bac
 Attributes
 ----------
 
-Pod::Defn<6323489844544>
+Pod::Defn<3852343881024>
 
 Holds the backend object (Table::Driver::Postgres, Table::Driver::Memory, etc) that talks to the table in its backend store; the translation layer between Table and the datastore.
 
-Pod::Defn<6323479365728>
+Pod::Defn<3852205869152>
 
 The table name.
 
@@ -95,15 +95,15 @@ Methods
 
 ### .new Parameters to .new include:
 
-Pod::Defn<6323479365840>
+Pod::Defn<3852205869264>
 
 The database to which this table should be attached.
 
-Pod::Defn<6323479365896>
+Pod::Defn<3852205869320>
 
 The name of the backend to use when creating this table. The default is that it's an in-memory table.
 
-Pod::Defn<6323491731984>
+Pod::Defn<3852331022808>
 
 What kind of action to take when creating the table.
 
@@ -126,7 +126,7 @@ This is the Database class from which all other Database classes descend.
 Attributes
 ----------
 
-Pod::Defn<6323489844544>
+Pod::Defn<3852343881024>
 
 The backend object that talks to the data store for us.
 
@@ -137,7 +137,7 @@ Methods
 
 Parameters to .new() are:
 
-Pod::Defn<6323480254896>
+Pod::Defn<3852330425144>
 
 The backend that will be used by this database. The default is that it's the in-memory backend.
 
@@ -145,5 +145,5 @@ The backend that will be used by this database. The default is that it's the in-
 
     method	useTable(:$name)
 
-Creates and returns and object representing the named table in this database. 
+Creates and returns an object representing the named table in this database.
 

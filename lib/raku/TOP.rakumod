@@ -360,7 +360,7 @@ class	Database {
 
 	    method	useTable(:$name)
 
-	Creates and returns and object representing the named table in this database.  
+	Creates and returns an object representing the named table in this database.
 
 	=end pod
 
