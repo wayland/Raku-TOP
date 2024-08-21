@@ -15,13 +15,13 @@ ids
 Raku TOP Class References
 -------------------------
 
-  * [class CSV](docs/HTML/Class/CSV.html)
+  * [class CSV](docs/Markdown/Class/CSV.md)
 
-  * [class Memory](docs/HTML/Class/Memory.html)
+  * [class Memory](docs/Markdown/Class/Memory.md)
 
-  * [class Postgres](docs/HTML/Class/Postgres.html)
+  * [class Postgres](docs/Markdown/Class/Postgres.md)
 
-  * [class Driver](docs/HTML/Class/Driver.html)
+  * [class Driver](docs/Markdown/Class/Driver.md)
 
-  * [class TOP](docs/HTML/Class/TOP.html)
+  * [class TOP](docs/Markdown/Class/TOP.md)
 

@@ -27,7 +27,7 @@ sub	MAIN($action) {
 			for @sourcefiles -> $sourcefile {
 				my %returns = build-docs(%doc-types, 'Class', $sourcefile);
 
-				my ($basename, $target-file) = %returns<HTML>;
+				my ($basename, $target-file) = %returns<Markdown>;
 				push @class-pod, "=item L<class {$basename}|{$target-file}>"
 			}
 
