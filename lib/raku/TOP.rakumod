@@ -4,6 +4,14 @@ use	Hash::Ordered;
 
 =begin pod
 
+=NAME Raku TOP - Table Oriented Programming in Raku
+
+=AUTHOR Tim Nelson - https://github.com/wayland
+
+=TITLE Raku TOP
+
+=SUBTITLE Table Oriented Programming in Raku
+
 =head1 TOP::Core
 
 =begin code
@@ -71,7 +79,10 @@ class	Field does Positional {
 	=head2 Methods
 	=head3 .new
 
-	Parameters to .new are:
+	Creates a new Field.
+
+		.new(Relation :$relation, Any:U $type)
+
 	=defn Relation	:$relation
 	The Relation which contains the field.  Required.
 	=end pod
@@ -88,7 +99,7 @@ class	Field does Positional {
 
 	=head3 type
 
-		method 	type(Any:U $value = Nil) {
+		method 	type(Any:U $value = Nil)
 
 	Parameters:
 
@@ -186,7 +197,11 @@ class	Table does Relation is export {
 	=begin pod
 	=head2 Methods
 	=head3 .new
-	Parameters to .new include:
+
+	Creates a new Table.
+
+		.new(Database :$database, Str :$backend = 'Memory', Str :$action = 'use')
+
 	=defn Database :$database
 
 	The database to which this table should be attached.
@@ -226,6 +241,8 @@ class	Table does Relation is export {
 		say "Name: " ~ $p<name>;
 		return-rw $p;
 	}
+
+	# TODO: The formatting on the following table should use tabs -- try to improve it after the Pod6 rewite
 
 	=begin pod
 	=defn Str :$action = 'use'
@@ -316,14 +333,20 @@ class	Database {
 
 	=begin pod
 	=head2 Methods
-	=head3 .new()
+	=head3 .new
 
-	Parameters to .new() are:
+	Creates a new Database (ie. database object -- may be attaching to an
+	existing database)
+
+		.new(Str$.backend = 'Memory')
+
+	Parameters to .new are:
 
 	=defn Str $.backend = 'Memory'
 
 	The backend that will be used by this database.  The default is that it's
 	the in-memory backend.
+
 	=end pod
 	has	Str	$.backend	is built = 'Memory';
 
@@ -351,8 +374,6 @@ class	Database {
 
 		return $driver;
 	}
-
-	# TODO: The formatting on the following table should use tabs -- try to improve it after the Pod6 rewite
 
 	=begin pod
 

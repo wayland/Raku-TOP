@@ -1,3 +1,80 @@
-    method	exists() {...}
+NAME
+Raku TOP Driver - The common driver for Raku TOP backends
+
+TITLE
+Raku TOP Driver
+
+SUBTITLE
+The common driver for Raku TOP backends
+
+AUTHOR
+Tim Nelson - https://github.com/wayland
+
+Table::Driver
+
+    role	Table::Driver does Associative does Positional {
+
+
+
+  Attributes
+
+Field @.fields
+Stores the fields
+
+%.field-indices
+For looking up fields by name
+
+  Methods
+
+    .new
+
+Creates a Table::Driver.
+
+    .new(Relation :$frontend-object, Str :$action, Str :%fields)
+
+Parameters to .new are:
+
+Relation $frontend-object
+The frontend object that is using this backend object.
+
+Str $action
+The action to take -- see the parameter of the same name on the frontend
+object
+
+Str %fields
+If relevant, the fields to use in creating/altering the table
+
+    exists
 
 Returns True if the table already exists.
+
+    method	.exists(Str :$true-error, Str :$false-error) {...}
+
+    .add-field
+
+Adds a field to the table
+
+    .add-field(Table :$relation, Str :$name, Any:U $type)
+
+Str $name
+The name of the field being added
+
+Any:U $type
+The type of the field, as a Raku type
+
+Database::Driver
+
+The parent class for all the different Database Drivers (backends).
+
+    role	Database::Driver
+
+
+
+  Methods
+
+    .useTable
+
+    method	useTable(Table :$table, *%params)
+
+Returns a table belonging to the database. Parameters vary from driver to
+driver.

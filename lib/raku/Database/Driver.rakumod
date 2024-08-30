@@ -1,11 +1,56 @@
 use	v6.d;
 use	TOP;
 
+=begin pod
+
+=NAME Raku TOP Driver - The common driver for Raku TOP backends
+
+=TITLE Raku TOP Driver
+
+=SUBTITLE The common driver for Raku TOP backends
+
+=AUTHOR Tim Nelson - https://github.com/wayland
+
+=head1 Table::Driver
+
+=begin code
+
 role	Table::Driver does Associative does Positional {
-	has	Relation	$!frontend-object	is built is required;
-	has				%.field-indices;	# For looking up fields by name
+
+=end code
+
+=head2 Attributes
+
+=end pod
+
+role	Table::Driver does Associative does Positional {
+	=begin pod
+	=defn Field @.fields
+	Stores the fields
+	=end pod
+	has	Field		@.fields;
+
+	=begin pod
+	=defn %.field-indices
+	For looking up fields by name
+	=end pod
+	has				%.field-indices;
+
 	has	Str			@!field-names;		# For keeping the fields in order
-	has	Field		@.fields;			# Store the actual fields
+
+	=begin pod
+	=head2 Methods
+	=head3 .new
+
+	Creates a Table::Driver.
+
+		.new(Relation :$frontend-object, Str :$action, Str :%fields)
+
+	Parameters to .new are:
+	=defn Relation $frontend-object
+	The frontend object that is using this backend object.
+	=end pod
+	has	Relation	$!frontend-object	is built is required;
 
 	# Only used during initialisation
 	has	Bool		$!init-create = False;
@@ -14,7 +59,15 @@ role	Table::Driver does Associative does Positional {
 
 	submethod	TWEAK(
 			Table :$frontend-object,
+			=begin pod
+			=defn Str $action
+			The action to take -- see the parameter of the same name on the frontend object
+			=end pod
 			Str :$action,
+			=begin pod
+			=defn Str %fields
+			If relevant, the fields to use in creating/altering the table
+			=end pod
 			:%fields
 	) {
 		my $name = $frontend-object.name;
@@ -44,10 +97,11 @@ role	Table::Driver does Associative does Positional {
 	}
 
 	=begin pod
-
-		method	exists() {...}
+	=head3 exists
 
 	Returns True if the table already exists.
+
+		method	.exists(Str :$true-error, Str :$false-error) {...}
 
 	=end pod
 	method	exists(Str :$true-error, Str :$false-error) {...}
@@ -82,13 +136,62 @@ role	Table::Driver does Associative does Positional {
 		)
 	}
 
+	# TODO: Try removing this
 	method	of() { return Mu; }
 
-	method	add-field(Table :$relation, Str :$name, Any:U :$type) {
+	=begin pod
+	=head3 .add-field
+
+	Adds a field to the table
+
+		.add-field(Table :$relation, Str :$name, Any:U $type)
+	=end pod
+	method	add-field(
+		# TODO: Try to replace "relation" with "self"; if that doesn't work, then document
+		Table :$relation,
+		=begin pod
+		=defn Str $name
+		The name of the field being added
+		=end pod
+		Str :$name,
+		=begin pod
+		=defn Any:U $type
+		The type of the field, as a Raku type
+		=end pod
+		Any:U :$type
+	) {
 		%!field-indices{$name}:exists and die "Error: Can't create field '$name' because it already exists";
 		self.{$name} = Field.new(:$relation, :$name, :$type);
 		#@!fields.push(self.{$name});
 		#@!field-names.push($name);
 	}
 }
-role	Database::Driver {}
+
+=begin pod
+=head1 Database::Driver
+
+The parent class for all the different Database Drivers (backends).
+
+=begin code
+
+role	Database::Driver
+
+=end code
+
+=head2 Methods
+
+=end pod
+role	Database::Driver {
+	=begin pod
+	=head3 .useTable
+
+		method	useTable(Table :$table, *%params)
+
+	Returns a table belonging to the database.  Parameters vary from driver to driver.
+	=end pod
+	method	useTable(Table :$table, *%params) {...}
+#method	useTable(Table :$table, Str :$action = 'use', :%fields = {}) {
+#method	useTable(Table :$table, *%params) {
+#method	useTable(Table :$table, Str :$filename) {
+
+}

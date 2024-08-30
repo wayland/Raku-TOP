@@ -1,13 +1,49 @@
 use     Database::Driver;
 use     TOP;
 
+=begin pod
+
+=NAME Raku *::Driver::Memory - Raku classes to implement the in-memory table store
+
+=TITLE Raku *::Driver::Memory
+
+=SUBTITLE Raku classes to implement the in-memory table store
+
+=AUTHOR Tim Nelson - https://github.com/wayland
+
+=head1 Table::Driver::Memory
+
+	class	Table::Driver::Memory does Table::Driver is export {
+
+=head1 Usage
+
+=head3 The Easy Options
+
+	Table.new(name => 'countries', action => 'can-create'),
+
+The default database (if none is specified) is a Memory database, so there's
+not much you need to specify when using one of these.
+
+=head3 The Flexible Option
+
+	$memdb = Database.new(
+		name => 'MyMemoryDatabase',
+	);
+	$memdb.useTable(name => 'countries');
+
+The parameters to Database.useTable are basically the same as are passed to Table.new().  
+
+=end pod
+# TODO: See if we can remove 'is export' (and also from doco)
 class	Table::Driver::Memory does Table::Driver is export {
+	# TODO: Try removing this
 	# Currently public for access by Database object -- make protected/friend if useful
 	has		$.backend is rw;
 
 	# Currently public for access by Field object -- make protected/friend if useful
 	has	Tuple	@.rows handles <elems EXISTS-POS DELETE-POS ASSIGN-POS BIND-POS>;
 
+	# TODO:
 	# Not implemented yet
 	# Could be:
 	# -	'pragma' (default): Controlled by the strict pragma, as follows:
@@ -17,6 +53,8 @@ class	Table::Driver::Memory does Table::Driver is export {
 	has	Str	$!field-mode = 'lax';
 	has	Str	$!overflow-field-name;
 
+	# Doco: Documented in Table::Driver
+	# TODO: Align better with the one in the Postgres module
 	method	exists(Str :$true-error, Str :$false-error) {
 		$false-error.defined and die $false-error ~ " in Memory";
 		return False;
@@ -149,7 +187,7 @@ class	Table::Driver::Memory does Table::Driver is export {
 
 class	Database::Driver::Memory does Database::Driver {
 	my	Database::Driver::Memory	$primary-instance;	# Implement Singleton
-	my	%tables;
+	has	%tables;
 
 	# Singleton pattern
 	method	new(:$name) {

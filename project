@@ -1,5 +1,14 @@
 #!/usr/bin/raku
 
+class	MethodLoc {
+	has	Str	$.class;
+	has	Str	$.methodname;
+	has	Str	$.filename;
+	has	Str	$.classtype;
+	has		$.drivertype;
+	has	Int	$.lineno;
+}
+
 multi	MAIN('build-docs', @filenames?) {
 	# Set up
 	my %doc-types = %(
@@ -44,6 +53,7 @@ multi	MAIN($action) {
 
 	given ($action) {
 		when 'test' {
+			do_cmd("$docker_compose_command up -d");
 			do_cmd("docker exec raku_raku_1 /bin/bash -lc ./table-tests.rakutest");
 		}
 		when 'build' {
@@ -52,16 +62,80 @@ multi	MAIN($action) {
 		when 'stop' {
 			do_cmd("$docker_compose_command down");
 		}
+		when 'find-common' {
+			# Locate methods in files and classes/roles
+			my (@files-to-check) = qx{find lib/raku/Database/Driver -name '*.rakumod'}.lines;
+			push @files-to-check, 'lib/raku/Database/Driver.rakumod';
+
+			my @methodlocs;
+			for @files-to-check -> $file {
+				say "File: $file";
+				my ($currentclass, $classtype, $drivertype);
+				my $lineno = 0;
+				for $file.IO.lines -> $line {
+					$lineno++;
+					$line ~~ /^\s*(role|class)\s+ $<classname> = (<[\w:]>+)/ and do {
+						my $thisclass = ~$/<classname>;
+						$line ~~ /\{$/ or next;
+						$currentclass = $thisclass;
+						my $d;
+						($classtype, $d, $drivertype) = $thisclass.split(/\:\:/);
+					}
+					$line ~~ /
+						[multi\s+|sub|<?>]method\s+
+						$<method> = [<[\w-]>+].*
+					/ and do {
+						my $method = ~$<method>;
+						defined($drivertype) and $line ~~ /\}$/ and next;
+						push @methodlocs, MethodLoc.new(
+							class => $currentclass,
+							methodname => $method,
+							lineno => $lineno,
+							filename => $file,
+							classtype => $classtype,
+							drivertype => $drivertype,
+						);
+					};
+				}
+			}
+
+			# Loop over methods and categorise
+			my %groups;
+			for @methodlocs -> $ml {
+				push %groups{$ml.classtype ~ $ml.methodname}, $ml;
+			}
+			GROUP: for %groups.kv -> $key, @group {
+				@group.elems > 1 and do {
+					for @group -> $methodloc {
+						defined($methodloc.drivertype) or next GROUP;
+					}
+#dd @group;
+					for @group -> $methodloc {
+						FIRST {
+							printf "%s.%s:\n", $methodloc.classtype, $methodloc.methodname;
+						}
+						printf "\t%s: %s\n", $methodloc.filename, $methodloc.lineno;
+					}
+				};
+			}
+		}
 		default {
 			die "Unknown action '$action'";
 		}
 	}
 }
 
-sub	do_cmd($cmd, $level = 1) {
+sub	do_cmd($cmd, :$level = 1, :$use = 'shell') {
 	print "+" x $level;
 	say " $cmd";
-	print qqx{$cmd};
+	given $use {
+		when 'shell' {
+			shell $cmd;
+		}
+		when 'qqx' {
+			print qqx{$cmd};
+		}
+	}
 
 	return $!;
 }
@@ -73,14 +147,32 @@ sub	build-docs($format-name, $format-extension, $type, $sourcefile, :$source-tex
 	my $target-file = $type eq 'README' 
 		?? "README.$format-extension"
 		!! "docs/$format-name/$type/$basename.$format-extension";
+	my $use-source-text;
 	if ($source-text ~~ Nil) {
-		do_cmd("cat $sourcefile | RAKULIB=lib/raku raku --doc=$format-name - > $target-file");
+		$use-source-text = $sourcefile.IO.slurp;
+		do_cmd("cat $sourcefile | RAKULIB=lib/raku raku --doc=$format-name - > $target-file", use => 'qqx');
+		say "after";
 	} else {
+		$use-source-text = $source-text;
 		my $p = shell "RAKULIB=lib/raku raku --doc=$format-name - > $target-file", :in;
 		$p.in.say: $source-text;
 		$p.in.close;
 		say "Generated $target-file from source text";
 	}
 
+	##### GENERATE POD TABLE OF CONTENTS
+	# ATTEMPT 2
+	# This is the approach, but it needs a newer Raku
+	# Drawn from https://github.com/Raku/doc/blob/main/xt/rakuast-validate.rakutest (start reading at the bottom of the file
+#	for $use-source-text.AST.rakudoc -> $pod {
+#		dd $pod
+#	}
+
+	# ATTEMPT 1
+	# Not sure if this might be useful as a component in attempt 2, above; 
+#	use	Pod::Contents;
+#	say "Got: " ~ join_pod_contents_of $use-source-text, 'TITLE';
+
 	return [$basename, $target-file];
 }
+

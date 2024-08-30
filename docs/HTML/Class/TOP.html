@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <title></title>
+    <title>Raku TOP</title>
     <meta charset="UTF-8"/>
     <style>hr,
 img {
@@ -370,23 +370,23 @@ hr {
     <nav class="indexgroup">
 <table id="TOC">
 <caption><h2 id="TOC_Title">Table of Contents</h2></caption>
-<tr class="toc-level-1"><td class="toc-number">1</td><td class="toc-text"><a href="#TOP::Core">TOP::Core</a></td></tr>
+    <tr class="toc-level-1"><td class="toc-number">1</td><td class="toc-text"><a href="#TOP::Core">TOP::Core</a></td></tr>
      <tr class="toc-level-1"><td class="toc-number">2</td><td class="toc-text"><a href="#Tuple">Tuple</a></td></tr>
     <tr class="toc-level-1"><td class="toc-number">3</td><td class="toc-text"><a href="#Field">Field</a></td></tr>
     <tr class="toc-level-2"><td class="toc-number">3.1</td><td class="toc-text"><a href="#Attributes">Attributes</a></td></tr>
   <tr class="toc-level-2"><td class="toc-number">3.2</td><td class="toc-text"><a href="#Methods">Methods</a></td></tr>
  <tr class="toc-level-3"><td class="toc-number">3.2.1</td><td class="toc-text"><a href="#.new">.new</a></td></tr>
-    <tr class="toc-level-3"><td class="toc-number">3.2.2</td><td class="toc-text"><a href="#type">type</a></td></tr>
+     <tr class="toc-level-3"><td class="toc-number">3.2.2</td><td class="toc-text"><a href="#type">type</a></td></tr>
                <tr class="toc-level-1"><td class="toc-number">4</td><td class="toc-text"><a href="#Relation">Relation</a></td></tr>
    <tr class="toc-level-1"><td class="toc-number">5</td><td class="toc-text"><a href="#Table">Table</a></td></tr>
    <tr class="toc-level-2"><td class="toc-number">5.1</td><td class="toc-text"><a href="#Attributes">Attributes</a></td></tr>
       <tr class="toc-level-2"><td class="toc-number">5.2</td><td class="toc-text"><a href="#Methods">Methods</a></td></tr>
- <tr class="toc-level-3"><td class="toc-number">5.2.1</td><td class="toc-text"><a href="#.new_Parameters_to_.new_include:">.new Parameters to .new include:</a></td></tr>
-                                <tr class="toc-level-1"><td class="toc-number">6</td><td class="toc-text"><a href="#Database">Database</a></td></tr>
+ <tr class="toc-level-3"><td class="toc-number">5.2.1</td><td class="toc-text"><a href="#.new">.new</a></td></tr>
+                                  <tr class="toc-level-1"><td class="toc-number">6</td><td class="toc-text"><a href="#Database">Database</a></td></tr>
    <tr class="toc-level-2"><td class="toc-number">6.1</td><td class="toc-text"><a href="#Attributes">Attributes</a></td></tr>
    <tr class="toc-level-2"><td class="toc-number">6.2</td><td class="toc-text"><a href="#Methods">Methods</a></td></tr>
- <tr class="toc-level-3"><td class="toc-number">6.2.1</td><td class="toc-text"><a href="#.new()">.new()</a></td></tr>
-    <tr class="toc-level-3"><td class="toc-number">6.2.2</td><td class="toc-text"><a href="#method_useTable">method useTable</a></td></tr>
+ <tr class="toc-level-3"><td class="toc-number">6.2.1</td><td class="toc-text"><a href="#.new">.new</a></td></tr>
+      <tr class="toc-level-3"><td class="toc-number">6.2.2</td><td class="toc-text"><a href="#method_useTable">method useTable</a></td></tr>
   
 </table>
 </nav>
@@ -415,7 +415,8 @@ hr {
 </dl>
 <h2 id="Methods"><a class="u" href="#___top" title="go to top of document">Methods</a></h2>
 <h3 id=".new"><a class="u" href="#___top" title="go to top of document">.new</a></h3>
-<p>Parameters to .new are:</p>
+<p>Creates a new Field.</p>
+<pre class="pod-block-code">.new(Relation :$relation, Any:U $type)</pre>
 <dl>
 <dt>Relation :$relation</dt>
 <dd><p>The Relation which contains the field. Required.</p>
@@ -429,7 +430,7 @@ hr {
 
 </dl>
 <h3 id="type"><a class="u" href="#___top" title="go to top of document">type</a></h3>
-<pre class="pod-block-code">method 	type(Any:U $value = Nil) {</pre>
+<pre class="pod-block-code">method 	type(Any:U $value = Nil)</pre>
 <p>Parameters:</p>
 <ul><li><p>Any:U $value = Nil</p>
 </li>
@@ -471,7 +472,9 @@ hr {
 </dl>
 <p>The table name.</p>
 <h2 id="Methods"><a class="u" href="#___top" title="go to top of document">Methods</a></h2>
-<h3 id=".new_Parameters_to_.new_include:"><a class="u" href="#___top" title="go to top of document">.new Parameters to .new include:</a></h3>
+<h3 id=".new"><a class="u" href="#___top" title="go to top of document">.new</a></h3>
+<p>Creates a new Table.</p>
+<pre class="pod-block-code">.new(Database :$database, Str :$backend = &#39;Memory&#39;, Str :$action = &#39;use&#39;)</pre>
 <dl>
 <dt>Database :$database</dt>
 <dd></dd>
@@ -508,8 +511,10 @@ hr {
 </dl>
 <p>The backend object that talks to the data store for us.</p>
 <h2 id="Methods"><a class="u" href="#___top" title="go to top of document">Methods</a></h2>
-<h3 id=".new()"><a class="u" href="#___top" title="go to top of document">.new()</a></h3>
-<p>Parameters to .new() are:</p>
+<h3 id=".new"><a class="u" href="#___top" title="go to top of document">.new</a></h3>
+<p>Creates a new Database (ie. database object -- may be attaching to an existing database)</p>
+<pre class="pod-block-code">.new(Str$.backend = &#39;Memory&#39;)</pre>
+<p>Parameters to .new are:</p>
 <dl>
 <dt>Str $.backend = &#39;Memory&#39;</dt>
 <dd></dd>

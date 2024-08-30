@@ -61,7 +61,7 @@ for <Memory Postgres> -> $type {
 #	dd $table;
 #	say $table.backend-object;
 	subtest {
-		plan 10;
+		plan 11;
 
 		isa-ok($table, Table, "Made a Table of type $type");
 		does-ok($table, Relation, 'Table is a Relation');
@@ -78,7 +78,8 @@ for <Memory Postgres> -> $type {
 		lives-ok({ $table<name>[1] = 'Middle-Earth' }, "Didn't die when setting by column, then row");
 		is($table[1]<name>, 'Middle-Earth', "...and when fetching by row, then column, got the same result");
 
-		is($table.fields.elems, 11, "Found 11 fields in the CSV file");
+		is($table.fields.elems, 11, "Found 11 fields in the table");
+		is($table.elems, 249, "Found 249 rows in the table");
 	}, "Testing $type";
 	# Test it with raw Postgres to ensure caching isn't causing problems
 	$type eq 'Postgres' and do {

@@ -95,7 +95,7 @@ say "found";
 	}
 }
 
-class	Tuple::Postgres is Tuple {
+class	Tuple::Driver::Postgres is Tuple {
 	has	Table::Driver::Postgres	$!table is built is required;
 	has	Int						$.position;	# Position within the table
 	has	Bool					$.auto-update-database = True; # Indicates whether AT-KEY should update the database when written
@@ -126,7 +126,7 @@ class	Tuple::Postgres is Tuple {
 
 class	Table::Driver::Postgres does Table::Driver does Hash::Agnostic {
 	has	Database::Driver::Postgres	$!database is built is required;
-	has	Cursor::Driver::Postgres	$!basic-cursor handles <EXISTS-POS elems>;
+	has	Cursor::Driver::Postgres	$!basic-cursor handles <EXISTS-POS>;
 	has	Str							%!primary-keys;
 	has	Bool						$!needs-refresh = True;
 	has	Int							$!at-pos-cache-position = Nil;
@@ -141,6 +141,11 @@ class	Table::Driver::Postgres does Table::Driver does Hash::Agnostic {
 		my $rv = callsame;
 
 		return $rv;
+	}
+
+	# Can't delegate because we want it to call the basic-cursor method which will instantiate the object
+	method	elems() {
+		return $.basic-cursor.elems;
 	}
 
 	submethod	TWEAK(
@@ -321,7 +326,7 @@ class	Table::Driver::Postgres does Table::Driver does Hash::Agnostic {
 					$!at-pos-cache-item;
 				} else {
 					$!at-pos-cache-position = position;
-					$!at-pos-cache-item = Tuple::Postgres.new(
+					$!at-pos-cache-item = Tuple::Driver::Postgres.new(
 						table => self,
 						position => position,
 						initial-values => %( $.basic-cursor.AT-POS(position) ),
@@ -395,6 +400,7 @@ class	Cursor::Driver::Postgres does Positional {
 	has Bool						$!writable = False;
 	has	Bool						$!scrollable = False;
 	has	Bool						$!needs-update = False;
+	has Int							$!position;	# The current cursor position; zero-indexed, so one less than the Postgres number
 
 	submethod	TWEAK() {
 		if $!writable and $!scrollable {
@@ -420,6 +426,7 @@ class	Cursor::Driver::Postgres does Positional {
 	#	Must: elems, AT-POS, EXISTS-POS
 	#	May: DELETE-POS, ASSIGN-POS, BIND-POS, STORE
 	method	AT-POS(\position) {
+		$!position = position;
 		my $result = self.query(qq[FETCH ABSOLUTE {position+1} FROM "$!cursor-name";]);
 		return $result.allrows(:array-of-hash)[0];
 	}
@@ -429,11 +436,10 @@ class	Cursor::Driver::Postgres does Positional {
 	}
 
 	method	elems() {
+		self.query(qq{MOVE ABSOLUTE 0 FROM "$!cursor-name";});
 		my $result = self.query(qq{MOVE FORWARD ALL FROM "$!cursor-name";});
+		$!position = $result.rows - 1;
 		return $result.rows;
 	}
-
-#	method	AT-POS() {
-#	}
 }
 

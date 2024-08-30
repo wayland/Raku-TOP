@@ -1,3 +1,23 @@
+NAME
+====
+
+Raku TOP - Table Oriented Programming in Raku
+
+AUTHOR
+======
+
+Tim Nelson - https://github.com/wayland
+
+TITLE
+=====
+
+Raku TOP
+
+SUBTITLE
+========
+
+Table Oriented Programming in Raku
+
 TOP::Core
 =========
 
@@ -35,7 +55,9 @@ Methods
 
 ### .new
 
-Parameters to .new are:
+Creates a new Field.
+
+    .new(Relation :$relation, Any:U $type)
 
 **Relation :$relation**
 
@@ -47,7 +69,7 @@ The Field type. Optional. Just pass in the actual type (eg. Str -- no quotes nee
 
 ### type
 
-    method 	type(Any:U $value = Nil) {
+    method 	type(Any:U $value = Nil)
 
 Parameters:
 
@@ -103,7 +125,11 @@ The table name.
 Methods
 -------
 
-### .new Parameters to .new include:
+### .new
+
+Creates a new Table.
+
+    .new(Database :$database, Str :$backend = 'Memory', Str :$action = 'use')
 
 **Database :$database**
 
@@ -151,9 +177,13 @@ The backend object that talks to the data store for us.
 Methods
 -------
 
-### .new()
+### .new
 
-Parameters to .new() are:
+Creates a new Database (ie. database object -- may be attaching to an existing database)
+
+    .new(Str$.backend = 'Memory')
+
+Parameters to .new are:
 
 **Str $.backend = 'Memory'**
 
