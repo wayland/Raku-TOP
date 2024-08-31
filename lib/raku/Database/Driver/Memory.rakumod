@@ -13,7 +13,7 @@ use     TOP;
 
 =head1 Table::Driver::Memory
 
-	class	Table::Driver::Memory does Table::Driver is export {
+	class	Table::Driver::Memory does Table::Driver {
 
 =head1 Usage
 
@@ -34,12 +34,7 @@ not much you need to specify when using one of these.
 The parameters to Database.useTable are basically the same as are passed to Table.new().
 
 =end pod
-# TODO: See if we can remove 'is export' (and also from doco)
-class	Table::Driver::Memory does Table::Driver is export {
-	# TODO: Try removing this
-	# Currently public for access by Database object -- make protected/friend if useful
-	has		$.backend is rw;
-
+class	Table::Driver::Memory does Table::Driver {
 	# Currently public for access by Field object -- make protected/friend if useful
 	has	Tuple	@.rows handles <elems EXISTS-POS DELETE-POS ASSIGN-POS BIND-POS>;
 

@@ -232,8 +232,6 @@ class	Table does Relation is export {
 
 	# TODO: The formatting on the following table should use tabs -- try to improve it after the Pod6 rewite
 
-	# TODO: The formatting on the following table should use tabs -- try to improve it after the Pod6 rewite
-
 	=begin pod
 	=defn Str :$action = 'use'
 
