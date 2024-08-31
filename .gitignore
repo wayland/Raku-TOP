@@ -5,3 +5,6 @@
 .precomp
 lib/.precomp
 
+# IDE files
+.idea
+TOP.iml
