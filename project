@@ -38,7 +38,7 @@ multi	MAIN('build-docs', @filenames?) {
 		# Generate READMEs
 		my %includes = %(
 			class-refs => join("\n", @class-pod),
-			intro-docs => 'ids',
+			intro-docs => 'L<Raku Introductory Docs|https://wayland.github.io/table-oriented-programming/Raku-TOP/Introduction.xml>',
 		);
 
 		my $this-readme-text = $readme-text;
@@ -151,7 +151,6 @@ sub	build-docs($format-name, $format-extension, $type, $sourcefile, :$source-tex
 	if ($source-text ~~ Nil) {
 		$use-source-text = $sourcefile.IO.slurp;
 		do_cmd("cat $sourcefile | RAKULIB=lib/raku raku --doc=$format-name - > $target-file", use => 'qqx');
-		say "after";
 	} else {
 		$use-source-text = $source-text;
 		my $p = shell "RAKULIB=lib/raku raku --doc=$format-name - > $target-file", :in;

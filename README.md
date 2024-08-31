@@ -10,7 +10,7 @@ This package implements TOP in Raku.
 Raku TOP Introductory Documents
 -------------------------------
 
-ids
+[Raku Introductory Docs](https://wayland.github.io/table-oriented-programming/Raku-TOP/Introduction.xml)
 
 Raku TOP Class References
 -------------------------

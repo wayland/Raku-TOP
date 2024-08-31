@@ -11,7 +11,7 @@ This package implements TOP in Raku.
 
   Raku TOP Introductory Documents
 
-ids
+Raku Introductory Docs
 
   Raku TOP Class References
 

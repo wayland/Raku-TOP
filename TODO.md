@@ -1,6 +1,4 @@
 # First Iteration Tasks
--	Register with zef/fez: https://docs.raku.org/language/modules#Upload_your_module_to_zef_ecosystem
--	Investigate registering with raku.land (so I can upload modules) -- uploading to fez might be enough
 -	Module ready to use; publicise
 	-	Announce on #raku
 	-	Link to it from my TOP site -- maybe start replacing parts of Raku TOP with the doco I've written
@@ -39,4 +37,6 @@ DONE	Finish off tests for Memory and Postgres types
 DONE	Write github tests based on DBIish (but comment out lots)
 DONE	Write Pod doco
 DONE	Go through and remove all the extraneous code
+DONE	Register with zef/fez: https://docs.raku.org/language/modules#Upload_your_module_to_zef_ecosystem
+DONE	Investigate registering with raku.land (so I can upload modules) -- uploading to fez might be enough
 
