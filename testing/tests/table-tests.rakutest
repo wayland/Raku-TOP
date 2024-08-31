@@ -6,6 +6,9 @@ use	Test;
 use	CSV::Parser;
 
 use	lib 'lib/raku';
+
+plan 1;
+use-ok "TOP";
 use	TOP;
 
 say "Prepping for tests";
@@ -13,9 +16,9 @@ say "Prepping for tests";
 my $full_filename = 'all-countries.csv';
 my $file_handle = open $full_filename, :r;
 my $parser = CSV::Parser.new(
-                :$file_handle,
-                :contains_header_row,
-                );
+	:$file_handle,
+	:contains_header_row,
+);
 my @rows;
 until $file_handle.eof {
 	my %data;

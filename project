@@ -54,7 +54,7 @@ multi	MAIN($action) {
 	given ($action) {
 		when 'test' {
 			do_cmd("$docker_compose_command up -d");
-			do_cmd("docker exec raku_raku_1 /bin/bash -lc ./table-tests.rakutest");
+			do_cmd("docker exec raku_raku_1 /bin/bash -lc ./table-tests.rakutest 2>&1");
 		}
 		when 'build' {
 			do_cmd("$docker_compose_command build raku");

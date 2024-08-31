@@ -1,0 +1,19 @@
+{
+	"name": "TOP",
+	"description": "Table-Oriented Programming (TOP) module for Raku",
+	"version": "0.0.1"
+
+	"auth": "zef:wayland",
+
+	"build-depends": [
+	],
+	"depends": [
+	],
+	"provides": {
+		"TOP": "lib/TOP.rakumod"
+	},
+	"resources": [
+	],
+	"test-depends": [
+	],
+}
