@@ -370,22 +370,31 @@ hr {
     <nav class="indexgroup">
 <table id="TOC">
 <caption><h2 id="TOC_Title">Table of Contents</h2></caption>
-    <tr class="toc-level-1"><td class="toc-number">1</td><td class="toc-text"><a href="#Table::Driver">Table::Driver</a></td></tr>
-    <tr class="toc-level-2"><td class="toc-number">1.1</td><td class="toc-text"><a href="#Attributes">Attributes</a></td></tr>
-   <tr class="toc-level-2"><td class="toc-number">1.2</td><td class="toc-text"><a href="#Methods">Methods</a></td></tr>
- <tr class="toc-level-3"><td class="toc-number">1.2.1</td><td class="toc-text"><a href="#.new">.new</a></td></tr>
-       <tr class="toc-level-3"><td class="toc-number">1.2.2</td><td class="toc-text"><a href="#exists">exists</a></td></tr>
-   <tr class="toc-level-3"><td class="toc-number">1.2.3</td><td class="toc-text"><a href="#.add-field">.add-field</a></td></tr>
-     <tr class="toc-level-1"><td class="toc-number">2</td><td class="toc-text"><a href="#Database::Driver">Database::Driver</a></td></tr>
-     <tr class="toc-level-2"><td class="toc-number">2.1</td><td class="toc-text"><a href="#Methods">Methods</a></td></tr>
- <tr class="toc-level-3"><td class="toc-number">2.1.1</td><td class="toc-text"><a href="#.useTable">.useTable</a></td></tr>
-  
+    <tr class="toc-level-1"><td class="toc-number">1</td><td class="toc-text"><a href="#Database::Driver">Database::Driver</a></td></tr>
+     <tr class="toc-level-2"><td class="toc-number">1.1</td><td class="toc-text"><a href="#Methods">Methods</a></td></tr>
+ <tr class="toc-level-3"><td class="toc-number">1.1.1</td><td class="toc-text"><a href="#.useTable">.useTable</a></td></tr>
+   <tr class="toc-level-1"><td class="toc-number">2</td><td class="toc-text"><a href="#Table::Driver">Table::Driver</a></td></tr>
+    <tr class="toc-level-2"><td class="toc-number">2.1</td><td class="toc-text"><a href="#Attributes">Attributes</a></td></tr>
+   <tr class="toc-level-2"><td class="toc-number">2.2</td><td class="toc-text"><a href="#Methods">Methods</a></td></tr>
+ <tr class="toc-level-3"><td class="toc-number">2.2.1</td><td class="toc-text"><a href="#.new">.new</a></td></tr>
+        <tr class="toc-level-3"><td class="toc-number">2.2.2</td><td class="toc-text"><a href="#exists">exists</a></td></tr>
+    <tr class="toc-level-3"><td class="toc-number">2.2.3</td><td class="toc-text"><a href="#.add-field">.add-field</a></td></tr>
+    
 </table>
 </nav>
 
 
     <div class="pod-body">
-    <h1 id="Table::Driver"><a class="u" href="#___top" title="go to top of document">Table::Driver</a></h1>
+    <h1 id="Database::Driver"><a class="u" href="#___top" title="go to top of document">Database::Driver</a></h1>
+<p>The parent class for all the different Database Drivers (backends).</p>
+<pre class="pod-block-code">role	Database::Driver
+
+</pre>
+<h2 id="Methods"><a class="u" href="#___top" title="go to top of document">Methods</a></h2>
+<h3 id=".useTable"><a class="u" href="#___top" title="go to top of document">.useTable</a></h3>
+<pre class="pod-block-code">method	useTable(Table :$table, *%params)</pre>
+<p>Returns a table belonging to the database. Parameters vary from driver to driver.</p>
+<h1 id="Table::Driver"><a class="u" href="#___top" title="go to top of document">Table::Driver</a></h1>
 <pre class="pod-block-code">role	Table::Driver does Associative does Positional {
 
 </pre>
@@ -405,11 +414,17 @@ hr {
 <h2 id="Methods"><a class="u" href="#___top" title="go to top of document">Methods</a></h2>
 <h3 id=".new"><a class="u" href="#___top" title="go to top of document">.new</a></h3>
 <p>Creates a Table::Driver.</p>
-<pre class="pod-block-code">.new(Relation :$frontend-object, Str :$action, Str :%fields)</pre>
+<pre class="pod-block-code">.new(Database::Driver :$database, Relation :$frontend-object, Str :$action, Str :%fields)</pre>
 <p>Parameters to .new are:</p>
 <dl>
 <dt>Relation $frontend-object</dt>
 <dd><p>The frontend object that is using this backend object.</p>
+</dd>
+
+</dl>
+<dl>
+<dt>Database::Driver :$database</dt>
+<dd><p>The Database::Driver with which this Table::Driver is connected.</p>
 </dd>
 
 </dl>
@@ -427,7 +442,8 @@ hr {
 </dl>
 <h3 id="exists"><a class="u" href="#___top" title="go to top of document">exists</a></h3>
 <p>Returns True if the table already exists.</p>
-<pre class="pod-block-code">method	.exists(Str :$true-error, Str :$false-error) {...}</pre>
+<pre class="pod-block-code">method	.exists(Str :$true-error, Str :$false-error)</pre>
+<p>If $true-error is passed, and the table exists, the function will die with the passed error. If $false-error is passed, and the table doesn&#39;t exist, the function will die with the passed error.</p>
 <h3 id=".add-field"><a class="u" href="#___top" title="go to top of document">.add-field</a></h3>
 <p>Adds a field to the table</p>
 <pre class="pod-block-code">.add-field(Table :$relation, Str :$name, Any:U $type)</pre>
@@ -443,15 +459,6 @@ hr {
 </dd>
 
 </dl>
-<h1 id="Database::Driver"><a class="u" href="#___top" title="go to top of document">Database::Driver</a></h1>
-<p>The parent class for all the different Database Drivers (backends).</p>
-<pre class="pod-block-code">role	Database::Driver
-
-</pre>
-<h2 id="Methods"><a class="u" href="#___top" title="go to top of document">Methods</a></h2>
-<h3 id=".useTable"><a class="u" href="#___top" title="go to top of document">.useTable</a></h3>
-<pre class="pod-block-code">method	useTable(Table :$table, *%params)</pre>
-<p>Returns a table belonging to the database. Parameters vary from driver to driver.</p>
 
     </div>
 

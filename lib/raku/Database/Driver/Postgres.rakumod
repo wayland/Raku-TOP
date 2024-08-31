@@ -3,23 +3,56 @@ use	TOP;
 use	DBIish;
 use	Slang::Otherwise;
 
+# Pre-declarations so that we can use class names
 class	Cursor::Driver::Postgres {...}
 class	Table::Driver::Postgres does Table::Driver {...}
 
 
-# Postgres driver
+=begin pod
+
+=NAME Postgres Driver - The Postgres driver for Raku TOP
+
+=TITLE Postgres Driver
+
+=SUBTITLE The Postgres driver for Raku TOP
+
+=AUTHOR Tim Nelson - https://github.com/wayland
+
+=head1 Database::Driver::Postgres
+
+=begin code
+
+class	Database::Driver::Postgres does Database::Driver {
+
+=end code
+
+Currently uses a cursor for all reads.  What we'd like to change is:
+
+=item1 The user can specify a mode:
+=item2 B<Key:> Uses a key field (default: primary key) to track rows; doesn't matter if we miss some when paginating, etc (ie. if others have been added into the sequence)
+=item2 B<NumKey:> Like Key, but the key has to be numeric
+=item2 B<Sort+Key:> Like Key, but also applies an ordering to the table (ie. an ordering other than by Key)
+=item2 B<Cursor:> Uses cursors to match things up; could be suitable for eg. batch jobs
+
+The current (only) behaviour is Cursor.  We'd like to make the other options available, and default to NumKey (since it's probably the quickest, and loads the database least).
+
+=head2 Methods
+
+=end pod
+
+
 class	Database::Driver::Postgres does Database::Driver {
 	has	$.database-name;
 	has	$.handle;
 	has	%!tableObjects;
 
+	# Set up the Database Driver
 	submethod	TWEAK(:$database-name, :$username is copy) {
-		say "t1";
+		# Check the parameters
 		$!database-name or die "Error: no database name passed in";
 		$username or $username = Database::Driver::Postgres.get_username();
-say "t2 {$database-name} ## {$username}";
 
-		# PostgreSQL config
+		# Read PostgreSQL config and map into fields that can be passed to DBIish.connect
 		my @lines = (%*ENV<HOME> ~ "/.pgpass").IO.slurp.split(/\n/);
 		my %pgpass;
 		given * {
@@ -33,56 +66,50 @@ say "t2 {$database-name} ## {$username}";
 					$line ~~ /^\s*$/ and next;
 					%pgpass = <host port database user password> Z=> split(/\:/, $line);
 					# In theory, "succeed" should not work here.  In theory, there's a "leave" keyword that *should* work here
-say "Matching $fieldname '{%pgpass{$fieldname}}' against {$regexp.raku}";
-					(%pgpass{$fieldname} ~~ /<$regexp>/) and do { say "succeeding"; succeed; }
+					(%pgpass{$fieldname} ~~ /<$regexp>/) and do { succeed; }
 				}
 			}
 			default { die "Did not match any .pgpass entries"; }
 		}
 		%pgpass<database> eq '*' and %pgpass<database> = $!database-name;
 
+		# Set up actual connection to database
 		$!handle = DBIish.connect('Pg', |%pgpass);
 	}
 
-	method	table_object(:$table-name = Any, :$tableclass = DominionDocuments::Database::SheetFromTable, :$toname = Any) {
-		defined($table-name) or return %!tableObjects{$toname};
-
-say "Making {$tableclass.raku} ($table-name, $toname)";
-		%!tableObjects{$toname} = $tableclass.new(
-			:$table-name,
-			session => self,
-		);
-
-		return %!tableObjects{$toname};
-	}
-
-	# Class method; calls 'new'
-	method	create(*%params) {
-		qx/createdb {$params{database-name}}/;
-		Database::Driver::Postgres.new(|%params);
-	}
-
-	# Should be callable as a class method
+	# Fetch OS username on local (Unix) system
+	# Needs to be callable as a class method so that it can be called from TWEAK, above
 	method	get_username {
 		my $username;
-say 'Er' ~ %*ENV.raku;
 		for <LOGNAME USER USERNAME> -> $varname {
 			$username = %*ENV{$varname};
 			$username and last;
 		}
 		$username or do {
-say "H1 " ~ %*ENV{'HOME'};
-say "H2 " ~ %*ENV{'HOME'}.split(/\//);
-say "H3 " ~ %*ENV{'HOME'}.split(/\//).tail;
 			$username = %*ENV{'HOME'}.split(m{\/}).tail;
 		};
 
 		return $username;
 	}
 
+	=begin pod
+	=head3 .useTable
+
+	=begin code
+	method	useTable(Table :$table, Str :$action = 'use', :%fields = {}) {
+	=end code
+
+	=defn Table :$table
+	The frontend table object that's going to reference this backend
+	=defn Str :$action = 'use'
+	Documented in TOP Table.new()
+
+	=defn :%fields = {}
+	The fields to be used on the table.
+
+	=end pod
 	method	useTable(Table :$table, Str :$action = 'use', :%fields = {}) {
 		my Str $name = $table.name;
-		say "useTable $name";
 
 		%!tableObjects{$name} = Table::Driver::Postgres.new(
 			database => self,
@@ -90,24 +117,24 @@ say "H3 " ~ %*ENV{'HOME'}.split(/\//).tail;
 			fields => %fields,
 			action => $action,
 		);
-say "found";
 		return %!tableObjects{$name};
 	}
 }
 
+# Represents a Postgres tuple
 class	Tuple::Driver::Postgres is Tuple {
-	has	Table::Driver::Postgres	$!table is built is required;
-	has	Int						$.position;	# Position within the table
-	has	Bool					$.auto-update-database = True; # Indicates whether AT-KEY should update the database when written
-	has	Proxy					$!proxy;
+	has	Table::Driver::Postgres	$!table is built is required;	# The table in which the Tuple is stored
+	has	Int						$.position;						# Position within the table
+	has	Bool					$.auto-update-database = True;	# Indicates whether AT-KEY should update the database when written
 
 	submethod	TWEAK(:%initial-values) {
-		# Set up hash values
+		# Set up initial values in this tuple
 		%initial-values.kv.map: -> $key, $value { self.Tuple::AT-KEY($key) = $value };
 
 		return True;
 	}
 
+	# Sets/fetches one cell in this Tuple
 	method	AT-KEY($key) is raw {
 		my $fullself = self;
 		my $p := Proxy.new(
@@ -124,20 +151,18 @@ class	Tuple::Driver::Postgres is Tuple {
 	}
 }
 
+
 class	Table::Driver::Postgres does Table::Driver does Hash::Agnostic {
-	has	Database::Driver::Postgres	$!database is built is required;
-	has	Cursor::Driver::Postgres	$!basic-cursor handles <EXISTS-POS>;
-	has	Str							%!primary-keys;
-	has	Bool						$!needs-refresh = True;
+	has	Cursor::Driver::Postgres	$!basic-cursor handles <EXISTS-POS>;	# Holds the cursor that does some of the work for us -- see note at top about how we'd like this to be more optional
+	has	Str							%!column-keys;							# Maps a Field name to its primary key in information_schema.columns
+#	has	Bool						$!needs-refresh = True;
+
+	# Persistent cache for .AT-POS; only caches a single item
 	has	Int							$!at-pos-cache-position = Nil;
 	has								$!at-pos-cache-item;
 
-#	has				$!use-cache;
-	# Currently public for access by Field object -- make protected/friend if useful
-#	has	Tuple		@.cache handles <EXISTS-POS DELETE-POS ASSIGN-POS BIND-POS>;
-
 	# Required to resolve between parent classes
-	method	new(:$database) {
+	method	new(Database::Driver :$database) {
 		my $rv = callsame;
 
 		return $rv;
@@ -153,18 +178,20 @@ class	Table::Driver::Postgres does Table::Driver does Hash::Agnostic {
 	) {
 		# Set up object
 		if $!init-create {
+			# TODO: Implement create
 			die "Create not implemented yet";
 			#			%!tableObjects{$name} = Table::Driver::Postgres.new(
 			#				database => self,
 			#				frontend-object => $table,
 			#			);
 		} elsif $!init-alter {
+			# TODO: Implement alter
 			die "Alter not implemented yet";
 		} else {
-			say "Not altering or creating";
+			say "Not altering or creating -- we'll give it a go";
 		}
-		say "Table object created";
 
+		# Populate %!column-keys (see Attributes, above)
 		my $handle = self.query(qq:to/EOT/);
 			SELECT c.column_name, c.data_type
 			FROM information_schema.table_constraints tc
@@ -175,17 +202,17 @@ class	Table::Driver::Postgres does Table::Driver does Hash::Agnostic {
 		EOT
 		for $handle.allrows() -> $row {
 			my ($key, $value) = $row;
-			%!primary-keys{$key} = $value;
+			%!column-keys{$key} = $value;
 		}
 	}
 
-	method	exists(Str :$true-error, Str :$false-error) {
+	# Returns True if the table exists; see Table::Driver for more info
+	method	raw-exists() {
 		my Bool $exists =  self.create_fields_from_columns();
-		$exists and $true-error.defined and die "{$true-error} in database '{$!database.database-name}'";
-		! $exists and $false-error.defined and die "{$false-error} in database '{$!database.database-name}'";
 		return $exists;
 	}
 
+	# Use the columns in the Postgres database to create Field objects
 	method	create_fields_from_columns() {
 		if %!field-indices.elems { return True; }
 		my @rows = self.fetch_columns();
@@ -209,6 +236,7 @@ class	Table::Driver::Postgres does Table::Driver does Hash::Agnostic {
 		return True;
 	}
 
+	# Fetches a list of all the columns in the Postgres database for this table
 	method	fetch_columns() {
 		my $statement-handle = self.query(qq:to/STATEMENT/);
 			SELECT *
@@ -221,7 +249,7 @@ class	Table::Driver::Postgres does Table::Driver does Hash::Agnostic {
 			return($statement-handle.allrows(:array-of-hash));
 	}
 
-
+	# Creates a table in the Postgres database from the Fields connected to this Table object
 	method	create-table-from-fields(Bool $alter = False) {
 		if ! @!fields.elems { die "Error: can't create table from fields when no fields exist"; }
 		my @column-specs;
@@ -232,12 +260,11 @@ class	Table::Driver::Postgres does Table::Driver does Hash::Agnostic {
 			my $extra = %extras{$field.name}:exists ?? %extras{$field.name} !! '';
 			@column-specs.push: qq["{$field.name}" {self.postgres-type-from-raku-type($field.name)} {$extra}];
 		}
-		say 'column-specs';
-		say @column-specs;
 		my $column-specs = @column-specs.join(', ');
 		self.query("CREATE TABLE {$!frontend-object.name} ($column-specs)");
 	}
 
+	# What it does: Given the name of a Field, returns the name of the Postgres type that matches the Raku type associated with that field
 	# We're intending that this work for:
 	# -	Raku Num, Int -> Numeric types (and maybe we could refine this with eg. Raku int16, etc -- https://docs.raku.org/language/nativetypes)
 	# -	Raku Str -> Character Types
@@ -247,7 +274,10 @@ class	Table::Driver::Postgres does Table::Driver does Hash::Agnostic {
 	# -	Raku array/hash -> JSON, XML, or array types
 	# https://www.postgresql.org/docs/current/datatype.html
 	method	postgres-type-from-raku-type(Str $field-name) {
+		# Gets the Raku type of the field name that was passed in
 		my $raku-type = self.{$field-name}.type();
+		# Sets up table of type translations
+		# TODO: we should find somewhere more useful to store this.
 		my %type-translations = %{
 			'Int' => 'bigint',
 			'Num' => 'numeric',
@@ -259,12 +289,18 @@ class	Table::Driver::Postgres does Table::Driver does Hash::Agnostic {
 			'Duration' => 'interval',
 			'Bool' => 'boolean',
 		};
+		# Gets the Postgres type associated with the Raku type
 		my $postgres-type = %type-translations{$raku-type.^name};
 		return $postgres-type;
 	}
 
+	# Uses an Array of Hash to fill in the rows of the table
+	# TODO:
+	# - Create a "fill" function that takes another Table as the source
+	# -	On Table::Driver::Memory, make a fill function that takes an AOH
+	# -	Remove this function, since it can be replaced with "fill"
 	method	fill_from_aoh(@rows) {
-		say "fill_from_aoh not fully implemented yet";
+		say "fill_from_aoh will be replaced with 'fill' someday";
 		my Any:U %field-types;
 		for @rows -> $row {
 			for $row.kv -> $field-name, $field-value {
@@ -294,14 +330,14 @@ class	Table::Driver::Postgres does Table::Driver does Hash::Agnostic {
 		}
 	}
 
-	method  of() { return Mu; }
-
-
+	# Runs a SQL query on this database
+	# TODO: possibly this should be moved to the $!database itself
 	method	query(Str $sql) {
 		#say "SQL is " ~ $sql;
 		return $!database.handle.execute($sql);
 	}
 
+	# If $!basic-cursor is defined, return it, otherwise make it
 	method	basic-cursor() {
 		defined $!basic-cursor and return $!basic-cursor;
 		my $table-name = $!frontend-object.name;
@@ -322,26 +358,22 @@ class	Table::Driver::Postgres does Table::Driver does Hash::Agnostic {
 		my $p := Proxy.new(
 			FETCH => {
 #				say "Table P AT-POS FETCH {position}";
-				if defined($!at-pos-cache-position) and position == $!at-pos-cache-position {
-					$!at-pos-cache-item;
-				} else {
+				if ! (defined($!at-pos-cache-position) and position == $!at-pos-cache-position) {
 					$!at-pos-cache-position = position;
 					$!at-pos-cache-item = Tuple::Driver::Postgres.new(
 						table => self,
 						position => position,
 						initial-values => %( $.basic-cursor.AT-POS(position) ),
 					);
-					say "starting acpi";
-					say "apci: " ~ $!at-pos-cache-item{'name'};
 				}
 				$!at-pos-cache-item;
 			},
 			STORE => -> $, \value {
-				say "Table P AT-POS STORE {position}";
+#				say "Table P AT-POS STORE {position}";
 				my $item = $.basic-cursor.AT-POS(position);
 				my %where;
-				if %!primary-keys.elems {
-					for %!primary-keys.keys -> $key {
+				if %!column-keys.elems {
+					for %!column-keys.keys -> $key {
 						%where{$key} = $item{$key};
 					}
 				} else {
@@ -353,18 +385,23 @@ class	Table::Driver::Postgres does Table::Driver does Hash::Agnostic {
 				my $result = self.query(qq[UPDATE {$!frontend-object.name} SET $set-string WHERE $where-string]);
 			},
 		);
-		say "Table backend: " ~ $p.VAR.^name;
+#		say "Table backend: " ~ $p.VAR.^name;
 		return-rw $p;
 	}
 
+	# SQL string escaping function for next function
+	# TODO:  should probably be moved to $!database
+	# $as-string says whether it should be quoted like a string or not
 	method	escape(Str $text is copy, Bool :$as-string = False) {
 		$text ~~ s/\'/''/;
 		return $as-string ?? qq{'$text'} !! $text;
 	}
 
+	# Converts a Raku hash to a string suitable for use in SQL
 	# Formats are:
 	# -	equals: key = value, suitable for use in SET and WHERE clauses
-	# -	insert: Returns two ordered, comma-separated list suitable for use in INSERT statements
+	# -	insert: Returns two ordered, comma-separated lists suitable for use in INSERT statements
+	# TODO:  should probably be moved to $!database
 	method	hash-to-sql(%hash, :$format = 'equals', :$join = ',') {
 		given $format {
 			when 'equals' {
@@ -373,12 +410,10 @@ class	Table::Driver::Postgres does Table::Driver does Hash::Agnostic {
 				}).join(' ' ~ $join ~ ' ');
 			}
 			when 'insert' {
-				say "insert";
 				my @fieldnames;
 				my @fieldvalues;
 				for %hash.kv -> $fieldname, $fieldvalue {
 					push @fieldnames, $fieldname;
-					dd $fieldvalue;
 					push @fieldvalues, self.escape($fieldvalue, :as-string);
 				}
 				my $field-names = @fieldnames.map({ qq{"$_"} }).join(', ');
@@ -392,6 +427,7 @@ class	Table::Driver::Postgres does Table::Driver does Hash::Agnostic {
 	}
 }
 
+# Represents a cursor on a database
 class	Cursor::Driver::Postgres does Positional {
 	has	Database::Driver::Postgres	$!database		is built is required;
 	has	Str							$!cursor-name	is built is required;
@@ -414,11 +450,11 @@ class	Cursor::Driver::Postgres does Positional {
 			$sql = qq{DECLARE "$!cursor-name" $scrollable-text CURSOR WITH HOLD FOR SELECT * FROM "$!table-name"};
 		}
 		$!handle = self.query($sql);
-		say "Cursor " ~ $!handle.rows;
 	}
 
+	# TODO: Look at moving to $!database
 	method	query(Str $sql) {
-		say "Cursor SQL is " ~ $sql;
+		#say "Cursor SQL is " ~ $sql;
 		return $!database.handle.execute($sql);
 	}
 

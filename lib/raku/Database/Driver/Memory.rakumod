@@ -49,12 +49,12 @@ class	Table::Driver::Memory does Table::Driver {
 	has	Str	$!overflow-field-name;
 
 	# Doco: Documented in Table::Driver
-	# TODO: Align better with the one in the Postgres module
-	method	exists(Str :$true-error, Str :$false-error) {
-		$false-error.defined and die $false-error ~ " in Memory";
+	# TODO: a) Populate Table::Driver::Memory.database and b) make this check database.tables
+	method	raw-exists() {
 		return False;
 	}
 
+	# Makes a Tuple object from the key/values specified in %items, and returns it
 	multi	method	makeTuple(%items) {
 
 		#		die "fm2: {$!field-mode}";
@@ -82,6 +82,7 @@ class	Table::Driver::Memory does Table::Driver {
 		Tuple.new(%items);
 	}
 
+	# Allows people to assign to this table
 	multi	method	STORE(\values, :$INITIALIZE) {
 		for values -> $row {
 			@!rows.STORE(self.makeTuple($row), :$INITIALIZE);
@@ -90,6 +91,7 @@ class	Table::Driver::Memory does Table::Driver {
 		return self;
 	}
 
+	# If we don't have this, we get the error: Method 'of' must be resolved by class Table::Driver::Memory because it exists in multiple roles (Associative, Positional)
 	method	of() { return Mu; }
 
 	# Positional interface, used for rows
@@ -163,15 +165,6 @@ class	Table::Driver::Memory does Table::Driver {
 		%!field-indices.EXISTS-KEY(key)
 	}
 
-	method gist() {
-#		'gist-needs-fixing' ~ '{' ~ self.pairs.map( *.gist).join(", ") ~ '}' ~ ' gnf';
-		self.values.map( *.Str ).join(" ") ~ ' .gist-needs-fixing'
-	}
-
-	method Str() {
-		'Str-needs-fixing' ~ self.pairs.join(" ")
-	}
-
 	##### Other methods
 	method	fill_from_aoh(@rows) {
 		for @rows -> $row {
@@ -180,20 +173,17 @@ class	Table::Driver::Memory does Table::Driver {
 	}
 }
 
+# Implements Database::Driver for the Memory type
 class	Database::Driver::Memory does Database::Driver {
-	my	Database::Driver::Memory	$primary-instance;	# Implement Singleton
+	my	Database::Driver::Memory	$primary-instance;	# Help implement Singleton
 	has	%tables;
 
 	# Singleton pattern
 	method	new(:$name) {
-		say "new DDM";
 		if $name {
-			say "new DDM 3";
 			nextsame;
 		} else {
-			say "new DDM 4";
 			$primary-instance or $primary-instance = callsame;
-			say "new DDM 5";
 			return $primary-instance;
 		}
 	}
@@ -205,7 +195,6 @@ class	Database::Driver::Memory does Database::Driver {
 			frontend-object => $table,
 			|%params
 		);
-		say "uTM1" ~ $backend-table.raku;
 
 		%tables{$table.name} = $backend-table;
 

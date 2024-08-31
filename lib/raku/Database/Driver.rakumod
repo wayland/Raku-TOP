@@ -11,6 +11,36 @@ use	TOP;
 
 =AUTHOR Tim Nelson - https://github.com/wayland
 
+=head1 Database::Driver
+
+The parent class for all the different Database Drivers (backends).
+
+=begin code
+
+role	Database::Driver
+
+=end code
+
+=head2 Methods
+
+=end pod
+role	Database::Driver {
+	=begin pod
+	=head3 .useTable
+
+		method	useTable(Table :$table, *%params)
+
+	Returns a table belonging to the database.  Parameters vary from driver to driver.
+	=end pod
+	method	useTable(Table :$table, *%params) {...}
+	#method	useTable(Table :$table, Str :$action = 'use', :%fields = {}) {
+	#method	useTable(Table :$table, *%params) {
+	#method	useTable(Table :$table, Str :$filename) {
+
+}
+
+=begin pod
+
 =head1 Table::Driver
 
 =begin code
@@ -44,13 +74,19 @@ role	Table::Driver does Associative does Positional {
 
 	Creates a Table::Driver.
 
-		.new(Relation :$frontend-object, Str :$action, Str :%fields)
+		.new(Database::Driver :$database, Relation :$frontend-object, Str :$action, Str :%fields)
 
 	Parameters to .new are:
 	=defn Relation $frontend-object
 	The frontend object that is using this backend object.
 	=end pod
-	has	Relation	$!frontend-object	is built is required;
+	has	Relation			$!frontend-object	is built is required;
+	=begin pod
+	=defn Database::Driver	:$database
+	The Database::Driver with which this Table::Driver is connected.
+	=end pod
+	has	Database::Driver	$!database			is built;		# Links to the database
+	# TODO: Make the above "is required" once the Memory driver supports it
 
 	# Only used during initialisation
 	has	Bool		$!init-create = False;
@@ -101,12 +137,21 @@ role	Table::Driver does Associative does Positional {
 
 	Returns True if the table already exists.
 
-		method	.exists(Str :$true-error, Str :$false-error) {...}
+		method	.exists(Str :$true-error, Str :$false-error)
+
+	If $true-error is passed, and the table exists, the function will die with the passed error.
+	If $false-error is passed, and the table doesn't exist, the function will die with the passed error.
 
 	=end pod
-	method	exists(Str :$true-error, Str :$false-error) {...}
-	# Abstracts
+	method	exists(Str :$true-error, Str :$false-error) {
+		my Bool $exists =  self.raw-exists();
+		$exists and $true-error.defined and die "{$true-error} in database '{$!database.database-name}'";
+		! $exists and $false-error.defined and die "{$false-error} in database '{$!database.database-name}'";
+		return $exists;
+	}
+	##### Abstracts
 	method fill_from_aoh(@rows) {...}
+	method	raw-exists() {...}	# Helper function for .exists, above
 
 	# Associative interface, used for fields
 	# 	Must: AT-KEY, EXISTS-KEY
@@ -164,31 +209,3 @@ role	Table::Driver does Associative does Positional {
 	}
 }
 
-=begin pod
-=head1 Database::Driver
-
-The parent class for all the different Database Drivers (backends).
-
-=begin code
-
-role	Database::Driver
-
-=end code
-
-=head2 Methods
-
-=end pod
-role	Database::Driver {
-	=begin pod
-	=head3 .useTable
-
-		method	useTable(Table :$table, *%params)
-
-	Returns a table belonging to the database.  Parameters vary from driver to driver.
-	=end pod
-	method	useTable(Table :$table, *%params) {...}
-#method	useTable(Table :$table, Str :$action = 'use', :%fields = {}) {
-#method	useTable(Table :$table, *%params) {
-#method	useTable(Table :$table, Str :$filename) {
-
-}

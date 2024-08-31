@@ -18,6 +18,22 @@ AUTHOR
 
 Tim Nelson - https://github.com/wayland
 
+Database::Driver
+================
+
+The parent class for all the different Database Drivers (backends).
+
+    role	Database::Driver
+
+Methods
+-------
+
+### .useTable
+
+    method	useTable(Table :$table, *%params)
+
+Returns a table belonging to the database. Parameters vary from driver to driver.
+
 Table::Driver
 =============
 
@@ -41,13 +57,17 @@ Methods
 
 Creates a Table::Driver.
 
-    .new(Relation :$frontend-object, Str :$action, Str :%fields)
+    .new(Database::Driver :$database, Relation :$frontend-object, Str :$action, Str :%fields)
 
 Parameters to .new are:
 
 **Relation $frontend-object**
 
 The frontend object that is using this backend object.
+
+**Database::Driver :$database**
+
+The Database::Driver with which this Table::Driver is connected.
 
 **Str $action**
 
@@ -61,7 +81,9 @@ If relevant, the fields to use in creating/altering the table
 
 Returns True if the table already exists.
 
-    method	.exists(Str :$true-error, Str :$false-error) {...}
+    method	.exists(Str :$true-error, Str :$false-error)
+
+If $true-error is passed, and the table exists, the function will die with the passed error. If $false-error is passed, and the table doesn't exist, the function will die with the passed error.
 
 ### .add-field
 
@@ -76,20 +98,4 @@ The name of the field being added
 **Any:U $type**
 
 The type of the field, as a Raku type
-
-Database::Driver
-================
-
-The parent class for all the different Database Drivers (backends).
-
-    role	Database::Driver
-
-Methods
--------
-
-### .useTable
-
-    method	useTable(Table :$table, *%params)
-
-Returns a table belonging to the database. Parameters vary from driver to driver.
 

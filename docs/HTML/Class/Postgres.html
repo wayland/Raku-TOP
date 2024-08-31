@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <title></title>
+    <title>Postgres Driver</title>
     <meta charset="UTF-8"/>
     <style>hr,
 img {
@@ -367,10 +367,53 @@ hr {
 
 <body class="pod">
     <div id="___top"></div>
-    
+    <nav class="indexgroup">
+<table id="TOC">
+<caption><h2 id="TOC_Title">Table of Contents</h2></caption>
+    <tr class="toc-level-1"><td class="toc-number">1</td><td class="toc-text"><a href="#Database::Driver::Postgres">Database::Driver::Postgres</a></td></tr>
+               <tr class="toc-level-2"><td class="toc-number">1.1</td><td class="toc-text"><a href="#Methods">Methods</a></td></tr>
+ <tr class="toc-level-3"><td class="toc-number">1.1.1</td><td class="toc-text"><a href="#.useTable">.useTable</a></td></tr>
+     
+</table>
+</nav>
 
-    <div class="pod-body no-toc">
-    
+
+    <div class="pod-body">
+    <h1 id="Database::Driver::Postgres"><a class="u" href="#___top" title="go to top of document">Database::Driver::Postgres</a></h1>
+<pre class="pod-block-code">class	Database::Driver::Postgres does Database::Driver {
+
+</pre>
+<p>Currently uses a cursor for all reads. What we&#39;d like to change is:</p>
+<ul><li><p>The user can specify a mode:</p>
+</li>
+<ul><li><p><strong>Key:</strong> Uses a key field (default: primary key) to track rows; doesn&#39;t matter if we miss some when paginating, etc (ie. if others have been added into the sequence)</p>
+</li>
+<li><p><strong>NumKey:</strong> Like Key, but the key has to be numeric</p>
+</li>
+<li><p><strong>Sort+Key:</strong> Like Key, but also applies an ordering to the table (ie. an ordering other than by Key)</p>
+</li>
+<li><p><strong>Cursor:</strong> Uses cursors to match things up; could be suitable for eg. batch jobs</p>
+</li>
+</ul>
+</ul>
+<p>The current (only) behaviour is Cursor. We&#39;d like to make the other options available, and default to NumKey (since it&#39;s probably the quickest, and loads the database least).</p>
+<h2 id="Methods"><a class="u" href="#___top" title="go to top of document">Methods</a></h2>
+<h3 id=".useTable"><a class="u" href="#___top" title="go to top of document">.useTable</a></h3>
+<pre class="pod-block-code">method	useTable(Table :$table, Str :$action = &#39;use&#39;, :%fields = {}) {
+</pre>
+<dl>
+<dt>Table :$table</dt>
+<dd><p>The frontend table object that&#39;s going to reference this backend</p>
+</dd>
+<dt>Str :$action = &#39;use&#39;</dt>
+<dd><p>Documented in TOP Table.new()</p>
+</dd>
+<dt>:%fields = {}</dt>
+<dd><p>The fields to be used on the table.</p>
+</dd>
+
+</dl>
+
     </div>
 
     

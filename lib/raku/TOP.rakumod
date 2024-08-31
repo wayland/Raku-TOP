@@ -330,7 +330,6 @@ class	Database {
 	submethod	TWEAK(Str :$backend, :%parameters) {
 		my $driver = $!loaded-lock.protect: {
 			my $module = "Database::Driver::$!backend";
-			say "m: $module";
 
 			# Load the relevant module
 			my \M = (require ::($module));
@@ -363,7 +362,6 @@ class	Database {
 	=end pod
 
 	method	useTable(:$name, *%params) {
-		say "Database.useTable";
 		my Table $table = Table.new(
 			database => self,
 			:$!backend,
@@ -371,7 +369,6 @@ class	Database {
 			:$name,
 			parameters => %params,
 		);
-		say "uT1" ~ $table.raku;
 
 		return $table;
 	}	

@@ -13,7 +13,7 @@ Tim Nelson - https://github.com/wayland
 
 Table::Driver::Memory
 
-    class	Table::Driver::Memory does Table::Driver is export {
+    class	Table::Driver::Memory does Table::Driver {
 
 Usage
 
@@ -32,4 +32,4 @@ there's not much you need to specify when using one of these.
     $memdb.useTable(name => 'countries');
 
 The parameters to Database.useTable are basically the same as are passed to
-Table.new(). 
+Table.new().

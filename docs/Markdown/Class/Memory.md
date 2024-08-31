@@ -21,7 +21,7 @@ Tim Nelson - https://github.com/wayland
 Table::Driver::Memory
 =====================
 
-    class	Table::Driver::Memory does Table::Driver is export {
+    class	Table::Driver::Memory does Table::Driver {
 
 Usage
 =====
@@ -39,5 +39,5 @@ The default database (if none is specified) is a Memory database, so there's not
     );
     $memdb.useTable(name => 'countries');
 
-The parameters to Database.useTable are basically the same as are passed to Table.new(). 
+The parameters to Database.useTable are basically the same as are passed to Table.new().
 
