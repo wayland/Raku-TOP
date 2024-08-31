@@ -218,9 +218,6 @@ class	Table does Relation is export {
 	=end pod
 	has	Str				$!backend	is built = 'Memory';
 
-	# TODO: Can we eliminate this?
-	has	Lock	$!loaded-lock = Lock.new();
-
 	# See above for doco on $.backend-object
 	# Would like to make this a Table::Driver (which would include subclasses) once I solve the recursive use issue
 	# TODO: Can we use a stub somewhere?
@@ -231,16 +228,9 @@ class	Table does Relation is export {
 		fields
 	>;
 	multi method	STORE(\values, :$INITIALIZE) { $!backend-object.STORE(values, :$INITIALIZE); }
-	# TODO: When debugging is done, this next can be a one-liner
-	multi method	AT-POS(\position) is raw {
-		my $p := $!backend-object.AT-POS(position);
-		say "Table frontend: " ~ $p.VAR.^name;
-		say "beo: " ~ $p.^name;
-		say $p.raku;
-		say "starting name";
-		say "Name: " ~ $p<name>;
-		return-rw $p;
-	}
+	multi method	AT-POS(\position) is raw { return-rw $!backend-object.AT-POS(position); }
+
+	# TODO: The formatting on the following table should use tabs -- try to improve it after the Pod6 rewite
 
 	# TODO: The formatting on the following table should use tabs -- try to improve it after the Pod6 rewite
 
@@ -263,11 +253,6 @@ class	Table does Relation is export {
 	# Hash::Agnostic overrides new and doesn't do TWEAK et. al. -- if that gets fixed, this can go away
 	# TODO: Try to remove this next function; may need to take lizmat's suggestion of blessing the object -- https://irclogs.raku.org/raku/2024-08-17.html#15:41
 	multi method new(Database :$database, Str :$backend, Str :$name, Str :$action = 'use', *%parameters) {
-		my $n = nextcallee;
-		say "=== nextcallee ===";
-		dd $n;
-		say $n.raku;
-		say $n.WHAT;
 		my $rv = callsame;
 		$rv.TWEAK(:$database, :$backend, :$name, :$action, |%parameters);
 		return $rv;
@@ -275,14 +260,10 @@ class	Table does Relation is export {
 
 	# TODO: After code cleanup (see new, above), see if we need to comment this function
 	submethod	TWEAK(Database :$database, Str :$backend, Str :$name, Str :$action = 'use', *%parameters) {
-		say "TWEAKing ## $backend ## $name ## $action\n";
-		dd %parameters;
 		# This section because Hash::Agnostic overrides new and doesn't do TWEAK
 		defined $database and $!database = $database;
 		$!backend = defined($backend) ?? $backend !! 'Memory';
 		defined $name and $!name = $name;
-		say "Preset name to $!name";
-		$!loaded-lock = Lock.new();
 		# End Hash::Agnostic fix
 		defined $!database and do {
 			$!backend = $!database.backend;
@@ -292,10 +273,8 @@ class	Table does Relation is export {
 				:$!backend,
 			);
 		}
-		dd $!database;
-		say "Name is $!name";
-		say "returning";
 
+		# Create the actual backend table object
 		$!backend-object = $!database.backend-object.useTable(
 			table => self,
 			:$action,
@@ -305,7 +284,7 @@ class	Table does Relation is export {
 		defined self.name or die "Error: all tables must be named!";
 	}
 
-	# TODO: Can we remove this now that Hash::Agnostic is fixed?
+	# If this is removed, we get: Method 'of' must be resolved by class Table because it exists in multiple roles (Associative, Positional)
 	method  of() { return Mu; }
 }
 

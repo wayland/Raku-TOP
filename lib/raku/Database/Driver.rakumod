@@ -136,9 +136,6 @@ role	Table::Driver does Associative does Positional {
 		)
 	}
 
-	# TODO: Try removing this
-	method	of() { return Mu; }
-
 	=begin pod
 	=head3 .add-field
 

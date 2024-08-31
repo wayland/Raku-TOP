@@ -31,7 +31,7 @@ not much you need to specify when using one of these.
 	);
 	$memdb.useTable(name => 'countries');
 
-The parameters to Database.useTable are basically the same as are passed to Table.new().  
+The parameters to Database.useTable are basically the same as are passed to Table.new().
 
 =end pod
 # TODO: See if we can remove 'is export' (and also from doco)
