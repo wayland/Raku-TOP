@@ -179,8 +179,6 @@ multi	MAIN('release') {
 	@problems.elems > 0 and do {
 		@problems ==> map { "$_\n" } ==> join '' ==> die;
 	};
-	die "Needs fixing";
-# Need to put in some code to check git status -- if there's anything that hasn't been checked in, it should cause an error
 
 	# Finally ready to go
 	do_cmd(sprintf(qq{git tag 'v%s'}, %metadata<version>), die => True);
