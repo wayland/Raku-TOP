@@ -1,5 +1,7 @@
 #!/usr/bin/raku
 
+use	JSON::Fast;
+
 class	MethodLoc {
 	has	Str	$.class;
 	has	Str	$.methodname;
@@ -7,6 +9,94 @@ class	MethodLoc {
 	has	Str	$.classtype;
 	has		$.drivertype;
 	has	Int	$.lineno;
+}
+
+# >>= TOP:ver<0.0.1>:auth<zef:wayland>
+grammar	FezListItem {
+	rule	TOP ($module)	{ '>>=' <.ws> $module <parameter>+ }
+	rule	parameter	{ ':' <param-name> '<' <param-value> '>' }
+	rule	param-name	{ \w+ }
+	rule	param-value	{ <[\w:.]>+ }
+}
+class	FezListItemActions {
+	method	TOP($match) {
+		$match.make: $match<parameter>».made;
+	}
+	method	parameter($/) {
+#		printf "Got %s -- %s\n", $/<param-name>, $/<param-value>;
+		make $/<param-name>.made => $/<param-value>.made;
+	}
+	method	param-name($/)	{ make ~$/; }
+	method	param-value($/)	{ make ~$/; }
+}
+
+multi	MAIN('release') {
+	# Fetch version from META6.json
+	my %metadata = from-json("META6.json".IO.slurp);
+#	say %metadata;
+
+# TODO: The build stuff was causing weird errors; revisit when I upgrade the raku version on my local
+	# Set up promises
+#	my $build-promise = start {
+#		my $result = MAIN('build') and MAIN('stop') and MAIN('test');
+#		$result and return $result;
+#		return Nil;
+#	}
+
+	# Get existing fez versions so that we can ensure we're not releasing an existing version
+	my $fez-list-promise = start {
+		my @lines = qqx{fez list}.lines;
+		my %versions;
+		for @lines -> $line {
+			my %params = FezListItem.parse(
+				$line,
+				:args(@(%metadata<name>)),
+				actions => FezListItemActions.new(),
+			).made;
+			%versions{%params<ver>} = 1;
+		}
+		%versions{%metadata<version>};
+	}
+	# Run fez review so we can quit if it finds any problems
+	my $fez-review-promise = start {
+		my @lines = qqx{fez review}.lines;
+		$!, @lines;
+	}
+	# Check the git tags to see if we've already tagged this version there
+	my $git-tag-promise = start {
+		my %tags = qqx{git tag -l v*}.lines.map: -> $_ is copy { s/^v//; $_ => 1 };
+		%tags{%metadata<version>};
+	}
+
+	# Collate promised answers into @problems
+	my @problems;
+	my $gt-version = await $git-tag-promise;
+	if $gt-version {
+		@problems.push: "Can't create release '{%metadata<version>}': A git tag for this version already exists\n";
+	}
+	my ($fez-review-rv, @fez-review-lines) = await $fez-review-promise;
+	if $fez-review-rv {
+		@problems.push: "Can't create release '{%metadata<version>}': Fez review failed\n";
+	}
+	my $fez-version = await $fez-list-promise;
+	if $fez-version {
+		@problems.push: "Can't create release '{%metadata<version>}': A fez version with this ID already exists\n";
+	}
+#	my @build-errors = await $build-promise;
+#	if @build-errors {
+#		@problems.push: @build-errors;
+#	}
+	# If there were problems, die
+	@problems.elems > 0 and do {
+		@problems ==> map { "$_\n" } ==> join '' ==> die;
+	};
+	die "Needs fixing";
+# Need to put in some code to check git status -- if there's anything that hasn't been checked in, it should cause an error
+
+	# Finally ready to go
+	do_cmd(sprintf(qq{git tag 'v%s'}, %metadata<version>), die => True);
+	do_cmd(qq{git push --tags}, die => True);
+	do_cmd(qq{fez upload}, die => True);
 }
 
 multi	MAIN('build-docs', @filenames?) {
@@ -125,7 +215,7 @@ multi	MAIN($action) {
 	}
 }
 
-sub	do_cmd($cmd, :$level = 1, :$use = 'shell') {
+sub	do_cmd($cmd, :$level = 1, :$use = 'shell', :$die = False) {
 	print "+" x $level;
 	say " $cmd";
 	given $use {
@@ -136,6 +226,7 @@ sub	do_cmd($cmd, :$level = 1, :$use = 'shell') {
 			print qqx{$cmd};
 		}
 	}
+	$die and $! and die "Command failed!";
 
 	return $!;
 }

@@ -1,12 +1,12 @@
 # First Iteration Tasks
 -	Module ready to use; publicise
-	-	Announce on #raku
+	DONE	Announce on #raku
 	-	Link to it from my TOP site -- maybe start replacing parts of Raku TOP with the doco I've written
 -	Rewrite https://wayland.github.io/table-oriented-programming/Raku-TOP/Introduction.xml so that:
 	-	The TODO list is a separate page
 	-	The TODO list below (aka Iterations) is incorporated into it
 -	Clean up browser tabs relating to TOP
--	Start next coding iteration
+-	Start next coding iteration (ON A NEW BRANCH)
 
 # Iterations
 -	Look at the TODO items in the code

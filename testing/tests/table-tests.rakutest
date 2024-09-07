@@ -7,7 +7,7 @@ use	CSV::Parser;
 
 use	lib 'lib/raku';
 
-plan 1;
+plan 6;
 use-ok "TOP";
 use	TOP;
 
