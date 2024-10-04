@@ -70,6 +70,7 @@ class	Process::Build does AsyncProcess {
 
 # Get list of existing fez versions so that we can ensure we're not releasing an existing version
 class	Process::FezList does AsyncProcess {
+	has	$.type = 'fez';
 	has	$.priority = 1;
 
 	method	start-process() {
@@ -93,6 +94,7 @@ class	Process::FezList does AsyncProcess {
 
 # Run fez review so we can quit if it finds any problems
 class	Process::FezReview does AsyncProcess {
+	has	$.type = 'fez';
 	has	$.priority = 2;
 
 	method	start-process() {
@@ -107,6 +109,7 @@ class	Process::FezReview does AsyncProcess {
 
 # Check the git tags to see if we've already tagged this version there
 class	Process::GitTag does AsyncProcess {
+	has	$.type = 'git';
 	has	$.priority = 3;
 
 	method	start-process() {
@@ -121,6 +124,7 @@ class	Process::GitTag does AsyncProcess {
 
 # Check whether any code needs to be checked in
 class	Process::GitStatus does AsyncProcess {
+	has	$.type = 'git';
 	has	$.priority = 4;
 
 	method	start-process() {
@@ -133,7 +137,10 @@ class	Process::GitStatus does AsyncProcess {
 	}
 }
 
-multi	MAIN('release') { #= Create a release, including pushing to github and fez.  
+multi	MAIN('release', Str :$skip = '') { #= Create a release, including pushing to github and fez.  
+	# Create %skips
+	split(/\,/, $skip) ==> map({ $_ => 1 }) ==> my %skips;
+
 	# Fetch version from META6.json
 	my %metadata = from-json("META6.json".IO.slurp);
 #	say %metadata;
@@ -169,6 +176,10 @@ multi	MAIN('release') { #= Create a release, including pushing to github and fez
 
 	# Start processes in order of priority
 	for %process-classes.sort(*.value.priority)».kv -> ($key, $value) {
+		%skips{$value.type}:exists and do {
+			say "Skipping $key because we're skipping {$value.type}";
+			next;
+		};
 		say "Starting $key ...";
 		$value.start();
 	}
@@ -176,6 +187,10 @@ multi	MAIN('release') { #= Create a release, including pushing to github and fez
 	# Collate promised answers into @problems (reverse order of priority
 	my Str @problems;
 	for %process-classes.sort(-*.value.priority)».kv -> ($key, $value) {
+		%skips{$value.type}:exists and do {
+			say "Skipping $key because we're skipping {$value.type}";
+			next;
+		};
 		say "Waiting for $key";
 		$value.check(@problems);
 	}
@@ -185,9 +200,13 @@ multi	MAIN('release') { #= Create a release, including pushing to github and fez
 	};
 
 	# Finally ready to go
-	do_cmd(sprintf(qq{git tag 'v%s'}, %metadata<version>), die => True);
-	do_cmd(qq{git push --tags}, die => True);
-	do_cmd(qq{fez upload}, die => True);
+	%skips{'git'}:exists or do {
+		do_cmd(sprintf(qq{git tag 'v%s'}, %metadata<version>), die => True);
+		do_cmd(qq{git push --tags}, die => True);
+	};
+	%skips{'fez'}:exists or do {
+		do_cmd(qq{fez upload}, die => True);
+	};
 }
 
 multi	MAIN('build-docs', @filenames?) { #= Rebuilds documentation (docs dir and READMEs) from rakumod files
