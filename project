@@ -294,22 +294,12 @@ multi	MAIN('test') { #= Runs the tests for the project in a docker container.  T
 	do_cmd("docker exec raku_raku_1 /bin/bash -lc ./table-tests.rakutest 2>&1");
 }
 
-multi	MAIN('build') { #= where $action might be 'build', or 'stop'
+multi	MAIN('build') { #= Build the docker image
 	do_cmd("$docker_compose_command build raku");
 }
 
-multi	MAIN($action) { #= where $action might be 'build', or 'stop'
-	given ($action) {
-		when 'build' {
-			do_cmd("$docker_compose_command build raku");
-		}
-		when 'stop' {
-			do_cmd("$docker_compose_command down");
-		}
-		default {
-			die "Unknown action '$action'";
-		}
-	}
+multi	MAIN('stop') { #= Stops the docker-compose project
+	do_cmd("$docker_compose_command down");
 }
 
 sub	do_cmd($cmd, :$level = 1, :$use = 'shell', :$die = False) {
