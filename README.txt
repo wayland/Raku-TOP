@@ -15,6 +15,12 @@ Raku Introductory Docs
 
   Raku TOP Class References
 
+Note that the following links don't yet work on raku.land -- you'll need to
+go to github to read them. 
+
+Also, the CSV one doesn't work yet, but the others should; probably start
+with TOP, then go to Memory, then as you please. 
+
   * class CSV
 
   * class Memory
