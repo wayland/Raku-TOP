@@ -133,7 +133,7 @@ class	Process::GitStatus does AsyncProcess {
 	}
 }
 
-multi	MAIN('release') {
+multi	MAIN('release') { #= Create a release, including pushing to github and fez.  
 	# Fetch version from META6.json
 	my %metadata = from-json("META6.json".IO.slurp);
 #	say %metadata;
@@ -145,18 +145,22 @@ multi	MAIN('release') {
 #			name    => %metadata<name>,
 #			version => %metadata<version>,
 #		),
+		# Get list of existing fez versions so that we can ensure we're not releasing an existing version
 		FezList => Process::FezList.new(
 			name    => %metadata<name>,
 			version => %metadata<version>,
 		),
+		# Run fez review so we can quit if it finds any problems
 		FezReview => Process::FezReview.new(
 			name    => %metadata<name>,
 			version => %metadata<version>,
 		),
+		# Check the git tags to see if we've already tagged this version there
 		GitTag => Process::GitTag.new(
 			name    => %metadata<name>,
 			version => %metadata<version>,
 		),
+		# Check whether any code needs to be checked in
 		GitStatus => Process::GitStatus.new(
 			name    => %metadata<name>,
 			version => %metadata<version>,
@@ -186,7 +190,7 @@ multi	MAIN('release') {
 	do_cmd(qq{fez upload}, die => True);
 }
 
-multi	MAIN('build-docs', @filenames?) {
+multi	MAIN('build-docs', @filenames?) { #= Rebuilds documentation (docs dir and READMEs) from rakumod files
 	# Set up
 	my %doc-types = %(
 		Markdown => 'md',
@@ -225,76 +229,82 @@ multi	MAIN('build-docs', @filenames?) {
 
 }
 
-multi	MAIN($action) {
-	my $docker_compose_command = "docker-compose -f testing/docker/docker-compose.yml --project-directory .";
+multi	MAIN('find-common') { #= Finds the methods which are the same across all database drivers
+	# Locate methods in files and classes/roles
+	my (@files-to-check) = qx{find lib/raku/Database/Driver -name '*.rakumod'}.lines;
+	push @files-to-check, 'lib/raku/Database/Driver.rakumod';
 
-	given ($action) {
-		when 'test' {
-			do_cmd("$docker_compose_command up -d");
-			do_cmd("docker exec raku_raku_1 /bin/bash -lc ./table-tests.rakutest 2>&1");
+	my @methodlocs;
+	for @files-to-check -> $file {
+		say "File: $file";
+		my ($currentclass, $classtype, $drivertype);
+		my $lineno = 0;
+		for $file.IO.lines -> $line {
+			$lineno++;
+			$line ~~ /^\s*(role|class)\s+ $<classname> = (<[\w:]>+)/ and do {
+				my $thisclass = ~$/<classname>;
+				$line ~~ /\{$/ or next;
+				$currentclass = $thisclass;
+				my $d;
+				($classtype, $d, $drivertype) = $thisclass.split(/\:\:/);
+			}
+			$line ~~ /
+				[multi\s+|sub|<?>]method\s+
+				$<method> = [<[\w-]>+].*
+			/ and do {
+				my $method = ~$<method>;
+				defined($drivertype) and $line ~~ /\}$/ and next;
+				push @methodlocs, MethodLoc.new(
+					class => $currentclass,
+					methodname => $method,
+					lineno => $lineno,
+					filename => $file,
+					classtype => $classtype,
+					drivertype => $drivertype,
+				);
+			};
 		}
+	}
+
+	# Loop over methods and categorise
+	my %groups;
+	for @methodlocs -> $ml {
+		push %groups{$ml.classtype ~ $ml.methodname}, $ml;
+	}
+	GROUP: for %groups.kv -> $key, @group {
+		@group.elems > 1 and do {
+			for @group -> $methodloc {
+				defined($methodloc.drivertype) or next GROUP;
+			}
+			#dd @group;
+			for @group -> $methodloc {
+				FIRST {
+					printf "%s.%s:\n", $methodloc.classtype, $methodloc.methodname;
+				}
+				printf "\t%s: %s\n", $methodloc.filename, $methodloc.lineno;
+			}
+		};
+	}
+}
+
+my $docker_compose_command = "docker-compose -f testing/docker/docker-compose.yml --project-directory .";
+
+multi	MAIN('test') { #= Runs the tests for the project in a docker container.  This means we can run them as a github action, and easily change raku versions
+	do_cmd("$docker_compose_command up -d");
+	do_cmd("docker exec raku_raku_1 /bin/bash -lc ./table-tests.rakutest 2>&1");
+}
+
+multi	MAIN('build') { #= where $action might be 'build', or 'stop'
+	do_cmd("$docker_compose_command build raku");
+}
+
+multi	MAIN($action) { #= where $action might be 'build', or 'stop'
+	given ($action) {
 		when 'build' {
 			do_cmd("$docker_compose_command build raku");
 		}
 		when 'stop' {
 			do_cmd("$docker_compose_command down");
-		}
-		when 'find-common' {
-			# Locate methods in files and classes/roles
-			my (@files-to-check) = qx{find lib/raku/Database/Driver -name '*.rakumod'}.lines;
-			push @files-to-check, 'lib/raku/Database/Driver.rakumod';
-
-			my @methodlocs;
-			for @files-to-check -> $file {
-				say "File: $file";
-				my ($currentclass, $classtype, $drivertype);
-				my $lineno = 0;
-				for $file.IO.lines -> $line {
-					$lineno++;
-					$line ~~ /^\s*(role|class)\s+ $<classname> = (<[\w:]>+)/ and do {
-						my $thisclass = ~$/<classname>;
-						$line ~~ /\{$/ or next;
-						$currentclass = $thisclass;
-						my $d;
-						($classtype, $d, $drivertype) = $thisclass.split(/\:\:/);
-					}
-					$line ~~ /
-						[multi\s+|sub|<?>]method\s+
-						$<method> = [<[\w-]>+].*
-					/ and do {
-						my $method = ~$<method>;
-						defined($drivertype) and $line ~~ /\}$/ and next;
-						push @methodlocs, MethodLoc.new(
-							class => $currentclass,
-							methodname => $method,
-							lineno => $lineno,
-							filename => $file,
-							classtype => $classtype,
-							drivertype => $drivertype,
-						);
-					};
-				}
-			}
-
-			# Loop over methods and categorise
-			my %groups;
-			for @methodlocs -> $ml {
-				push %groups{$ml.classtype ~ $ml.methodname}, $ml;
-			}
-			GROUP: for %groups.kv -> $key, @group {
-				@group.elems > 1 and do {
-					for @group -> $methodloc {
-						defined($methodloc.drivertype) or next GROUP;
-					}
-#dd @group;
-					for @group -> $methodloc {
-						FIRST {
-							printf "%s.%s:\n", $methodloc.classtype, $methodloc.methodname;
-						}
-						printf "\t%s: %s\n", $methodloc.filename, $methodloc.lineno;
-					}
-				};
-			}
 		}
 		default {
 			die "Unknown action '$action'";
