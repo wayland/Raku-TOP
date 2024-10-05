@@ -207,6 +207,7 @@ multi	MAIN('release', Str :$skip = '') { #= Create a release, including pushing 
 	%skips{'fez'}:exists or do {
 		do_cmd(qq{fez upload}, die => True);
 	};
+	say "Next you may want to run: zef update && zef install TOP --force-install";
 }
 
 multi	MAIN('build-docs', @filenames?) { #= Rebuilds documentation (docs dir and READMEs) from rakumod files

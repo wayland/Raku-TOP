@@ -25,6 +25,7 @@ role	Database::Driver
 
 =end pod
 role	Database::Driver {
+	has	Str	$.name;
 	=begin pod
 	=head3 .useTable
 
@@ -88,6 +89,8 @@ role	Table::Driver does Associative does Positional {
 	has	Database::Driver	$!database			is built;		# Links to the database
 	# TODO: Make the above "is required" once the Memory driver supports it
 
+	has	Lock	%!formatter-loaded-lock;
+
 	# Only used during initialisation
 	has	Bool		$!init-create = False;
 	has	Bool		$!init-alter = False;
@@ -145,10 +148,42 @@ role	Table::Driver does Associative does Positional {
 	=end pod
 	method	exists(Str :$true-error, Str :$false-error) {
 		my Bool $exists =  self.raw-exists();
-		$exists and $true-error.defined and die "{$true-error} in database '{$!database.database-name}'";
-		! $exists and $false-error.defined and die "{$false-error} in database '{$!database.database-name}'";
+		my $usename = $!database.name ?? $!database.name !! '(unnamed memory database)';
+		  $exists and $true-error.defined  and die "{$true-error} in database '{$usename}'";
+		! $exists and $false-error.defined and die "{$false-error} in database '{$usename}'";
 		return $exists;
 	}
+
+	method	format(Str $format = 'HalfHuman', *%parameters) {
+		%!formatter-loaded-lock{$format}:exists or %!formatter-loaded-lock{$format} = Lock.new();
+		my $formatter = %!formatter-loaded-lock{$format}.protect: {
+			my $module = "TOP::Formatter::$format";
+
+			# Load the relevant module
+			my \M = (require ::($module));
+
+			# Check that it's a real driver
+			#			unless M ~~ Database::Driver {
+			#				warn "$module doesn't do Database::Driver role!";
+			#			}
+			# TODO: The above ended up with circular references; need to figure out what the fix is; possibly move Database::Driver into this file
+
+			# Create the object
+			M.new(table => $!frontend-object, |%parameters);
+		}
+
+		without $formatter { .throw }
+
+		$formatter.prepare-table();
+		$formatter.output-header();
+		for self[0..*] -> $row {
+			$formatter.output-row($row);
+		}
+		$formatter.output-footer();
+		say $formatter.output;
+		return $formatter.output;
+	}
+
 	##### Abstracts
 	method fill_from_aoh(@rows) {...}
 	method	raw-exists() {...}	# Helper function for .exists, above

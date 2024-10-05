@@ -1,6 +1,8 @@
 use     Database::Driver;
 use     TOP;
 
+class	Database::Driver::Memory {...}
+
 =begin pod
 
 =NAME Raku *::Driver::Memory - Raku classes to implement the in-memory table store
@@ -48,6 +50,16 @@ class	Table::Driver::Memory does Table::Driver {
 	has	Str	$!field-mode = 'lax';
 	has	Str	$!overflow-field-name;
 
+	method	new(:$database, *@_, *%_) {
+		my $usedb;
+		if $database ~~ Database::Driver {
+			$usedb = $database;
+		} else {
+			$usedb = Database::Driver::Memory.new();
+		}
+		callwith(database => $usedb, |@_, |%_);
+	}
+
 	# Doco: Documented in Table::Driver
 	# TODO: a) Populate Table::Driver::Memory.database and b) make this check database.tables
 	method	raw-exists() {
@@ -80,6 +92,10 @@ class	Table::Driver::Memory does Table::Driver {
 		}
 
 		Tuple.new(%items);
+	}
+	multi	method	makeTuple(@items) {
+		my %items is Hash::Ordered = 'A'..* Z=> @items;
+		self.makeTuple(%items);
 	}
 
 	# Allows people to assign to this table
@@ -171,6 +187,10 @@ class	Table::Driver::Memory does Table::Driver {
 			@!rows.push: self.makeTuple($row);
 		}
 	}
+
+	method	add-row(@fields) {
+		@!rows.push: self.makeTuple(@fields);
+	}
 }
 
 # Implements Database::Driver for the Memory type
@@ -178,7 +198,7 @@ class	Database::Driver::Memory does Database::Driver {
 	my	Database::Driver::Memory	$primary-instance;	# Help implement Singleton
 	has	%tables;
 
-	# Singleton pattern
+	# Singleton pattern (if unnamed; if it's named, then don't Singleton; could in future use a hash and then Singleton everything
 	method	new(:$name) {
 		if $name {
 			nextsame;

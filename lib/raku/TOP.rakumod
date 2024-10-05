@@ -224,11 +224,12 @@ class	Table does Relation is export {
 	has		$.backend-object handles <
 		elems EXISTS-POS DELETE-POS ASSIGN-POS BIND-POS
 		AT-KEY BIND-KEY CLEAR DELETE-KEY EXISTS-KEY
-		makeTuple fill_from_aoh
+		makeTuple fill_from_aoh add-row list
 		fields
+		format
 	>;
 	multi method	STORE(\values, :$INITIALIZE) { $!backend-object.STORE(values, :$INITIALIZE); }
-	multi method	AT-POS(\position) is raw { return-rw $!backend-object.AT-POS(position); }
+	multi method	AT-POS(Int:D \position) is raw { return-rw $!backend-object.AT-POS(position); }
 
 	# TODO: The formatting on the following table should use tabs -- try to improve it after the Pod6 rewite
 
