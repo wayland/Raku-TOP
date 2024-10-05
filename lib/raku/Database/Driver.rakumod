@@ -54,7 +54,7 @@ role	Table::Driver does Associative does Positional {
 
 =end pod
 
-role	Table::Driver does Associative does Positional {
+role	Table::Driver does Associative does Positional does TOP::Core {
 	=begin pod
 	=defn Field @.fields
 	Stores the fields
@@ -88,8 +88,6 @@ role	Table::Driver does Associative does Positional {
 	=end pod
 	has	Database::Driver	$!database			is built;		# Links to the database
 	# TODO: Make the above "is required" once the Memory driver supports it
-
-	has	Lock	%!formatter-loaded-lock;
 
 	# Only used during initialisation
 	has	Bool		$!init-create = False;
@@ -155,24 +153,11 @@ role	Table::Driver does Associative does Positional {
 	}
 
 	method	format(Str $format = 'HalfHuman', *%parameters) {
-		%!formatter-loaded-lock{$format}:exists or %!formatter-loaded-lock{$format} = Lock.new();
-		my $formatter = %!formatter-loaded-lock{$format}.protect: {
-			my $module = "TOP::Formatter::$format";
-
-			# Load the relevant module
-			my \M = (require ::($module));
-
-			# Check that it's a real driver
-			#			unless M ~~ Database::Driver {
-			#				warn "$module doesn't do Database::Driver role!";
-			#			}
-			# TODO: The above ended up with circular references; need to figure out what the fix is; possibly move Database::Driver into this file
-
-			# Create the object
-			M.new(table => $!frontend-object, |%parameters);
-		}
-
-		without $formatter { .throw }
+		my $formatter = $.load-library(
+			type => "TOP::Formatter::$format",
+			table => $!frontend-object,
+			|%parameters
+		);
 
 		$formatter.prepare-table();
 		$formatter.output-header();
@@ -180,8 +165,15 @@ role	Table::Driver does Associative does Positional {
 			$formatter.output-row($row);
 		}
 		$formatter.output-footer();
-		say $formatter.output;
 		return $formatter.output;
+	}
+
+	method	parse(Str $format = 'HalfHuman', *%parameters) {
+		my $parser = $.load-library(
+			type => "TOP::Parser::$format",
+			table => $!frontend-object,
+			|%parameters
+		);
 	}
 
 	##### Abstracts

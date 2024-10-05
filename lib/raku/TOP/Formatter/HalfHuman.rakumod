@@ -2,15 +2,11 @@ use    TOP;
 
 class    TOP::Formatter::HalfHuman {
 	has	Table	$!table is built is required;
+	has	Bool	$!show-headers is built = True;
 	has	Str		$.output;
 	has	Str		$!sformat;
 	has			%!maxes;
 	has			%!types is default(Nil);
-	has	Str		%!sformatchars = %(
-		Str => 's',
-		Num => 's',
-		Int => 'd',
-	);
 
 	method    set-table(Table $table) {
 		$!table = $table;
@@ -40,7 +36,7 @@ class    TOP::Formatter::HalfHuman {
 
 	method    output-header() {
 		# output header(s)
-		$.add-row($!table.fields.map({ .name }));
+		$!show-headers and $.add-row($!table.fields.map({ .name }));
 	}
 
 	method    output-row($row) {
@@ -53,6 +49,6 @@ class    TOP::Formatter::HalfHuman {
 	}
 
 	method	add-row(@items) {
-		$!output ~= sprintf $!sformat, @items;
+		$!output ~= (@items ==> map({ .defined ?? $_ !! '' }) ==> sprintf($!sformat));
 	}
 }

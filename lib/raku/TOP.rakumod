@@ -16,7 +16,7 @@ use	Hash::Ordered;
 
 =begin code
 
-role	TOP::Core {}
+role	TOP::Core {...}
 
 =end code
 
@@ -25,7 +25,38 @@ to be a role on all TOP classes.
 
 =end pod
 
-role	TOP::Core {}
+role	TOP::Core {
+	has	Lock	%!library-locks;
+
+	=begin pod
+
+	=head1 method load-library
+
+	method	load-library(Str :$type = 'Database::Driver::Memory', *%parameters)
+
+	Loads the library in question, and makes an object of the named type
+	=end pod
+	method	load-library(Str :$type = 'Database::Driver::Memory', *%parameters) {
+		%!library-locks{$type}:exists or %!library-locks{$type} = Lock.new();
+		my $library-object = %!library-locks{$type}.protect: {
+			# Load the relevant module
+			my \M = (require ::($type));
+
+			# Check that it's a real driver
+			#			unless M ~~ Database::Driver {
+			#				warn "$module doesn't do Database::Driver role!";
+			#			}
+			# TODO: The above ended up with circular references; need to figure out what the fix is; possibly move Database::Driver into this file
+
+			# Create the object
+			M.new(|%parameters);
+		}
+
+		without $library-object { .throw }
+
+		return $library-object;
+	}
+}
 
 =begin pod
 =head1 Tuple
@@ -226,7 +257,7 @@ class	Table does Relation is export {
 		AT-KEY BIND-KEY CLEAR DELETE-KEY EXISTS-KEY
 		makeTuple fill_from_aoh add-row list
 		fields
-		format
+		format parse
 	>;
 	multi method	STORE(\values, :$INITIALIZE) { $!backend-object.STORE(values, :$INITIALIZE); }
 	multi method	AT-POS(Int:D \position) is raw { return-rw $!backend-object.AT-POS(position); }
@@ -298,7 +329,7 @@ This is the Database class from which all other Database classes descend.
 
 =end pod
 
-class	Database {
+class	Database does TOP::Core {
 	=begin pod
 	=defn $.backend-object
 
@@ -307,7 +338,6 @@ class	Database {
 	has		$.backend-object;	# Public for use by Table; make protected with friend
 
 	has		%loaded-drivers;	# TODO: In some future iteration, this will store a list of the drivers that have been loaded
-	has	Lock	$!loaded-lock = Lock.new();
 
 	=begin pod
 	=head2 Methods
@@ -329,27 +359,7 @@ class	Database {
 	has	Str	$.backend	is built = 'Memory';
 
 	submethod	TWEAK(Str :$backend, :%parameters) {
-		my $driver = $!loaded-lock.protect: {
-			my $module = "Database::Driver::$!backend";
-
-			# Load the relevant module
-			my \M = (require ::($module));
-
-			# Check that it's a real driver
-#			unless M ~~ Database::Driver {
-#				warn "$module doesn't do Database::Driver role!";
-#			}
-			# TODO: The above ended up with circular references; need to figure out what the fix is; possibly move Database::Driver into this file
-
-			# Create the object
-			M.new(|%parameters);
-		}
-
-		without $driver { .throw }
-
-		$!backend-object = $driver;
-
-		return $driver;
+		$!backend-object = self.load-library(type => "Database::Driver::$!backend", |%parameters);
 	}
 
 	=begin pod
