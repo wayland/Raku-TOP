@@ -96,11 +96,13 @@ role	Table::Driver does Associative does Positional does TOP::Core {
 
 	submethod	TWEAK(
 			Table :$frontend-object,
+
 			=begin pod
 			=defn Str $action
 			The action to take -- see the parameter of the same name on the frontend object
 			=end pod
 			Str :$action,
+
 			=begin pod
 			=defn Str %fields
 			If relevant, the fields to use in creating/altering the table
@@ -168,7 +170,7 @@ role	Table::Driver does Associative does Positional does TOP::Core {
 		return $formatter.output;
 	}
 
-	method	parse(Str $format = 'HalfHuman', *%parameters) {
+	method	parse(Str :$format = 'HalfHuman', *%parameters) {
 		my $parser = $.load-library(
 			type => "TOP::Parser::$format",
 			table => $!frontend-object,
@@ -213,16 +215,18 @@ role	Table::Driver does Associative does Positional does TOP::Core {
 
 	Adds a field to the table
 
-		.add-field(Table :$relation, Str :$name, Any:U $type)
+		.add-field(Table :$relation, Str :$name, Any:U :$type)
 	=end pod
 	method	add-field(
 		# TODO: Try to replace "relation" with "self"; if that doesn't work, then document
 		Table :$relation,
+
 		=begin pod
 		=defn Str $name
 		The name of the field being added
 		=end pod
 		Str :$name,
+
 		=begin pod
 		=defn Any:U $type
 		The type of the field, as a Raku type

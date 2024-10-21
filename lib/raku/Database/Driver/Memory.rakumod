@@ -188,8 +188,11 @@ class	Table::Driver::Memory does Table::Driver {
 		}
 	}
 
-	method	add-row(@fields) {
+	multi method	add-row(@fields) {
 		@!rows.push: self.makeTuple(@fields);
+	}
+	multi method	add-row(%fields) {
+		@!rows.push: self.makeTuple(%fields);
 	}
 }
 
