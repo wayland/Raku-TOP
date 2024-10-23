@@ -1,6 +1,7 @@
 use v6.e.PREVIEW;
 
 use	Hash::Ordered;
+use	UUID;
 
 =begin pod
 
@@ -316,6 +317,24 @@ class	Table does Relation is export {
 
 	# If this is removed, we get: Method 'of' must be resolved by class Table because it exists in multiple roles (Associative, Positional)
 	method  of() { return Mu; }
+
+	# TODO: Implement other return types
+	method	grep(Mu $matcher, :$k, :$kv, :$p, :$v, :$table = True --> Relation:D) {
+		$table or die "Error: Can only return tables at the moment";
+		($k or $kv or $p or $v) and die "Error: Can only return tables at the moment";
+		my Table $return-value = Table.new(name => ~UUID.new(), action => 'ensure');
+		for self.fields.map({ .name }) -> $name {
+			$return-value.add-field(relation => self, name => $name);
+		}
+		for 0..^self.elems -> $row-id {
+			my $thisrow = self[$row-id];
+			$matcher ~~ Block or die "Can currently only handle blocks as matcher";
+			if $matcher($thisrow) {
+				$return-value.add-row($thisrow);
+			}
+		}
+		return $return-value;
+	}
 }
 
 =begin pod
@@ -358,7 +377,7 @@ class	Database does TOP::Core {
 	=end pod
 	has	Str	$.backend	is built = 'Memory';
 
-	submethod	TWEAK(Str :$backend, :%parameters) {
+	submethod	TWEAK(Str :$backend, *%parameters) {
 		$!backend-object = self.load-library(type => "Database::Driver::$!backend", |%parameters);
 	}
 
@@ -372,13 +391,15 @@ class	Database does TOP::Core {
 
 	=end pod
 
-	method	useTable(:$name, *%params) {
+	method	useTable(:$name, *%parameters) {
+		my $action = %parameters<action> ?? %parameters<action> !! 'use';
+		%parameters<action>:delete;
 		my Table $table = Table.new(
 			database => self,
 			:$!backend,
-			action => 'use',
+			action => $action,
 			:$name,
-			parameters => %params,
+			parameters => %parameters,
 		);
 
 		return $table;

@@ -28,12 +28,12 @@
 	-	Look at options to Raku and Perl to see which ones I want to copy
 -	CSV (Storage, Parser, and Formatter)
 -	Or should I backend onto those other 2 things (Dan and DataQueryWorkflows)
--	HumanOnly Formatter (must be after CSV Parser)
-	-	Use the CSV Parser to read the table characters for use in the HumanOnly Formatter -- see 
+-	WithBorders Formatter (must be after CSV Parser)
+	-	Use the CSV Parser to read the table characters for use in the WithBorders Formatter -- see 
 		data/BoxDrawingCharacters.csv.  Also make a script to check that none of the characters have
 		identical descriptions (this will catch errors in my input)
 -	Basic Colour:
-	-	Add colour to HumanOnly and HalfHuman (strictly not allowed for HalfHuman, but could still be handy)
+	-	Add colour to WithBorders and HalfHuman (strictly not allowed for HalfHuman, but could still be handy)
 	-	cf. https://github.com/jc21/clitable/blob/master/src/jc21/CliTable.php
 	-	At the end, see if there's anything from jc21/clitable that we still haven't included; field
 		formatters, for example
@@ -44,7 +44,7 @@
 	-	Do early because it's so different from Database; this will require less rewriting in future
 	-	Spreadsheet (OpenOffice format)
 -	Better colours
-	-	Add colour to HTML/Spreadsheet (and cf. HumanOnly colours)
+	-	Add colour to HTML/Spreadsheet (and cf. WithBorders colours)
 	-	If conditional formatting were supported, that'd be even cooler
 -	Pod6
 -	JSON
@@ -85,7 +85,7 @@ Format		Storage	Parser	Formatter	JOP Format
 Memory		Yes	No	No
 Postgres	Yes	No	No
 HalfHuman	?	Yes	Yes
-HumanOnly	No	No	Yes
+WithBorders	No	No	Yes
 ## Make next
 CSV		Make	Make	Make
 ## Waiting on Jungle-Oriented Programming

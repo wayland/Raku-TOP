@@ -59,22 +59,22 @@ U+25,3,8,┸,Box,T,Bottom,Solid,Light,Straight,Horizontal,Heavy,Terminal,Bottom
 U+25,3,9,┹,Box,T,Bottom,Solid,Heavy,Corner,Bottom-Right,Heavy,Terminal,Left
 U+25,3,A,┺,Box,T,Bottom,Solid,Heavy,Corner,Bottom-Left,Light,Terminal,Right
 U+25,3,B,┻,Box,T,Bottom,Solid,Heavy,,,,,
-U+25,3,C,┼,Box,Cross,,Solid,Light,,,,,
-U+25,3,D,┽,Box,Cross,,Solid,Light,T,Left,Heavy,Terminal,Right
-U+25,3,E,┾,Box,Cross,,Solid,Light,T,Right,Heavy,Terminal,Left
-U+25,3,F,┿,Box,Cross,,Solid,Heavy,Straight,Horizontal,Light,Straight,Vertical
-U+25,4,0,╀,Box,Cross,,Solid,Light,T,Top,Heavy,Terminal,Bottom
-U+25,4,1,╁,Box,Cross,,Solid,Light,T,Bottom,Heavy,Terminal,Top
-U+25,4,2,╂,Box,Cross,,Solid,Heavy,Straight,Vertical,Light,Straight,Horizontal
-U+25,4,3,╃,Box,Cross,,Solid,Heavy,Corner,Bottom-Left,Light,Corner,Top-Right
-U+25,4,4,╄,Box,Cross,,Solid,Heavy,Corner,Bottom-Right,Light,Corner,Top-Left
-U+25,4,5,╅,Box,Cross,,Solid,Heavy,Corner,Top-Right,Light,Corner,Bottom-Left
-U+25,4,6,╆,Box,Cross,,Solid,Heavy,Corner,Top-Left,Light,Corner,Bottom-Right
-U+25,4,7,╇,Box,Cross,,Solid,Heavy,T,Bottom,Light,Terminal,Top
-U+25,4,8,╈,Box,Cross,,Solid,Heavy,T,Top,Light,Terminal,Bottom
-U+25,4,9,╉,Box,Cross,,Solid,Heavy,T,Right,Light,Terminal,Left
-U+25,4,A,╊,Box,Cross,,Solid,Heavy,T,Left,Light,Terminal,Right
-U+25,4,B,╋,Box,Cross,,Solid,Heavy,,,,,
+U+25,3,C,┼,Box,Cross,Orthogonal,Solid,Light,,,,,
+U+25,3,D,┽,Box,Cross,Orthogonal,Solid,Light,T,Left,Heavy,Terminal,Right
+U+25,3,E,┾,Box,Cross,Orthogonal,Solid,Light,T,Right,Heavy,Terminal,Left
+U+25,3,F,┿,Box,Cross,Orthogonal,Solid,Heavy,Straight,Horizontal,Light,Straight,Vertical
+U+25,4,0,╀,Box,Cross,Orthogonal,Solid,Light,T,Top,Heavy,Terminal,Bottom
+U+25,4,1,╁,Box,Cross,Orthogonal,Solid,Light,T,Bottom,Heavy,Terminal,Top
+U+25,4,2,╂,Box,Cross,Orthogonal,Solid,Heavy,Straight,Vertical,Light,Straight,Horizontal
+U+25,4,3,╃,Box,Cross,Orthogonal,Solid,Heavy,Corner,Bottom-Left,Light,Corner,Top-Right
+U+25,4,4,╄,Box,Cross,Orthogonal,Solid,Heavy,Corner,Bottom-Right,Light,Corner,Top-Left
+U+25,4,5,╅,Box,Cross,Orthogonal,Solid,Heavy,Corner,Top-Right,Light,Corner,Bottom-Left
+U+25,4,6,╆,Box,Cross,Orthogonal,Solid,Heavy,Corner,Top-Left,Light,Corner,Bottom-Right
+U+25,4,7,╇,Box,Cross,Orthogonal,Solid,Heavy,T,Bottom,Light,Terminal,Top
+U+25,4,8,╈,Box,Cross,Orthogonal,Solid,Heavy,T,Top,Light,Terminal,Bottom
+U+25,4,9,╉,Box,Cross,Orthogonal,Solid,Heavy,T,Right,Light,Terminal,Left
+U+25,4,A,╊,Box,Cross,Orthogonal,Solid,Heavy,T,Left,Light,Terminal,Right
+U+25,4,B,╋,Box,Cross,Orthogonal,Solid,Heavy,,,,,
 U+25,4,C,╌,Box,Straight,Horizontal,Double Dash,Light,,,,,
 U+25,4,D,╍,Box,Straight,Horizontal,Double Dash,Heavy,,,,,
 U+25,4,E,╎,Box,Straight,Vertical,Double Dash,Light,,,,,
@@ -105,16 +105,16 @@ U+25,6,6,╦,Box,T,Top,Solid,Double,,,,,
 U+25,6,7,╧,Box,T,Bottom,Solid,Double,Straight,Horizontal,Light,Terminal,Bottom
 U+25,6,8,╨,Box,T,Bottom,Solid,Light,Straight,Horizontal,Double,Terminal,Bottom
 U+25,6,9,╩,Box,T,Bottom,Solid,Double,,,,,
-U+25,6,A,╪,Box,Cross,,Solid,Double,Straight,Horizontal,Light,Straight,Vertical
-U+25,6,B,╫,Box,Cross,,Solid,Double,Straight,Vertical,Light,Straight,Horizontal
-U+25,6,C,╬,Box,Cross,,Solid,Double,,,,,
-U+25,6,D,╭,Box,Corner,Top-Left,Solid,Light,,,,,
-U+25,6,E,╮,Box,Corner,Top-Right,Solid,Light,,,,,
-U+25,6,F,╯,Box,Corner,Bottom-Left,Solid,Light,,,,,
-U+25,7,0,╰,Box,Corner,Bottom-Right,Solid,Light,,,,,
+U+25,6,A,╪,Box,Cross,Orthogonal,Solid,Double,Straight,Horizontal,Light,Straight,Vertical
+U+25,6,B,╫,Box,Cross,Orthogonal,Solid,Double,Straight,Vertical,Light,Straight,Horizontal
+U+25,6,C,╬,Box,Cross,Orthogonal,Solid,Double,,,,,
+U+25,6,D,╭,Box,Corner,Top-Left,Solid,Light,Curved,,,,
+U+25,6,E,╮,Box,Corner,Top-Right,Solid,Light,Curved,,,,
+U+25,6,F,╯,Box,Corner,Bottom-Left,Solid,Light,Curved,,,,
+U+25,7,0,╰,Box,Corner,Bottom-Right,Solid,Light,Curved,,,,
 U+25,7,1,╱,Box,Straight,Diagonal Forward,Solid,Light,,,,,
 U+25,7,2,╲,Box,Straight,Diagonal Backward,Solid,Light,,,,,
-U+25,7,3,╳,Box,Cross,,Solid,Light,,,,,
+U+25,7,3,╳,Box,Cross,Diagonal ,Solid,Light,,,,,
 U+25,7,4,╴,Box,Terminal,Right,Solid,Light,,,,,
 U+25,7,5,╵,Box,Terminal,Bottom,Solid,Light,,,,,
 U+25,7,6,╶,Box,Terminal,Left,Solid,Light,,,,,
@@ -127,9 +127,10 @@ U+25,7,C,╼,Box,Transition,,Solid,Heavy,Terminal,Left,Light,Terminal,Right
 U+25,7,D,╽,Box,Transition,,Solid,Heavy,Terminal,Top,Light,Terminal,Top
 U+25,7,E,╾,Box,Transition,,Solid,Heavy,Terminal,Right,Light,Terminal,Left
 U+25,7,F,╿,Box,Transition,,Solid,Heavy,Terminal,Bottom,Light,Terminal,Top
-,2,B,+,ASCII,Cross,,Semi-Solid,Single,,,,,
+,2,B,+,ASCII,Cross,Orthogonal,Semi-Solid,Single,,,,,
 ,2,D,-,ASCII,Straight,Horizontal,Semi-Solid,Single,,,,,
 ,2,F,/,ASCII,Straight,Diagonal Forward,Semi-Solid,Single,,,,,
 ,3,D,=,ASCII,Straight,Horizontal,Semi-Solid,Double,,,,,
+,5,8,X,ASCII,Cross,Diagonal,Semi-Solid,Single,,,,,
 ,5,C,\,ASCII,Straight,Diagonal Backward,Semi-Solid,Single,,,,,
 ,7,B,|,ASCII,Straight,Vertical,Semi-Solid,Single,,,,,
