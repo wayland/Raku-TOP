@@ -1,3 +1,40 @@
+=begin pod
+
+=NAME TOP::Formatter::WithBorders - Format table on CLI to have borders
+
+=AUTHOR Tim Nelson - https://github.com/wayland
+
+=TITLE TOP::Formatter::WithBorders
+
+=SUBTITLE Formatting tables on the CLI to have Unicode borders
+
+=head1 TOP::Formatter::WithBorders
+
+=begin code
+
+class    TOP::Formatter::WithBorders {}
+
+=end code
+
+The class for formatting tables so that they have borders made out of 
+characters.  Currently these are the Unicode box-drawing characters, but 
+someday ASCII may be added as an option.  
+
+Many of the functions in this class are called by Database::Driver::format()
+
+Parameters that can be passed to Database::Driver (with defaults)
+
+=item1 C<$format => 'WithBorders'>
+
+=item1 C<$show-headers => True>
+
+=item1 C<$outer-line-type => 'Double'> (other options are Light and Heavy)
+
+=item1 C<$inner-line-type => 'Light'> (other options are Double and Heavy)
+
+=end pod
+
+
 use    TOP;
 
 our $border-db = Database.new(name => 'borderdb');

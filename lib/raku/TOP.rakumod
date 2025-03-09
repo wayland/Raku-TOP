@@ -318,6 +318,11 @@ class	Table does Relation is export {
 	# If this is removed, we get: Method 'of' must be resolved by class Table because it exists in multiple roles (Associative, Positional)
 	method  of() { return Mu; }
 
+	=begin pod
+	=head3 grep
+
+	Implements grep on Relation.  
+	=end pod
 	# TODO: Implement other return types
 	method	grep(Mu $matcher, :$k, :$kv, :$p, :$v, :$table = True --> Relation:D) {
 		$table or die "Error: Can only return tables at the moment";

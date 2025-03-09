@@ -1,3 +1,37 @@
+=begin pod
+
+=NAME TOP::Formatter::HalfHuman - Format table contents to be useful to humans and machines
+
+=AUTHOR Tim Nelson - https://github.com/wayland
+
+=TITLE TOP::Formatter::HalfHuman
+
+=SUBTITLE Formatting tables in a human readable but also machine readable format
+
+=head1 TOP::Formatter::HalfHuman
+
+=begin code
+
+class    TOP::Formatter::HalfHuman {
+
+=end code
+
+The class for formatting the tables in a half-human format.  Half-Human is a 
+format Tim Nelson designed.  It's basically the same as the output of many 
+Unix/Linux commands, but a little more standardised, so that computers can
+process them as easily as humans..  In particular, the rules are:
+
+=item1 All columns are whitespace-separated (standard)
+
+=item1 No columns may have spaces (suggestion: replace with underlines)
+
+=item1 No column be completely blank (suggestion: If there's no value, put a 
+dash)
+
+Many of the functions in this class are called by Database::Driver::format()
+
+=end pod
+
 use    TOP;
 
 class    TOP::Formatter::HalfHuman {
@@ -52,3 +86,4 @@ class    TOP::Formatter::HalfHuman {
 		$!output ~= (@items ==> map({ .defined ?? $_ !! '' }) ==> sprintf($!sformat));
 	}
 }
+

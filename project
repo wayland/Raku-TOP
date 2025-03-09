@@ -1,5 +1,7 @@
 #!/usr/bin/raku
 
+# Run ./project --help for information
+
 use	JSON::Fast;
 
 class	MethodLoc {

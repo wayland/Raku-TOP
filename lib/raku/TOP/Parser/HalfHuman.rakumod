@@ -1,3 +1,26 @@
+=begin pod
+
+=NAME TOP::Parser::HalfHuman
+
+=AUTHOR Tim Nelson - https://github.com/wayland
+
+=TITLE TOP::Parser::HalfHuman
+
+=SUBTITLE Parsing tables in HalfHuman format
+
+=head1 TOP::Parser::HalfHuman
+
+=begin code
+
+class   TOP::Parser::HalfHuman {}
+
+=end code
+
+The class for parsing HalfHuman text (such as many Unix commands).  See 
+TOP::Formatter::HalfHuman for details.  
+
+=end pod
+
 use	TOP;
 
 class	TOP::Parser::HalfHuman {

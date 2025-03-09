@@ -25,7 +25,7 @@ role	Database::Driver
 
 =end pod
 role	Database::Driver {
-	has	Str	$.name;
+	has	Str	$.name;	#= Name of the database
 	=begin pod
 	=head3 .useTable
 
@@ -154,7 +154,29 @@ role	Table::Driver does Associative does Positional does TOP::Core {
 		return $exists;
 	}
 
-	method	format(Str $format = 'HalfHuman', *%parameters) {
+	=begin pod
+	=head3 format
+
+	Outputs the current table using the specified formatter.  This is for
+	outputting tables in ASCII, Unicode Box, CSV, and maybe someday HTML.  
+
+	Parameters are:
+
+	=end pod
+	method	format(
+		=begin pod
+		=head4 Str $format = 'HalfHuman';
+
+		Specifies what the output format is
+		=end pod
+		Str $format = 'HalfHuman', 
+		=begin pod
+		=head4 %parameters
+
+		Parameters passed to TOP::Formatter::*.new()
+		=end pod
+		*%parameters
+	) {
 		my $formatter = $.load-library(
 			type => "TOP::Formatter::$format",
 			table => $!frontend-object,
@@ -170,7 +192,29 @@ role	Table::Driver does Associative does Positional does TOP::Core {
 		return $formatter.output;
 	}
 
-	method	parse(Str :$format = 'HalfHuman', *%parameters) {
+	=begin pod
+	=head3 parse
+
+	Reads data into a table from the specified format.  As with the above, this is
+	for reading tables in ASCII, Unicode Box, CSV, and the like.  
+
+	Parameters are:
+
+	=end pod
+	method	parse(
+		=begin pod
+		=head4 Str $format = 'HalfHuman';
+
+		Specifies what the input format is
+		=end pod
+		Str :$format = 'HalfHuman', 
+		=begin pod
+		=head4 %parameters
+
+		Parameters passed to TOP::Parser::*.new()
+		=end pod
+		*%parameters
+	) {
 		my $parser = $.load-library(
 			type => "TOP::Parser::$format",
 			table => $!frontend-object,

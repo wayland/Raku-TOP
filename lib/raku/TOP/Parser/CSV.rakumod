@@ -1,3 +1,28 @@
+=begin pod
+
+=NAME TOP::Parser::CSV - Parse a table in CSV format
+
+=AUTHOR Tim Nelson - https://github.com/wayland
+
+=TITLE TOP::Parser::CSV
+
+=SUBTITLE Parsing tables in CSV
+
+=head1 TOP::Parser::CSV
+
+=begin code
+
+class   TOP::Parser::CSV {}
+
+=end code
+
+The class for parsing CSVs into a table.  Uses Text::CSV.  
+
+Called by Database::Driver::parse()
+
+=end pod
+
+
 use	TOP;
 use	Text::CSV;
 
@@ -15,7 +40,6 @@ class	TOP::Parser::CSV {
 		};
 		my $parser = Text::CSV.new();
 		my @headers = $parser.header($handle, munge-column-names => 'none').column-names;
-dd @headers;
 		for @headers -> $heading {
 			$!table.add-field(
 				relation => $!table, 
