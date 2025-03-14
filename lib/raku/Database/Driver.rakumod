@@ -25,6 +25,7 @@ role	Database::Driver
 
 =end pod
 role	Database::Driver {
+	has	Str	$.name;	#= Name of the database
 	=begin pod
 	=head3 .useTable
 
@@ -53,7 +54,7 @@ role	Table::Driver does Associative does Positional {
 
 =end pod
 
-role	Table::Driver does Associative does Positional {
+role	Table::Driver does Associative does Positional does TOP::Core {
 	=begin pod
 	=defn Field @.fields
 	Stores the fields
@@ -95,11 +96,13 @@ role	Table::Driver does Associative does Positional {
 
 	submethod	TWEAK(
 			Table :$frontend-object,
+
 			=begin pod
 			=defn Str $action
 			The action to take -- see the parameter of the same name on the frontend object
 			=end pod
 			Str :$action,
+
 			=begin pod
 			=defn Str %fields
 			If relevant, the fields to use in creating/altering the table
@@ -145,10 +148,80 @@ role	Table::Driver does Associative does Positional {
 	=end pod
 	method	exists(Str :$true-error, Str :$false-error) {
 		my Bool $exists =  self.raw-exists();
-		$exists and $true-error.defined and die "{$true-error} in database '{$!database.database-name}'";
-		! $exists and $false-error.defined and die "{$false-error} in database '{$!database.database-name}'";
+		my $usename = $!database.name ?? $!database.name !! '(unnamed memory database)';
+		  $exists and $true-error.defined  and die "{$true-error} in database '{$usename}'";
+		! $exists and $false-error.defined and die "{$false-error} in database '{$usename}'";
 		return $exists;
 	}
+
+	=begin pod
+	=head3 format
+
+	Outputs the current table using the specified formatter.  This is for
+	outputting tables in ASCII, Unicode Box, CSV, and maybe someday HTML.  
+
+	Parameters are:
+
+	=end pod
+	method	format(
+		=begin pod
+		=head4 Str $format = 'HalfHuman';
+
+		Specifies what the output format is
+		=end pod
+		Str $format = 'HalfHuman', 
+		=begin pod
+		=head4 %parameters
+
+		Parameters passed to TOP::Formatter::*.new()
+		=end pod
+		*%parameters
+	) {
+		my $formatter = $.load-library(
+			type => "TOP::Formatter::$format",
+			table => $!frontend-object,
+			|%parameters
+		);
+
+		$formatter.prepare-table();
+		$formatter.output-header();
+		for self[0..*] -> $row {
+			$formatter.output-row($row);
+		}
+		$formatter.output-footer();
+		return $formatter.output;
+	}
+
+	=begin pod
+	=head3 parse
+
+	Reads data into a table from the specified format.  As with the above, this is
+	for reading tables in ASCII, Unicode Box, CSV, and the like.  
+
+	Parameters are:
+
+	=end pod
+	method	parse(
+		=begin pod
+		=head4 Str $format = 'HalfHuman';
+
+		Specifies what the input format is
+		=end pod
+		Str :$format = 'HalfHuman', 
+		=begin pod
+		=head4 %parameters
+
+		Parameters passed to TOP::Parser::*.new()
+		=end pod
+		*%parameters
+	) {
+		my $parser = $.load-library(
+			type => "TOP::Parser::$format",
+			table => $!frontend-object,
+			|%parameters
+		);
+	}
+
 	##### Abstracts
 	method fill_from_aoh(@rows) {...}
 	method	raw-exists() {...}	# Helper function for .exists, above
@@ -186,16 +259,18 @@ role	Table::Driver does Associative does Positional {
 
 	Adds a field to the table
 
-		.add-field(Table :$relation, Str :$name, Any:U $type)
+		.add-field(Table :$relation, Str :$name, Any:U :$type)
 	=end pod
 	method	add-field(
 		# TODO: Try to replace "relation" with "self"; if that doesn't work, then document
 		Table :$relation,
+
 		=begin pod
 		=defn Str $name
 		The name of the field being added
 		=end pod
 		Str :$name,
+
 		=begin pod
 		=defn Any:U $type
 		The type of the field, as a Raku type

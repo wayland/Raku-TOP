@@ -20,4 +20,35 @@ then as you please.
 
 #include class-refs
 
+=head1 Formats and their parameters
+
+Some formats are only really used as storage (eg. Memory, Postgres).  Some 
+things are only ever used as input/output (eg. WithBorders is generally not 
+very useful except as output).
+
+=begin table
+Format          | Storage | Parser | Formatter       | Tree Format
+===================================================================
+Memory          | Yes     | No     | No
+Postgres        | Yes     | No     | No
+HalfHuman       | No      | Yes    | Yes
+WithBorders     | No      | No     | Yes
+CSV             | Yes     | Yes    | Make
+HTML            | Make    | Make   | Make            | XML
+Spreadsheet     | Make    | No     | No              | XML
+JSON            | Make    | Make   | Make            | JSON
+Pod6            | ?       | ?      | Make            | AST
+SQLite          | Accept  | No     | No
+MySQL           | Accept  | No     | No
+Postgres option with not using cursors (has to support both cursor and non-cursor) | Accept  | No     | No
+=end table
+
+=head2 Key to Formats
+
+=item B<Yes>: This item exists
+=item B<No>: No plans for this
+=item B<Make>: Plans for this, but nothing yet
+=item B<Accept>: No plans to make this, but would gladly accept it if someone made it
+=item B<Tree>: These ones will be made, but not until Tree-Oriented Programming has been inaugurated
+
 =end pod

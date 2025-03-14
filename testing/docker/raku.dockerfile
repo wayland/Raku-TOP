@@ -26,6 +26,7 @@ RUN \
 		CSV::Parser \
 		Database::Driver::Postgres Slang::Otherwise \
 		'Hash::Ordered:ver<0.0.8>' 'Hash::Agnostic:ver<0.0.16>' \
+		'UUID' 'Text::CSV' 'IO::Glob' \
 	&& rm -rf /tmp/.zef
 
 ##### Install private raku packages
@@ -34,6 +35,7 @@ RUN mkdir -p $LIBDIR
 #COPY Slang/DataFlow.rakumod $LIBDIR/Slang/DataFlow.rakumod
 COPY lib/raku $LIBDIR/
 
+COPY data data
 COPY testing/tests/* ./
 COPY testing/docker/pgpass .pgpass
 #RUN ls -laF ./

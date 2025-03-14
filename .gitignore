@@ -8,3 +8,6 @@ lib/.precomp
 # IDE files
 .idea
 TOP.iml
+
+# LibreOffice lock
+.~lock.*

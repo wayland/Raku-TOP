@@ -25,8 +25,10 @@ jobs:
 
       - name: Build the stack
         run: docker compose -f testing/docker/docker-compose.yml --project-directory . up -d
+      - name: LS
+        run: docker exec raku-top-raku-1 /bin/bash -lc ls -laF
       - name: Test
-        run: docker exec raku-top-raku-1 /bin/bash -lc ./table-tests.rakutest
+        run: docker exec raku-top-raku-1 /bin/bash -lc ./all-tests
 #        run: docker run --network container:raku 
 
       # Finally, "Post Run satackey/action-docker-layer-caching@v0.0.11",

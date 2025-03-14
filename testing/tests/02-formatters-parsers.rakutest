@@ -1,0 +1,90 @@
+#!/usr/bin/raku
+
+use v6.e.PREVIEW;
+
+use	lib 'lib/raku';
+
+use	Test;
+use	TOP;
+
+plan 3;
+
+my $table = Table.new(name => 'input', action => 'ensure');
+isa-ok($table, Table, 'Made table');
+$table.parse(
+	command => 'ls -l /usr',
+);
+
+my $out-table = $table.format(
+	'WithBorders',
+#	show-headers => False,
+);
+my $ls-test-output = q:to/END/;
+╔════════════╤════╤══════╤══════╤══════╤═════╤═══╤═══════╤═════════╗
+║ A          │  B │ C    │ D    │    E │ F   │ G │ H     │ I       ║
+╟────────────┼────┼──────┼──────┼──────┼─────┼───┼───────┼─────────╢
+║ total      │ 24 │      │      │      │     │   │       │         ║
+║ drwxr-xr-x │  1 │ root │ root │ 4096 │ Oct │ 5 │ 05:49 │ bin     ║
+║ drwxr-xr-x │  1 │ root │ root │ 4096 │ Oct │ 5 │ 05:49 │ include ║
+║ drwxr-xr-x │  1 │ root │ root │ 4096 │ Oct │ 5 │ 05:49 │ lib     ║
+║ drwxr-xr-x │  1 │ root │ root │ 4096 │ Sep │ 6 │ 2024  │ local   ║
+║ drwxr-xr-x │  1 │ root │ root │ 4096 │ Oct │ 5 │ 05:49 │ sbin    ║
+║ drwxr-xr-x │  1 │ root │ root │ 4096 │ Oct │ 5 │ 05:49 │ share   ║
+╚════════════╧════╧══════╧══════╧══════╧═════╧═══╧═══════╧═════════╝
+END
+
+is($out-table, $ls-test-output, 'ls table is as expected');
+print $out-table;
+
+my $btable = Table.new(name => 'boxchars', action => 'ensure');
+say "Calling with CSV";
+$btable.parse(
+	format => 'CSV',
+	filename => 'data/BoxDrawingCharacters.csv',
+);
+
+my $table2 = $btable.grep({
+	.{'Primary Weight'} ~~ /^(Double)$/ 
+	and .{'Block Name'} eq 'Box'
+});
+dd $table2;
+
+say "Formatting";
+my $bout-table = $table2.format(
+	'WithBorders',
+#	show-headers => False,
+);
+
+my $boxchars-test-output = q:to/END/;
+╔══════════╤═════╤════════╤══════╤════════════╤═══════════════╤══════════════════╤═══════╤════════════════╤═══════════════╤══════════════════╤══════════════════╤═════════════════╤════════════════════╗
+║ Block ID │ Row │ Column │ Char │ Block Name │ Overall Shape │ Overall Position │ Style │ Primary Weight │ Primary Shape │ Primary Position │ Secondary Weight │ Secondary Shape │ Secondary Position ║
+╟──────────┼─────┼────────┼──────┼────────────┼───────────────┼──────────────────┼───────┼────────────────┼───────────────┼──────────────────┼──────────────────┼─────────────────┼────────────────────╢
+║ U+25     │ 5   │ 0      │ ═    │ Box        │ Straight      │ Horizontal       │ Solid │ Double         │               │                  │                  │                 │                    ║
+║ U+25     │ 5   │ 1      │ ║    │ Box        │ Straight      │ Vertical         │ Solid │ Double         │               │                  │                  │                 │                    ║
+║ U+25     │ 5   │ 2      │ ╒    │ Box        │ Corner        │ Top-Left         │ Solid │ Double         │ Terminal      │ Left             │ Light            │ Terminal        │ Top                ║
+║ U+25     │ 5   │ 3      │ ╓    │ Box        │ Corner        │ Top-Left         │ Solid │ Double         │ Terminal      │ Top              │ Light            │ Terminal        │ Left               ║
+║ U+25     │ 5   │ 4      │ ╔    │ Box        │ Corner        │ Top-Left         │ Solid │ Double         │               │                  │                  │                 │                    ║
+║ U+25     │ 5   │ 5      │ ╕    │ Box        │ Corner        │ Top-Right        │ Solid │ Double         │ Terminal      │ Right            │ Light            │ Terminal        │ Top                ║
+║ U+25     │ 5   │ 6      │ ╖    │ Box        │ Corner        │ Top-Right        │ Solid │ Double         │ Terminal      │ Top              │ Light            │ Terminal        │ Right              ║
+║ U+25     │ 5   │ 7      │ ╗    │ Box        │ Corner        │ Top-Right        │ Solid │ Double         │               │                  │                  │                 │                    ║
+║ U+25     │ 5   │ 8      │ ╘    │ Box        │ Corner        │ Bottom-Left      │ Solid │ Double         │ Terminal      │ Left             │ Light            │ Terminal        │ Bottom             ║
+║ U+25     │ 5   │ 9      │ ╙    │ Box        │ Corner        │ Bottom-Left      │ Solid │ Double         │ Terminal      │ Bottom           │ Light            │ Terminal        │ Left               ║
+║ U+25     │ 5   │ A      │ ╚    │ Box        │ Corner        │ Bottom-Left      │ Solid │ Double         │               │                  │                  │                 │                    ║
+║ U+25     │ 5   │ B      │ ╛    │ Box        │ Corner        │ Bottom-Right     │ Solid │ Double         │ Terminal      │ Right            │ Light            │ Terminal        │ Bottom             ║
+║ U+25     │ 5   │ C      │ ╜    │ Box        │ Corner        │ Bottom-Right     │ Solid │ Double         │ Terminal      │ Bottom           │ Light            │ Terminal        │ Right              ║
+║ U+25     │ 5   │ D      │ ╝    │ Box        │ Corner        │ Bottom-Right     │ Solid │ Double         │               │                  │                  │                 │                    ║
+║ U+25     │ 5   │ F      │ ╟    │ Box        │ T             │ Left             │ Solid │ Double         │ Straight      │ Vertical         │ Light            │ Terminal        │ Left               ║
+║ U+25     │ 6   │ 0      │ ╠    │ Box        │ T             │ Left             │ Solid │ Double         │               │                  │                  │                 │                    ║
+║ U+25     │ 6   │ 2      │ ╢    │ Box        │ T             │ Right            │ Solid │ Double         │ Straight      │ Vertical         │ Light            │ Terminal        │ Right              ║
+║ U+25     │ 6   │ 3      │ ╣    │ Box        │ T             │ Right            │ Solid │ Double         │               │                  │                  │                 │                    ║
+║ U+25     │ 6   │ 4      │ ╤    │ Box        │ T             │ Top              │ Solid │ Double         │ Straight      │ Horizontal       │ Light            │ Terminal        │ Top                ║
+║ U+25     │ 6   │ 6      │ ╦    │ Box        │ T             │ Top              │ Solid │ Double         │               │                  │                  │                 │                    ║
+║ U+25     │ 6   │ 7      │ ╧    │ Box        │ T             │ Bottom           │ Solid │ Double         │ Straight      │ Horizontal       │ Light            │ Terminal        │ Bottom             ║
+║ U+25     │ 6   │ 9      │ ╩    │ Box        │ T             │ Bottom           │ Solid │ Double         │               │                  │                  │                 │                    ║
+║ U+25     │ 6   │ A      │ ╪    │ Box        │ Cross         │ Orthogonal       │ Solid │ Double         │ Straight      │ Horizontal       │ Light            │ Straight        │ Vertical           ║
+║ U+25     │ 6   │ B      │ ╫    │ Box        │ Cross         │ Orthogonal       │ Solid │ Double         │ Straight      │ Vertical         │ Light            │ Straight        │ Horizontal         ║
+║ U+25     │ 6   │ C      │ ╬    │ Box        │ Cross         │ Orthogonal       │ Solid │ Double         │               │                  │                  │                 │                    ║
+╚══════════╧═════╧════════╧══════╧════════════╧═══════════════╧══════════════════╧═══════╧════════════════╧═══════════════╧══════════════════╧══════════════════╧═════════════════╧════════════════════╝
+END
+
+is($bout-table, $boxchars-test-output, 'box characters table is as expected');
