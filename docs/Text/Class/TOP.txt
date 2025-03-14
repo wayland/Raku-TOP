@@ -12,12 +12,18 @@ Table Oriented Programming in Raku
 
 TOP::Core
 
-    role	TOP::Core {}
+    role	TOP::Core {...}
 
 
 
 This is the common code that's shared across all TOP objects; this is
 intended to be a role on all TOP classes.
+
+method load-library
+
+method load-library(Str :$type = 'Database::Driver::Memory', *%parameters)
+
+Loads the library in question, and makes an object of the named type
 
 Tuple
 
@@ -152,6 +158,10 @@ What kind of action to take when creating the table.
   can-create  create if not existing  No        No          If Absent
   ensure      create or alter         No        Yes         If not conformant
 
+
+    grep
+
+Implements grep on Relation. 
 
 Database
 

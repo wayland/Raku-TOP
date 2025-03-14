@@ -373,7 +373,9 @@ hr {
 <tr class="toc-level-1"><td class="toc-number">1</td><td class="toc-text"><a href="#Raku_TOP:_Table-Oriented_Programming_(TOP)_in_the_Raku_programming_language">Raku TOP: Table-Oriented Programming (TOP) in the Raku programming language</a></td></tr>
       <tr class="toc-level-2"><td class="toc-number">1.1</td><td class="toc-text"><a href="#Raku_TOP_Introductory_Documents">Raku TOP Introductory Documents</a></td></tr>
   <tr class="toc-level-2"><td class="toc-number">1.2</td><td class="toc-text"><a href="#Raku_TOP_Class_References">Raku TOP Class References</a></td></tr>
-       
+            <tr class="toc-level-1"><td class="toc-number">2</td><td class="toc-text"><a href="#Formats_and_their_parameters">Formats and their parameters</a></td></tr>
+                                                              <tr class="toc-level-2"><td class="toc-number">2.1</td><td class="toc-text"><a href="#Key_to_Formats">Key to Formats</a></td></tr>
+          
 </table>
 </nav>
 
@@ -393,6 +395,14 @@ hr {
 <p>Also, the CSV one doesn&#39;t work yet, but the others should; probably start with TOP, then go to Memory, then as you please. </p>
 <ul><li><p><a href="docs/HTML/Class/CSV.html">class CSV</a></p>
 </li>
+<li><p><a href="docs/HTML/Class/HalfHuman.html">class HalfHuman</a></p>
+</li>
+<li><p><a href="docs/HTML/Class/WithBorders.html">class WithBorders</a></p>
+</li>
+<li><p><a href="docs/HTML/Class/HalfHuman.html">class HalfHuman</a></p>
+</li>
+<li><p><a href="docs/HTML/Class/CSV.html">class CSV</a></p>
+</li>
 <li><p><a href="docs/HTML/Class/Memory.html">class Memory</a></p>
 </li>
 <li><p><a href="docs/HTML/Class/Postgres.html">class Postgres</a></p>
@@ -400,6 +410,27 @@ hr {
 <li><p><a href="docs/HTML/Class/Driver.html">class Driver</a></p>
 </li>
 <li><p><a href="docs/HTML/Class/TOP.html">class TOP</a></p>
+</li>
+</ul>
+<h1 id="Formats_and_their_parameters"><a class="u" href="#___top" title="go to top of document">Formats and their parameters</a></h1>
+<p>Some formats are only really used as storage (eg. Memory, Postgres). Some things are only ever used as input/output (eg. WithBorders is generally not very useful except as output).</p>
+<table class="pod-table">
+<thead><tr>
+<th>Format</th> <th>Storage</th> <th>Parser</th> <th>Formatter</th> <th>Tree Format</th>
+</tr></thead>
+<tbody>
+<tr> <td>Memory</td> <td>Yes</td> <td>No</td> <td>No</td> <td></td> </tr> <tr> <td>Postgres</td> <td>Yes</td> <td>No</td> <td>No</td> <td></td> </tr> <tr> <td>HalfHuman</td> <td>No</td> <td>Yes</td> <td>Yes</td> <td></td> </tr> <tr> <td>WithBorders</td> <td>No</td> <td>No</td> <td>Yes</td> <td></td> </tr> <tr> <td>CSV</td> <td>Yes</td> <td>Yes</td> <td>Make</td> <td></td> </tr> <tr> <td>HTML</td> <td>Make</td> <td>Make</td> <td>Make</td> <td>XML</td> </tr> <tr> <td>Spreadsheet</td> <td>Make</td> <td>No</td> <td>No</td> <td>XML</td> </tr> <tr> <td>JSON</td> <td>Make</td> <td>Make</td> <td>Make</td> <td>JSON</td> </tr> <tr> <td>Pod6</td> <td>?</td> <td>?</td> <td>Make</td> <td>AST</td> </tr> <tr> <td>SQLite</td> <td>Accept</td> <td>No</td> <td>No</td> <td></td> </tr> <tr> <td>MySQL</td> <td>Accept</td> <td>No</td> <td>No</td> <td></td> </tr> <tr> <td>Postgres option with not using cursors (has to support both cursor and non-cursor)</td> <td>Accept</td> <td>No</td> <td>No</td> <td></td> </tr>
+</tbody>
+</table><h2 id="Key_to_Formats"><a class="u" href="#___top" title="go to top of document">Key to Formats</a></h2>
+<ul><li><p><strong>Yes</strong>: This item exists</p>
+</li>
+<li><p><strong>No</strong>: No plans for this</p>
+</li>
+<li><p><strong>Make</strong>: Plans for this, but nothing yet</p>
+</li>
+<li><p><strong>Accept</strong>: No plans to make this, but would gladly accept it if someone made it</p>
+</li>
+<li><p><strong>Tree</strong>: These ones will be made, but not until Tree-Oriented Programming has been inaugurated</p>
 </li>
 </ul>
 

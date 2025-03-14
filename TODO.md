@@ -1,7 +1,6 @@
 # 0.0.5 iteration tasks
--	Get the tests working with it
+-	Commit to git
 -	Write POD and comments, and clean up
-	-	Include moving the table below, under "How to deal with formats" to the doco
 -	Commit to git
 -	Review/Upload/Publicise to the fez ecosystem
 -	If there are any interesting changes, announce on #raku
@@ -23,6 +22,8 @@ Moved to TODO.xml on PP-site
 
 ## 0.0.5
 DONE	Human-only (output-only) & half-human (input/output)
+DONE	Get the tests working with it
+DONE	Include the table "How to deal with formats" in the doco
 
 ## 0.0.1
 DONE	Put in a copy of the artistic license; see if we can do dual license (Artistic + GPL)
@@ -40,32 +41,3 @@ DONE	Rewrite https://wayland.github.io/table-oriented-programming/Raku-TOP/Intro
 	-	The TODO list below (aka Iterations) is incorporated into it
 	-	Maybe also TODO items from the code are incorporated
 DONE	Clean up browser tabs relating to TOP
-
-
-
-
-# How to deal with formats
-
-Some things are only really used as storage (eg. Memory, Postgres).  Some things are only ever used as 
-input/output (eg. HalfHuman is the output of most Unix commands).
-
-Format		Storage	Parser	Formatter	POP Format
-------		-------	------	---------	----------
-## Existing (at least partially)
-Memory		Yes	No	No
-Postgres	Yes	No	No
-HalfHuman	?	Yes	Yes
-WithBorders	No	No	Yes
-## Make next
-CSV		Make	Make	Make
-## Waiting on Plex-Oriented Programming (POP)
-HTML		Make	Make	Make		XML
-Spreadsheet	Make	No	No		XML
-JSON		Make	Make	Make		JSON
-Pod6		?	?	Make		AST
-
-## Not planning, but would gladly accept
-SQLite		No	No	No
-MySQL		No	No	No
-Postgres option with not using cursors (has to support both cursor and non-cursor)
-		No	No	No

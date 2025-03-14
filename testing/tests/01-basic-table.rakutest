@@ -34,11 +34,11 @@ subtest {
 	plan 2;
 
 	$pgdb = Database.new(
+		# Database
 		backend => 'Postgres',
-		parameters => {
-			database-name => 'raku_top',
-			username => 'postgres',
-		}
+		# Postgres
+		database-name => 'raku_top',
+		username => 'postgres',
 	);
 	isa-ok($pgdb, Database, 'Database.new() returns a Database');
 #	dd $pgdb.backend-object.handle.execute("SELECT table_name FROM information_schema. tables WHERE table_schema='public'").allrows();

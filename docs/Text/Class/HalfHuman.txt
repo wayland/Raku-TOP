@@ -1,0 +1,33 @@
+NAME
+TOP::Formatter::HalfHuman - Format table contents to be useful to humans
+and machines
+
+AUTHOR
+Tim Nelson - https://github.com/wayland
+
+TITLE
+TOP::Formatter::HalfHuman
+
+SUBTITLE
+Formatting tables in a human readable but also machine readable format
+
+TOP::Formatter::HalfHuman
+
+    class    TOP::Formatter::HalfHuman {
+
+
+
+The class for formatting the tables in a half-human format. Half-Human is a
+format Tim Nelson designed. It's basically the same as the output of many
+Unix/Linux commands, but a little more standardised, so that computers can
+process them as easily as humans.. In particular, the rules are:
+
+  * All columns are whitespace-separated (standard)
+
+  * No columns may have spaces (suggestion: replace with underlines)
+
+  * No column be completely blank (suggestion: If there's no value, put a
+  dash)
+
+Many of the functions in this class are called by
+Database::Driver::format()

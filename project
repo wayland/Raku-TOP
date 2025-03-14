@@ -314,7 +314,9 @@ my $docker_compose_command = "docker-compose -f testing/docker/docker-compose.ym
 multi	MAIN('test') { #= Runs the tests for the project in a docker container.  This means we can run them as a github action, and easily change raku versions
 	do_cmd("$docker_compose_command up -d");
 	my $project-name = $*CWD.IO.basename.lc;
-	do_cmd("docker exec {$project-name}_raku_1 /bin/bash -lc ./table-tests.rakutest 2>&1");
+	for <01-basic-table.rakutest 02-formatters-parsers.rakutest> -> $testfile {
+		do_cmd("docker exec {$project-name}_raku_1 /bin/bash -lc ./$testfile 2>&1");
+	}
 }
 
 multi	MAIN('build') { #= Build the docker image
