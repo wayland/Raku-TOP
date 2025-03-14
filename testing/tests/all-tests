@@ -1,0 +1,9 @@
+#!/usr/bin/raku
+
+use	IO::Glob;
+
+for sort glob('*.rakutest') -> $script {
+	shell $script;
+}
+
+

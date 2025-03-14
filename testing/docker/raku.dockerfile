@@ -26,7 +26,7 @@ RUN \
 		CSV::Parser \
 		Database::Driver::Postgres Slang::Otherwise \
 		'Hash::Ordered:ver<0.0.8>' 'Hash::Agnostic:ver<0.0.16>' \
-		'UUID' 'Text::CSV' \
+		'UUID' 'Text::CSV' 'IO::Glob' \
 	&& rm -rf /tmp/.zef
 
 ##### Install private raku packages
