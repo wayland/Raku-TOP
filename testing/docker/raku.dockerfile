@@ -24,7 +24,7 @@ WORKDIR /home/raku
 RUN \
 	zef install -v \
 		CSV::Parser \
-		Database::Driver::Postgres Slang::Otherwise \
+		Slang::Otherwise \
 		'Hash::Ordered:ver<0.0.8>' 'Hash::Agnostic:ver<0.0.16>' \
 		'UUID' 'Text::CSV' 'IO::Glob' \
 	&& rm -rf /tmp/.zef

@@ -1,28 +1,28 @@
-use	Database::Driver;
+use	Database::Storage;
 use	TOP;
 use	DBIish;
 use	Slang::Otherwise;
 
 # Pre-declarations so that we can use class names
-class	Cursor::Driver::Postgres {...}
-class	Table::Driver::Postgres does Table::Driver {...}
+class	Cursor::Storage::Postgres {...}
+class	Table::Storage::Postgres does Table::Storage {...}
 
 
 =begin pod
 
-=NAME Postgres Driver - The Postgres driver for Raku TOP
+=NAME Postgres Storage - The Postgres driver for Raku TOP
 
-=TITLE Postgres Driver
+=TITLE Postgres Storage
 
 =SUBTITLE The Postgres driver for Raku TOP
 
 =AUTHOR Tim Nelson - https://github.com/wayland
 
-=head1 Database::Driver::Postgres
+=head1 Database::Storage::Postgres
 
 =begin code
 
-class	Database::Driver::Postgres does Database::Driver {
+class	Database::Storage::Postgres does Database::Storage {
 
 =end code
 
@@ -41,16 +41,16 @@ The current (only) behaviour is Cursor.  We'd like to make the other options ava
 =end pod
 
 
-class	Database::Driver::Postgres does Database::Driver {
+class	Database::Storage::Postgres does Database::Storage {
 	has	$.database-name;
 	has	$.handle;
 	has	%!tableObjects;
 
-	# Set up the Database Driver
+	# Set up the Database Storage
 	submethod	TWEAK(:$database-name, :$username is copy) {
 		# Check the parameters
 		$!database-name or die "Error: no database name passed in";
-		$username or $username = Database::Driver::Postgres.get_username();
+		$username or $username = Database::Storage::Postgres.get_username();
 
 		# Read PostgreSQL config and map into fields that can be passed to DBIish.connect
 		my @lines = (%*ENV<HOME> ~ "/.pgpass").IO.slurp.split(/\n/);
@@ -111,7 +111,7 @@ class	Database::Driver::Postgres does Database::Driver {
 	method	useTable(Table :$table, Str :$action = 'use', :%fields = {}) {
 		my Str $name = $table.name;
 
-		%!tableObjects{$name} = Table::Driver::Postgres.new(
+		%!tableObjects{$name} = Table::Storage::Postgres.new(
 			database => self,
 			frontend-object => $table,
 			fields => %fields,
@@ -122,8 +122,8 @@ class	Database::Driver::Postgres does Database::Driver {
 }
 
 # Represents a Postgres tuple
-class	Tuple::Driver::Postgres is Tuple {
-	has	Table::Driver::Postgres	$!table is built is required;	# The table in which the Tuple is stored
+class	Tuple::Storage::Postgres is Tuple {
+	has	Table::Storage::Postgres	$!table is built is required;	# The table in which the Tuple is stored
 	has	Int						$.position;						# Position within the table
 	has	Bool					$.auto-update-database = True;	# Indicates whether AT-KEY should update the database when written
 
@@ -152,8 +152,8 @@ class	Tuple::Driver::Postgres is Tuple {
 }
 
 
-class	Table::Driver::Postgres does Table::Driver does Hash::Agnostic {
-	has	Cursor::Driver::Postgres	$!basic-cursor handles <EXISTS-POS>;	# Holds the cursor that does some of the work for us -- see note at top about how we'd like this to be more optional
+class	Table::Storage::Postgres does Table::Storage does Hash::Agnostic {
+	has	Cursor::Storage::Postgres	$!basic-cursor handles <EXISTS-POS>;	# Holds the cursor that does some of the work for us -- see note at top about how we'd like this to be more optional
 	has	Str							%!column-keys;							# Maps a Field name to its primary key in information_schema.columns
 #	has	Bool						$!needs-refresh = True;
 
@@ -162,7 +162,7 @@ class	Table::Driver::Postgres does Table::Driver does Hash::Agnostic {
 	has								$!at-pos-cache-item;
 
 	# Required to resolve between parent classes
-	method	new(Database::Driver :$database) {
+	method	new(Database::Storage :$database) {
 		my $rv = callsame;
 
 		return $rv;
@@ -174,13 +174,13 @@ class	Table::Driver::Postgres does Table::Driver does Hash::Agnostic {
 	}
 
 	submethod	TWEAK(
-		Database::Driver::Postgres :$database
+		Database::Storage::Postgres :$database
 	) {
 		# Set up object
 		if $!init-create {
 			# TODO: Implement create
 			die "Create not implemented yet";
-			#			%!tableObjects{$name} = Table::Driver::Postgres.new(
+			#			%!tableObjects{$name} = Table::Storage::Postgres.new(
 			#				database => self,
 			#				frontend-object => $table,
 			#			);
@@ -206,7 +206,7 @@ class	Table::Driver::Postgres does Table::Driver does Hash::Agnostic {
 		}
 	}
 
-	# Returns True if the table exists; see Table::Driver for more info
+	# Returns True if the table exists; see Table::Storage for more info
 	method	raw-exists() {
 		my Bool $exists =  self.create_fields_from_columns();
 		return $exists;
@@ -297,7 +297,7 @@ class	Table::Driver::Postgres does Table::Driver does Hash::Agnostic {
 	# Uses an Array of Hash to fill in the rows of the table
 	# TODO:
 	# - Create a "fill" function that takes another Table as the source
-	# -	On Table::Driver::Memory, make a fill function that takes an AOH
+	# -	On Table::Storage::Memory, make a fill function that takes an AOH
 	# -	Remove this function, since it can be replaced with "fill"
 	method	fill_from_aoh(@rows) {
 		say "fill_from_aoh will be replaced with 'fill' someday";
@@ -343,7 +343,7 @@ class	Table::Driver::Postgres does Table::Driver does Hash::Agnostic {
 		my $table-name = $!frontend-object.name;
 		$table-name or die "Error: Unnamed table!";
 		my $cursor-name = "{$table-name}_basic_cursor";
-		$!basic-cursor = Cursor::Driver::Postgres.new(
+		$!basic-cursor = Cursor::Storage::Postgres.new(
 			:$cursor-name,
 			:$table-name,
 			database => $!database,
@@ -360,7 +360,7 @@ class	Table::Driver::Postgres does Table::Driver does Hash::Agnostic {
 #				say "Table P AT-POS FETCH {position}";
 				if ! (defined($!at-pos-cache-position) and position == $!at-pos-cache-position) {
 					$!at-pos-cache-position = position;
-					$!at-pos-cache-item = Tuple::Driver::Postgres.new(
+					$!at-pos-cache-item = Tuple::Storage::Postgres.new(
 						table => self,
 						position => position,
 						initial-values => %( $.basic-cursor.AT-POS(position) ),
@@ -428,8 +428,8 @@ class	Table::Driver::Postgres does Table::Driver does Hash::Agnostic {
 }
 
 # Represents a cursor on a database
-class	Cursor::Driver::Postgres does Positional {
-	has	Database::Driver::Postgres	$!database		is built is required;
+class	Cursor::Storage::Postgres does Positional {
+	has	Database::Storage::Postgres	$!database		is built is required;
 	has	Str							$!cursor-name	is built is required;
 	has	Str							$!table-name	is built is required;
 	has								$!handle;

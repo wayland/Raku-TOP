@@ -1,21 +1,21 @@
-use     Database::Driver;
+use     Database::Storage;
 use     TOP;
 
-class	Database::Driver::Memory {...}
+class	Database::Storage::Memory {...}
 
 =begin pod
 
-=NAME Raku *::Driver::Memory - Raku classes to implement the in-memory table store
+=NAME Raku *::Storage::Memory - Raku classes to implement the in-memory table store
 
-=TITLE Raku *::Driver::Memory
+=TITLE Raku *::Storage::Memory
 
 =SUBTITLE Raku classes to implement the in-memory table store
 
 =AUTHOR Tim Nelson - https://github.com/wayland
 
-=head1 Table::Driver::Memory
+=head1 Table::Storage::Memory
 
-	class	Table::Driver::Memory does Table::Driver {
+	class	Table::Storage::Memory does Table::Storage {
 
 =head1 Usage
 
@@ -36,7 +36,7 @@ not much you need to specify when using one of these.
 The parameters to Database.useTable are basically the same as are passed to Table.new().
 
 =end pod
-class	Table::Driver::Memory does Table::Driver {
+class	Table::Storage::Memory does Table::Storage {
 	# Currently public for access by Field object -- make protected/friend if useful
 	has	Tuple	@.rows handles <elems EXISTS-POS DELETE-POS ASSIGN-POS BIND-POS>;
 
@@ -52,16 +52,16 @@ class	Table::Driver::Memory does Table::Driver {
 
 	method	new(:$database, *@_, *%_) {
 		my $usedb;
-		if $database ~~ Database::Driver {
+		if $database ~~ Database::Storage {
 			$usedb = $database;
 		} else {
-			$usedb = Database::Driver::Memory.new();
+			$usedb = Database::Storage::Memory.new();
 		}
 		callwith(database => $usedb, |@_, |%_);
 	}
 
-	# Doco: Documented in Table::Driver
-	# TODO: a) Populate Table::Driver::Memory.database and b) make this check database.tables
+	# Doco: Documented in Table::Storage
+	# TODO: a) Populate Table::Storage::Memory.database and b) make this check database.tables
 	method	raw-exists() {
 		return False;
 	}
@@ -107,7 +107,7 @@ class	Table::Driver::Memory does Table::Driver {
 		return self;
 	}
 
-	# If we don't have this, we get the error: Method 'of' must be resolved by class Table::Driver::Memory because it exists in multiple roles (Associative, Positional)
+	# If we don't have this, we get the error: Method 'of' must be resolved by class Table::Storage::Memory because it exists in multiple roles (Associative, Positional)
 	method	of() { return Mu; }
 
 	# Positional interface, used for rows
@@ -196,9 +196,9 @@ class	Table::Driver::Memory does Table::Driver {
 	}
 }
 
-# Implements Database::Driver for the Memory type
-class	Database::Driver::Memory does Database::Driver {
-	my	Database::Driver::Memory	$primary-instance;	# Help implement Singleton
+# Implements Database::Storage for the Memory type
+class	Database::Storage::Memory does Database::Storage {
+	my	Database::Storage::Memory	$primary-instance;	# Help implement Singleton
 	has	%tables;
 
 	# Singleton pattern (if unnamed; if it's named, then don't Singleton; could in future use a hash and then Singleton everything
@@ -214,7 +214,7 @@ class	Database::Driver::Memory does Database::Driver {
 	method	useTable(Table :$table, *%params) {
 		%tables{$table.name} and return %tables{$table.name};
 
-		my Table::Driver::Memory $backend-table = Table::Driver::Memory.new(
+		my Table::Storage::Memory $backend-table = Table::Storage::Memory.new(
 			frontend-object => $table,
 			|%params
 		);

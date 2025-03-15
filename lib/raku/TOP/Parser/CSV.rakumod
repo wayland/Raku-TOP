@@ -18,7 +18,7 @@ class   TOP::Parser::CSV {}
 
 The class for parsing CSVs into a table.  Uses Text::CSV.  
 
-Called by Database::Driver::parse()
+Called by Database::Storage::parse()
 
 =end pod
 

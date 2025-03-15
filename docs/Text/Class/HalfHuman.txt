@@ -30,4 +30,4 @@ process them as easily as humans.. In particular, the rules are:
   dash)
 
 Many of the functions in this class are called by
-Database::Driver::format()
+Database::Storage::format()

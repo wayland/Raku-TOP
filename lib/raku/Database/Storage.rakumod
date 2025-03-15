@@ -3,28 +3,28 @@ use	TOP;
 
 =begin pod
 
-=NAME Raku TOP Driver - The common driver for Raku TOP backends
+=NAME Raku TOP Storage - The common driver for Raku TOP backends
 
-=TITLE Raku TOP Driver
+=TITLE Raku TOP Storage
 
 =SUBTITLE The common driver for Raku TOP backends
 
 =AUTHOR Tim Nelson - https://github.com/wayland
 
-=head1 Database::Driver
+=head1 Database::Storage
 
 The parent class for all the different Database Drivers (backends).
 
 =begin code
 
-role	Database::Driver
+role	Database::Storage
 
 =end code
 
 =head2 Methods
 
 =end pod
-role	Database::Driver {
+role	Database::Storage {
 	has	Str	$.name;	#= Name of the database
 	=begin pod
 	=head3 .useTable
@@ -42,11 +42,11 @@ role	Database::Driver {
 
 =begin pod
 
-=head1 Table::Driver
+=head1 Table::Storage
 
 =begin code
 
-role	Table::Driver does Associative does Positional {
+role	Table::Storage does Associative does Positional {
 
 =end code
 
@@ -54,7 +54,7 @@ role	Table::Driver does Associative does Positional {
 
 =end pod
 
-role	Table::Driver does Associative does Positional does TOP::Core {
+role	Table::Storage does Associative does Positional does TOP::Core {
 	=begin pod
 	=defn Field @.fields
 	Stores the fields
@@ -73,9 +73,9 @@ role	Table::Driver does Associative does Positional does TOP::Core {
 	=head2 Methods
 	=head3 .new
 
-	Creates a Table::Driver.
+	Creates a Table::Storage.
 
-		.new(Database::Driver :$database, Relation :$frontend-object, Str :$action, Str :%fields)
+		.new(Database::Storage :$database, Relation :$frontend-object, Str :$action, Str :%fields)
 
 	Parameters to .new are:
 	=defn Relation $frontend-object
@@ -83,10 +83,10 @@ role	Table::Driver does Associative does Positional does TOP::Core {
 	=end pod
 	has	Relation			$!frontend-object	is built is required;
 	=begin pod
-	=defn Database::Driver	:$database
-	The Database::Driver with which this Table::Driver is connected.
+	=defn Database::Storage	:$database
+	The Database::Storage with which this Table::Storage is connected.
 	=end pod
-	has	Database::Driver	$!database			is built;		# Links to the database
+	has	Database::Storage	$!database			is built;		# Links to the database
 	# TODO: Make the above "is required" once the Memory driver supports it
 
 	# Only used during initialisation

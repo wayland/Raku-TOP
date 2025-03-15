@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <title>Raku TOP Driver</title>
+    <title>Raku TOP Storage</title>
     <meta charset="UTF-8"/>
     <style>hr,
 img {
@@ -370,10 +370,10 @@ hr {
     <nav class="indexgroup">
 <table id="TOC">
 <caption><h2 id="TOC_Title">Table of Contents</h2></caption>
-    <tr class="toc-level-1"><td class="toc-number">1</td><td class="toc-text"><a href="#Database::Driver">Database::Driver</a></td></tr>
+    <tr class="toc-level-1"><td class="toc-number">1</td><td class="toc-text"><a href="#Database::Storage">Database::Storage</a></td></tr>
      <tr class="toc-level-2"><td class="toc-number">1.1</td><td class="toc-text"><a href="#Methods">Methods</a></td></tr>
   <tr class="toc-level-3"><td class="toc-number">1.1.1</td><td class="toc-text"><a href="#.useTable">.useTable</a></td></tr>
-   <tr class="toc-level-1"><td class="toc-number">2</td><td class="toc-text"><a href="#Table::Driver">Table::Driver</a></td></tr>
+   <tr class="toc-level-1"><td class="toc-number">2</td><td class="toc-text"><a href="#Table::Storage">Table::Storage</a></td></tr>
     <tr class="toc-level-2"><td class="toc-number">2.1</td><td class="toc-text"><a href="#Attributes">Attributes</a></td></tr>
    <tr class="toc-level-2"><td class="toc-number">2.2</td><td class="toc-text"><a href="#Methods">Methods</a></td></tr>
  <tr class="toc-level-3"><td class="toc-number">2.2.1</td><td class="toc-text"><a href="#.new">.new</a></td></tr>
@@ -391,17 +391,17 @@ hr {
 
 
     <div class="pod-body">
-    <h1 id="Database::Driver"><a class="u" href="#___top" title="go to top of document">Database::Driver</a></h1>
+    <h1 id="Database::Storage"><a class="u" href="#___top" title="go to top of document">Database::Storage</a></h1>
 <p>The parent class for all the different Database Drivers (backends).</p>
-<pre class="pod-block-code">role	Database::Driver
+<pre class="pod-block-code">role	Database::Storage
 
 </pre>
 <h2 id="Methods"><a class="u" href="#___top" title="go to top of document">Methods</a></h2>
 <h1>Any: Name of the database</h1><h3 id=".useTable"><a class="u" href="#___top" title="go to top of document">.useTable</a></h3>
 <pre class="pod-block-code">method	useTable(Table :$table, *%params)</pre>
 <p>Returns a table belonging to the database. Parameters vary from driver to driver.</p>
-<h1 id="Table::Driver"><a class="u" href="#___top" title="go to top of document">Table::Driver</a></h1>
-<pre class="pod-block-code">role	Table::Driver does Associative does Positional {
+<h1 id="Table::Storage"><a class="u" href="#___top" title="go to top of document">Table::Storage</a></h1>
+<pre class="pod-block-code">role	Table::Storage does Associative does Positional {
 
 </pre>
 <h2 id="Attributes"><a class="u" href="#___top" title="go to top of document">Attributes</a></h2>
@@ -419,8 +419,8 @@ hr {
 </dl>
 <h2 id="Methods"><a class="u" href="#___top" title="go to top of document">Methods</a></h2>
 <h3 id=".new"><a class="u" href="#___top" title="go to top of document">.new</a></h3>
-<p>Creates a Table::Driver.</p>
-<pre class="pod-block-code">.new(Database::Driver :$database, Relation :$frontend-object, Str :$action, Str :%fields)</pre>
+<p>Creates a Table::Storage.</p>
+<pre class="pod-block-code">.new(Database::Storage :$database, Relation :$frontend-object, Str :$action, Str :%fields)</pre>
 <p>Parameters to .new are:</p>
 <dl>
 <dt>Relation $frontend-object</dt>
@@ -429,8 +429,8 @@ hr {
 
 </dl>
 <dl>
-<dt>Database::Driver :$database</dt>
-<dd><p>The Database::Driver with which this Table::Driver is connected.</p>
+<dt>Database::Storage :$database</dt>
+<dd><p>The Database::Storage with which this Table::Storage is connected.</p>
 </dd>
 
 </dl>

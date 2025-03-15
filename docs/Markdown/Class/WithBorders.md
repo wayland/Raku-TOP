@@ -25,9 +25,9 @@ TOP::Formatter::WithBorders
 
 The class for formatting tables so that they have borders made out of characters. Currently these are the Unicode box-drawing characters, but someday ASCII may be added as an option. 
 
-Many of the functions in this class are called by Database::Driver::format()
+Many of the functions in this class are called by Database::Storage::format()
 
-Parameters that can be passed to Database::Driver (with defaults)
+Parameters that can be passed to Database::Storage (with defaults)
 
   * `$format =` 'WithBorders'>
 

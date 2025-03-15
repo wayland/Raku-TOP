@@ -34,10 +34,8 @@ my $ls-test-output = q:to/END/;
 END
 
 is($out-table, $ls-test-output, 'ls table is as expected');
-print $out-table;
 
 my $btable = Table.new(name => 'boxchars', action => 'ensure');
-say "Calling with CSV";
 $btable.parse(
 	format => 'CSV',
 	filename => 'data/BoxDrawingCharacters.csv',
@@ -47,9 +45,7 @@ my $table2 = $btable.grep({
 	.{'Primary Weight'} ~~ /^(Double)$/ 
 	and .{'Block Name'} eq 'Box'
 });
-dd $table2;
 
-say "Formatting";
 my $bout-table = $table2.format(
 	'WithBorders',
 #	show-headers => False,

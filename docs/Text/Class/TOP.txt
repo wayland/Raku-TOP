@@ -21,7 +21,8 @@ intended to be a role on all TOP classes.
 
 method load-library
 
-method load-library(Str :$type = 'Database::Driver::Memory', *%parameters)
+method load-library(Str :$type = 'Database::Storage::Memory',
+*%parameters)
 
 Loads the library in question, and makes an object of the named type
 
@@ -118,7 +119,7 @@ accessed via the same API.
 $.backend-object
 
 
-Holds the backend object (Table::Driver::Postgres, Table::Driver::Memory,
+Holds the backend object (Table::Storage::Postgres, Table::Storage::Memory,
 etc) that talks to the table in its backend store; the translation layer
 between Table and the datastore.
 

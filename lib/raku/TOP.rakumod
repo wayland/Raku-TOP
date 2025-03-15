@@ -33,21 +33,21 @@ role	TOP::Core {
 
 	=head1 method load-library
 
-	method	load-library(Str :$type = 'Database::Driver::Memory', *%parameters)
+	method	load-library(Str :$type = 'Database::Storage::Memory', *%parameters)
 
 	Loads the library in question, and makes an object of the named type
 	=end pod
-	method	load-library(Str :$type = 'Database::Driver::Memory', *%parameters) {
+	method	load-library(Str :$type = 'Database::Storage::Memory', *%parameters) {
 		%!library-locks{$type}:exists or %!library-locks{$type} = Lock.new();
 		my $library-object = %!library-locks{$type}.protect: {
 			# Load the relevant module
 			my \M = (require ::($type));
 
 			# Check that it's a real driver
-			#			unless M ~~ Database::Driver {
-			#				warn "$module doesn't do Database::Driver role!";
+			#			unless M ~~ Database::Storage {
+			#				warn "$module doesn't do Database::Storage role!";
 			#			}
-			# TODO: The above ended up with circular references; need to figure out what the fix is; possibly move Database::Driver into this file
+			# TODO: The above ended up with circular references; need to figure out what the fix is; possibly move Database::Storage into this file
 
 			# Create the object
 			M.new(|%parameters);
@@ -212,7 +212,7 @@ via the same API.
 
 =defn $.backend-object
 
-Holds the backend object (Table::Driver::Postgres, Table::Driver::Memory, etc)
+Holds the backend object (Table::Storage::Postgres, Table::Storage::Memory, etc)
 that talks to the table in its backend store; the translation layer between
 Table and the datastore.
 =end pod
@@ -251,7 +251,7 @@ class	Table does Relation is export {
 	has	Str				$!backend	is built = 'Memory';
 
 	# See above for doco on $.backend-object
-	# Would like to make this a Table::Driver (which would include subclasses) once I solve the recursive use issue
+	# Would like to make this a Table::Storage (which would include subclasses) once I solve the recursive use issue
 	# TODO: Can we use a stub somewhere?
 	has		$.backend-object handles <
 		elems EXISTS-POS DELETE-POS ASSIGN-POS BIND-POS
@@ -383,7 +383,7 @@ class	Database does TOP::Core {
 	has	Str	$.backend	is built = 'Memory';
 
 	submethod	TWEAK(Str :$backend, *%parameters) {
-		$!backend-object = self.load-library(type => "Database::Driver::$!backend", |%parameters);
+		$!backend-object = self.load-library(type => "Database::Storage::$!backend", |%parameters);
 	}
 
 	=begin pod

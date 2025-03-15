@@ -1,7 +1,7 @@
 use	TOP;
-use	Database::Driver;
+use	Database::Storage;
 
-class	Table::Driver::CSV does Table::Driver is export {
+class	Table::Storage::CSV does Table::Storage is export {
 	has 		@!rows;
 
 	submethod	TWEAK(Str :$filename) {
@@ -26,13 +26,13 @@ class	Table::Driver::CSV does Table::Driver is export {
 	}
 }
 
-class	Database::Driver::CSV does Database::Driver {
+class	Database::Storage::CSV does Database::Storage {
 	has	Str		$!directoryname is built;
 	has	Database	$!frontend-object;
 
 	method	useTable(Table :$table, Str :$filename) {
 		$!frontend-object = $table;
-		my $backend-table = Table::Driver::Memory.new(frontend-object => $table, action => 'use', :$filename);
+		my $backend-table = Table::Storage::Memory.new(frontend-object => $table, action => 'use', :$filename);
 
 		return $backend-table;
 	}

@@ -31,5 +31,5 @@ The class for formatting the tables in a half-human format. Half-Human is a form
 
   * No column be completely blank (suggestion: If there's no value, put a dash)
 
-Many of the functions in this class are called by Database::Driver::format()
+Many of the functions in this class are called by Database::Storage::format()
 

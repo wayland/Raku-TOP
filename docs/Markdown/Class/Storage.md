@@ -1,12 +1,12 @@
 NAME
 ====
 
-Raku TOP Driver - The common driver for Raku TOP backends
+Raku TOP Storage - The common driver for Raku TOP backends
 
 TITLE
 =====
 
-Raku TOP Driver
+Raku TOP Storage
 
 SUBTITLE
 ========
@@ -18,12 +18,12 @@ AUTHOR
 
 Tim Nelson - https://github.com/wayland
 
-Database::Driver
-================
+Database::Storage
+=================
 
 The parent class for all the different Database Drivers (backends).
 
-    role	Database::Driver
+    role	Database::Storage
 
 Methods
 -------
@@ -34,10 +34,10 @@ Methods
 
 Returns a table belonging to the database. Parameters vary from driver to driver.
 
-Table::Driver
-=============
+Table::Storage
+==============
 
-    role	Table::Driver does Associative does Positional {
+    role	Table::Storage does Associative does Positional {
 
 Attributes
 ----------
@@ -55,9 +55,9 @@ Methods
 
 ### .new
 
-Creates a Table::Driver.
+Creates a Table::Storage.
 
-    .new(Database::Driver :$database, Relation :$frontend-object, Str :$action, Str :%fields)
+    .new(Database::Storage :$database, Relation :$frontend-object, Str :$action, Str :%fields)
 
 Parameters to .new are:
 
@@ -65,9 +65,9 @@ Parameters to .new are:
 
 The frontend object that is using this backend object.
 
-**Database::Driver :$database**
+**Database::Storage :$database**
 
-The Database::Driver with which this Table::Driver is connected.
+The Database::Storage with which this Table::Storage is connected.
 
 **Str $action**
 

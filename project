@@ -253,8 +253,8 @@ multi	MAIN('build-docs', @filenames?) { #= Rebuilds documentation (docs dir and 
 
 multi	MAIN('find-common') { #= Finds the methods which are the same across all database drivers
 	# Locate methods in files and classes/roles
-	my (@files-to-check) = qx{find lib/raku/Database/Driver -name '*.rakumod'}.lines;
-	push @files-to-check, 'lib/raku/Database/Driver.rakumod';
+	my (@files-to-check) = qx{find lib/raku/Database/Storage -name '*.rakumod'}.lines;
+	push @files-to-check, 'lib/raku/Database/Storage.rakumod';
 
 	my @methodlocs;
 	for @files-to-check -> $file {

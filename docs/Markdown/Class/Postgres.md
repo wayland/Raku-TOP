@@ -1,12 +1,12 @@
 NAME
 ====
 
-Postgres Driver - The Postgres driver for Raku TOP
+Postgres Storage - The Postgres driver for Raku TOP
 
 TITLE
 =====
 
-Postgres Driver
+Postgres Storage
 
 SUBTITLE
 ========
@@ -18,10 +18,10 @@ AUTHOR
 
 Tim Nelson - https://github.com/wayland
 
-Database::Driver::Postgres
-==========================
+Database::Storage::Postgres
+===========================
 
-    class	Database::Driver::Postgres does Database::Driver {
+    class	Database::Storage::Postgres does Database::Storage {
 
 Currently uses a cursor for all reads. What we'd like to change is:
 

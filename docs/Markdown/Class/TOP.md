@@ -28,7 +28,7 @@ This is the common code that's shared across all TOP objects; this is intended t
 method load-library
 ===================
 
-method load-library(Str :$type = 'Database::Driver::Memory', *%parameters)
+method load-library(Str :$type = 'Database::Storage::Memory', *%parameters)
 
 Loads the library in question, and makes an object of the named type
 
@@ -121,7 +121,7 @@ Attributes
 
 
 
-Holds the backend object (Table::Driver::Postgres, Table::Driver::Memory, etc) that talks to the table in its backend store; the translation layer between Table and the datastore.
+Holds the backend object (Table::Storage::Postgres, Table::Storage::Memory, etc) that talks to the table in its backend store; the translation layer between Table and the datastore.
 
 **Str $.name**
 

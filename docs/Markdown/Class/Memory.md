@@ -1,12 +1,12 @@
 NAME
 ====
 
-Raku *::Driver::Memory - Raku classes to implement the in-memory table store
+Raku *::Storage::Memory - Raku classes to implement the in-memory table store
 
 TITLE
 =====
 
-Raku *::Driver::Memory
+Raku *::Storage::Memory
 
 SUBTITLE
 ========
@@ -18,10 +18,10 @@ AUTHOR
 
 Tim Nelson - https://github.com/wayland
 
-Table::Driver::Memory
-=====================
+Table::Storage::Memory
+======================
 
-    class	Table::Driver::Memory does Table::Driver {
+    class	Table::Storage::Memory does Table::Storage {
 
 Usage
 =====

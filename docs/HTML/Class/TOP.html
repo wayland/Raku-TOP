@@ -401,7 +401,7 @@ hr {
 </pre>
 <p>This is the common code that&#39;s shared across all TOP objects; this is intended to be a role on all TOP classes.</p>
 <h1 id="method_load-library"><a class="u" href="#___top" title="go to top of document">method load-library</a></h1>
-<p>method load-library(Str :$type = &#39;Database::Driver::Memory&#39;, *%parameters)</p>
+<p>method load-library(Str :$type = &#39;Database::Storage::Memory&#39;, *%parameters)</p>
 <p>Loads the library in question, and makes an object of the named type</p>
 <h1 id="Tuple"><a class="u" href="#___top" title="go to top of document">Tuple</a></h1>
 <pre class="pod-block-code">class	Tuple is Hash::Ordered {}</pre>
@@ -469,7 +469,7 @@ hr {
 <dd></dd>
 
 </dl>
-<p>Holds the backend object (Table::Driver::Postgres, Table::Driver::Memory, etc) that talks to the table in its backend store; the translation layer between Table and the datastore.</p>
+<p>Holds the backend object (Table::Storage::Postgres, Table::Storage::Memory, etc) that talks to the table in its backend store; the translation layer between Table and the datastore.</p>
 <dl>
 <dt>Str $.name</dt>
 <dd></dd>
