@@ -93,8 +93,47 @@ class	Table::Storage::Memory does Table::Storage {
 
 		Tuple.new(%items);
 	}
-	multi	method	makeTuple(@items) {
-		my %items is Hash::Ordered = 'A'..* Z=> @items;
+	multi	method	makeTuple(@items is copy) {
+		my @use_field_names;
+		given $!field-mode {
+			when 'overflow' {
+				@use_field_names = @!fields.grep: { .name ne $!overflow-field-name } ==> map { .name };
+			}
+			default {
+				@use_field_names = @!fields.map: { .name }
+			}
+		}
+		my %items is Hash::Ordered;
+		# Put the first ones in the ordered list of fields
+		for @use_field_names Z @items -> ($field, $item) {
+			%items{$field} = $item;
+		}
+		# If we've got fields left over...
+		my $count = @items.elems - @use_field_names.elems;
+		$count > 0 and do {
+			my %extra_items is Hash::Ordered;
+			given $!field-mode {
+				when /^(lax|overflow)$/ {
+					my $start = @use_field_names.elems;
+					my $end = @items.elems - 1;
+					for ((('A'..*)[$start..$end]) Z @items[$start..$end]) -> ($key, $item) {
+						%extra_items{$key} = $item;
+					}
+					when 'lax' {
+						for %extra_items.kv -> $key, $item { %items{$key} = $item; }
+					}
+					when 'overflow' {
+						%items{$!overflow-field-name} = %extra_items;
+					}
+				}
+				when 'error' {
+					die "Error: extra fields while making Tuple from array\n";
+				}
+				default {
+					die "Error: Unknown value for .field-mode: '{$!field-mode}'"
+				}
+			}
+		};
 		self.makeTuple(%items);
 	}
 

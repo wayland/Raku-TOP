@@ -1,5 +1,13 @@
 # Changelog
 
+## Cleanups-1
+
+*	Changed Driver to Storage
+*	Replaced TODO.md with Changelog.md and Developing.md
+*	In Table::Storage::Memory.makeTuple(@):
+	*	Changed to read existing fields before making up its own
+	*	Allowed for $!field-mode
+
 ## 0.0.5
 
 ### Table
