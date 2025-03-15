@@ -1,29 +1,41 @@
-# 0.0.5 iteration tasks
--	Commit to git
--	Write POD and comments, and clean up
--	Commit to git
--	Review/Upload/Publicise to the fez ecosystem
--	If there are any interesting changes, announce on #raku
-
-# Iterations
-
-Moved to TODO.xml on PP-site
-
-# Per-iteration tasks:
--	Start next coding iteration (ON A NEW BRANCH)
--	Write some code so that things work
--	Get the tests working with it
--	Write POD and comments, and clean up
--	Commit to git
--	Review/Upload to the fez ecosystem
--	If there are any interesting changes, announce on #raku
-
 # Changelog
 
 ## 0.0.5
-DONE	Human-only (output-only) & half-human (input/output)
-DONE	Get the tests working with it
-DONE	Include the table "How to deal with formats" in the doco
+
+### Table
+
+Made the following methods:
+
+*	`.format()`
+*	`.parse()`
+*	`.add-row()`
+*	Exposed `.add-field()`
+*	`.grep()`
+
+### Formatters
+
+Made the following:
+
+*	HalfHuman
+*	WithBorders
+
+### Parsers
+
+Made the following:
+
+*	CSV
+*	HalfHuman
+
+### Database::Driver::Memory
+
+*	Set up makeTuple to accept an array, and automatically assign field names as a range: A..*
+*	Made it so that if :exists gets called on the unnamed database, it won't throw warnings about the name being Nil
+
+### Other
+
+*	Updated documentation
+*	Updated tests
+*	Update github action to run new tests
 
 ## 0.0.1
 DONE	Put in a copy of the artistic license; see if we can do dual license (Artistic + GPL)

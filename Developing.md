@@ -1,0 +1,36 @@
+The goal is to implement table-oriented programming in such a way as it 
+integrates with Data-Oriented Programming.  
+
+# Plans
+
+Plans are currently being kept at [The TODO list]
+(https://wayland.github.io/table-oriented-programming/Raku-TOP/TODO.xml).
+
+At some point these will probably be converted to a ticketing system (maybe
+GitHub Issues?)  
+
+# Per-PR process
+
+The following is a list of steps that you should be doing on your branch before
+submitting a PR:
+
+*	Create and check out a new branch for coding on
+*	Write some code making the changes you want
+*	Write some tests covering the new code/cases above
+*	Write POD and comments.  Style is to interleave doco with code
+*	Clean up; this means that any debugging statements are removed, or
+	somehow disabled
+*	Write up a nice Changelog entry named after your branch/issue.  Things 
+	that might help prompt your memory:
+	*	Original ticket you're resolving
+	*	Diffs
+	*	Changelog messages
+*	Commit to git (you can do this earlier as well)
+*	If tests pass, submit PR.  PR body should be Changelog entry
+
+# Release Process
+
+*	Review the most recent changes, including that the doco works in 
+	Github
+*	Do a release to Github/Fez using `./project release`
+*	If there are any interesting changes, announce on #raku
