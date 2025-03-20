@@ -317,17 +317,31 @@ class	Table::Storage::Postgres does Table::Storage does Hash::Agnostic {
 		}
 		self.create-table-from-fields();
 		for @rows -> $row {
-			my @fieldnames;
-			my @fieldvalues;
-			for $row.kv -> $fieldname, $fieldvalue is copy {
-				$fieldvalue.can('elems') and $fieldvalue.elems == 0 and $fieldvalue = '';
-				push @fieldnames, $fieldname;
-				push @fieldvalues, self.escape($fieldvalue, :as-string);
-			}
-			my $field-names = @fieldnames.map({ qq{"$_"} }).join(', ');
-			my $field-values = @fieldvalues.join(', ');
-			self.query("INSERT INTO {$!frontend-object.name} ($field-names) VALUES ($field-values);");
+			self.insert-row($row);
 		}
+	}
+
+	method insert-row($newTuple) { # $newTuple could be either a Tuple or a $row (see fill_from_aoh)
+		my @fieldnames;
+		my @fieldvalues;
+		for $newtuple.kv -> $fieldname, $fieldvalue is copy {
+			$fieldvalue.can('elems') and $fieldvalue.elems == 0 and $fieldvalue = '';
+			push @fieldnames, $fieldname;
+			push @fieldvalues, self.escape($fieldvalue, :as-string);
+		}
+		my $field-names = @fieldnames.map({ qq{"$_"} }).join(', ');
+		my $field-values = @fieldvalues.join(', ');
+
+		self.query("INSERT INTO {$!frontend-object.name} ($field-names) VALUES ($field-values);");
+	}
+
+	multi method	add-row(@fields) {
+		my Tuple $newTuple = callsame;
+		self.insert-row($newTuple);
+	}
+	multi method	add-row(%fields) {
+		my Tuple $newTuple = callsame;
+		self.insert-row($newTuple);
 	}
 
 	# Runs a SQL query on this database

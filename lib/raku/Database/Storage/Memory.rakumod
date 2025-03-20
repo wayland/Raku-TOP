@@ -40,16 +40,6 @@ class	Table::Storage::Memory does Table::Storage {
 	# Currently public for access by Field object -- make protected/friend if useful
 	has	Tuple	@.rows handles <elems EXISTS-POS DELETE-POS ASSIGN-POS BIND-POS>;
 
-	# TODO:
-	# Not implemented yet
-	# Could be:
-	# -	'pragma' (default): Controlled by the strict pragma, as follows:
-	#	-	off: extra fields create new columns
-	#	-	on (default): extra fields create an error
-	# -	'overflow': extra fields get stuck in a JSON hash/object/assoc field; the name of the field is in $!overflow-field-name
-	has	Str	$!field-mode = 'lax';
-	has	Str	$!overflow-field-name;
-
 	method	new(:$database, *@_, *%_) {
 		my $usedb;
 		if $database ~~ Database::Storage {
@@ -68,72 +58,12 @@ class	Table::Storage::Memory does Table::Storage {
 
 	# Makes a Tuple object from the key/values specified in %items, and returns it
 	multi	method	makeTuple(%items) {
-
-		#		die "fm2: {$!field-mode}";
-		my $field-mode = $!field-mode ?? $!field-mode !! 'lax'; # This shouldn't be needed, but it is at the moment -- try removing it and seeing if things work
-		for %items.kv -> $key, $value {
-			#			say "Processing $key => $value";
-			# Check fields here; use $field-mode, above
-			#			say "fm: {$field-mode} ## $key";
-			#			say self.raku;
-			given $field-mode {
-				when 'strict' {
-					%!field-indices{$key}:exists or die "Error: Field '$key' doesn't exist\n";
-				}
-				when 'lax' {
-					%!field-indices{$key}:exists or do {
-						self.{$key} = Field.new(relation => $!frontend-object, name => $key);
-					};
-				}
-				default {
-					die "Unknown field mode '{$field-mode}'";
-				}
-			}
-		}
+		%items = self.vet-hash-for-tuple(%items);
 
 		Tuple.new(%items);
 	}
 	multi	method	makeTuple(@items is copy) {
-		my @use_field_names;
-		given $!field-mode {
-			when 'overflow' {
-				@use_field_names = @!fields.grep: { .name ne $!overflow-field-name } ==> map { .name };
-			}
-			default {
-				@use_field_names = @!fields.map: { .name }
-			}
-		}
-		my %items is Hash::Ordered;
-		# Put the first ones in the ordered list of fields
-		for @use_field_names Z @items -> ($field, $item) {
-			%items{$field} = $item;
-		}
-		# If we've got fields left over...
-		my $count = @items.elems - @use_field_names.elems;
-		$count > 0 and do {
-			my %extra_items is Hash::Ordered;
-			given $!field-mode {
-				when /^(lax|overflow)$/ {
-					my $start = @use_field_names.elems;
-					my $end = @items.elems - 1;
-					for ((('A'..*)[$start..$end]) Z @items[$start..$end]) -> ($key, $item) {
-						%extra_items{$key} = $item;
-					}
-					when 'lax' {
-						for %extra_items.kv -> $key, $item { %items{$key} = $item; }
-					}
-					when 'overflow' {
-						%items{$!overflow-field-name} = %extra_items;
-					}
-				}
-				when 'error' {
-					die "Error: extra fields while making Tuple from array\n";
-				}
-				default {
-					die "Error: Unknown value for .field-mode: '{$!field-mode}'"
-				}
-			}
-		};
+		%items = self.vet-array-for-tuple(@items);
 		self.makeTuple(%items);
 	}
 

@@ -70,6 +70,21 @@ role	Table::Storage does Associative does Positional does TOP::Core {
 	has	Str			@!field-names;		# For keeping the fields in order
 
 	=begin pod
+	=defn Str	$!field-mode = 'lax'
+
+	$!field-mode could be one of the following:
+	=item lax: extra fields create new columns (default)
+	=item error: extra fields create an error
+	=item overflow: extra fields get stuck in a (JSON?) hash/object/assoc field; the name of the field is in $!overflow-field-name
+
+	=defn Str	$!overflow-field-name
+
+	The name of the field the overflow fields get put in
+	=end pod
+	has	Str	$!field-mode = 'lax';
+	has	Str	$!overflow-field-name;
+
+	=begin pod
 	=head2 Methods
 	=head3 .new
 
@@ -281,6 +296,113 @@ role	Table::Storage does Associative does Positional does TOP::Core {
 		self.{$name} = Field.new(:$relation, :$name, :$type);
 		#@!fields.push(self.{$name});
 		#@!field-names.push($name);
+	}
+
+	# Don't call this directly; instead, call add-field
+	method vet-for-tuple(Associative %items) {
+		for %items.kv -> $key, $value {
+			%!field-indices{$key}:exists or next;
+			self.process-extra-fields-hash($!field-mode, $!frontend-object, $key);
+		}
+		return %items;
+	}
+	# Don't call this directly; instead, call add-field
+	method vet-for-tuple(Positional @items is copy) {
+		my @use_field_names = self.get-field-names($!field-mode);
+		my %items is Hash::Ordered;
+		# Put the first ones in the ordered list of fields
+		for @use_field_names Z @items -> ($field, $item) {
+			%items{$field} = $item;
+		}
+		# If we've got fields left over...
+		my $count = @items.elems - @use_field_names.elems;
+		$count > 0 and self.process-extra-fields-array($!field-mode, %items, @use_field_names, @items);
+		# TODO: Need to check if %items has been changed or discarded
+		return %items;
+	}
+
+
+	proto method process-extra-fields-hash(Str $field-mode, $!frontend-object, $key) {*}
+	multi method process-extra-fields-hash('error', $!frontend-object, $key) {
+		die "Error: extra field '$key' while making Tuple from hash\n";
+	}
+	multi method process-extra-fields-hash('lax', $!frontend-object, $key) {
+		self.{$key} = Field.new(relation => $!frontend-object, name => $key);
+	}
+	multi method process-extra-fields-hash('overflow', $!frontend-object, $key) {
+		# TODO: Write method body
+		die "Error: The following method still needs to be written: multi method process-extra-fields-hash('overflow', $!frontend-object, $key) {\n";
+	}
+	multi method process-extra-fields-array(Str $field-mode, %items, @use_field_names, @items) {
+		die "Error: Unknown value for .field-mode '$field-mode'; exiting\n";
+	}
+
+
+	# Gets a list of field names to use when automatically matching up values
+	proto method get-field-names(Str $field-mode) {*}
+	multi method get-field-names('overflow') {
+		# If the field-mode is overflow, then don't include the overflow field in the list of fields to eat things up automatically
+		return @!fields.grep: { .name ne $!overflow-field-name } ==> map { .name }
+	}
+	multi method get-field-names(Str $field-mode) {
+		return @!fields.map: { .name };
+	}
+
+	# Process any fields beyond the ones that already exist
+	proto method process-extra-fields-array(Str $field-mode, %items, @use_field_names, @items) {*}
+	multi method process-extra-fields-array('error', %items, @use_field_names, @items) {
+		die "Error: extra fields while making Tuple from array\n";
+	}
+	multi method process-extra-fields-array('lax', %items, @use_field_names, @items) {
+		my %extra_fields = self.make-extra-fields(@use_field_names, @items);
+		for %extra_items.kv -> $key, $item { %items{$key} = $item; }
+		return %items;
+	}
+	multi method process-extra-fields-array('overflow', %items, @use_field_names, @items) {
+		my %extra_fields = self.make-extra-fields(@use_field_names, @items);
+		%items{$!overflow-field-name} = %extra_items;
+		return %items;
+	}
+	multi method process-extra-fields-array(Str $field-mode, %items, @use_field_names, @items) {
+		die "Error: Unknown value for .field-mode '$field-mode'; exiting\n";
+	}
+
+	# Make a hash of extra fields
+	method make-extra-fields(@use_field_nammes, @items) {
+		my $start = @use_field_names.elems;
+		my $end = @items.elems - 1;
+		my %extra_items;
+		for ((('A'..*)[$start..$end]) Z @items[$start..$end]) -> ($key, $item) {
+			%extra_items{$key} = $item;
+		}
+		return %extra_items;
+	}
+
+	# Makes a Tuple object from the key/values specified in %items, and returns it
+	multi	method	makeTuple(%items) {
+		%items = self.vet-hash-for-tuple(%items);
+
+		Tuple.new(%items);
+	}
+	multi	method	makeTuple(@items is copy) {
+		%items = self.vet-array-for-tuple(@items);
+		self.makeTuple(%items);
+	}
+
+	# Allows people to assign to this table
+	multi	method	STORE(\values, :$INITIALIZE) {
+		for values -> $row {
+			@!rows.STORE(self.makeTuple($row), :$INITIALIZE);
+		}
+
+		return self;
+	}
+
+	multi method	add-row(@fields) {
+		@!rows.push: self.makeTuple(@fields);
+	}
+	multi method	add-row(%fields) {
+		@!rows.push: self.makeTuple(%fields);
 	}
 }
 
