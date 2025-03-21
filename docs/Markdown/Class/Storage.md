@@ -50,6 +50,28 @@ Stores the fields
 
 For looking up fields by name
 
+**Str $!field-mode = 'lax'**
+
+
+
+$!field-mode could be one of the following:
+
+  * lax: extra fields create new columns (default)
+
+  * error: extra fields create an error
+
+  * overflow: extra fields get stuck in a (JSON?) hash/object/assoc field; the name of the field is in $!overflow-field-name
+
+Can be passed to .new()
+
+**Str $!overflow-field-name**
+
+
+
+The name of the field the overflow fields get put in
+
+Can be passed to .new()
+
 Methods
 -------
 

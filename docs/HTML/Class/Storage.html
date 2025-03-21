@@ -375,7 +375,7 @@ hr {
   <tr class="toc-level-3"><td class="toc-number">1.1.1</td><td class="toc-text"><a href="#.useTable">.useTable</a></td></tr>
    <tr class="toc-level-1"><td class="toc-number">2</td><td class="toc-text"><a href="#Table::Storage">Table::Storage</a></td></tr>
     <tr class="toc-level-2"><td class="toc-number">2.1</td><td class="toc-text"><a href="#Attributes">Attributes</a></td></tr>
-   <tr class="toc-level-2"><td class="toc-number">2.2</td><td class="toc-text"><a href="#Methods">Methods</a></td></tr>
+            <tr class="toc-level-2"><td class="toc-number">2.2</td><td class="toc-text"><a href="#Methods">Methods</a></td></tr>
  <tr class="toc-level-3"><td class="toc-number">2.2.1</td><td class="toc-text"><a href="#.new">.new</a></td></tr>
         <tr class="toc-level-3"><td class="toc-number">2.2.2</td><td class="toc-text"><a href="#exists">exists</a></td></tr>
     <tr class="toc-level-3"><td class="toc-number">2.2.3</td><td class="toc-text"><a href="#format">format</a></td></tr>
@@ -417,6 +417,27 @@ hr {
 </dd>
 
 </dl>
+<dl>
+<dt>Str $!field-mode = &#39;lax&#39;</dt>
+<dd></dd>
+
+</dl>
+<p>$!field-mode could be one of the following:</p>
+<ul><li><p>lax: extra fields create new columns (default)</p>
+</li>
+<li><p>error: extra fields create an error</p>
+</li>
+<li><p>overflow: extra fields get stuck in a (JSON?) hash/object/assoc field; the name of the field is in $!overflow-field-name</p>
+</li>
+</ul>
+<p>Can be passed to .new()</p>
+<dl>
+<dt>Str $!overflow-field-name</dt>
+<dd></dd>
+
+</dl>
+<p>The name of the field the overflow fields get put in</p>
+<p>Can be passed to .new()</p>
 <h2 id="Methods"><a class="u" href="#___top" title="go to top of document">Methods</a></h2>
 <h3 id=".new"><a class="u" href="#___top" title="go to top of document">.new</a></h3>
 <p>Creates a Table::Storage.</p>

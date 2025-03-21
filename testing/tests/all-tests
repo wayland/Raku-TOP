@@ -3,8 +3,9 @@
 use	IO::Glob;
 
 for glob('*.rakutest').sort -> $script {
-	say "=== $script ===";
-	shell './' ~ $script ~ ' 2>&1';
+	say "\n\n=== $script ===";
+	$*OUT.flush;
+	shell './' ~ $script;
 }
 
 

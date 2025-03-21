@@ -41,6 +41,8 @@ Pod6            | ?       | ?      | Make            | AST
 SQLite          | Accept  | No     | No
 MySQL           | Accept  | No     | No
 Postgres option with not using cursors (has to support both cursor and non-cursor) | Accept  | No     | No
+Dan		| Accept  | ?      | ?
+DataQueryWorkflows | Accept | ?    | ?
 =end table
 
 =head2 Key to Formats
