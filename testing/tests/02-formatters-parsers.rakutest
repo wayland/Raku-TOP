@@ -11,6 +11,7 @@ plan 3;
 
 my $table = Table.new(name => 'input', action => 'ensure');
 isa-ok($table, Table, 'Made table');
+
 $table.parse(
 	command => 'ls -l /usr',
 );

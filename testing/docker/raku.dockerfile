@@ -26,7 +26,7 @@ RUN \
 		CSV::Parser \
 		Slang::Otherwise \
 		'Hash::Ordered:ver<0.0.8>' 'Hash::Agnostic:ver<0.0.16>' \
-		'UUID' 'Text::CSV' 'IO::Glob' \
+		'UUID' 'Text::CSV' 'IO::Glob' Test::Coverage \
 	&& rm -rf /tmp/.zef
 
 ##### Install private raku packages

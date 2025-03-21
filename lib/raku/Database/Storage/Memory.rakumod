@@ -56,17 +56,6 @@ class	Table::Storage::Memory does Table::Storage {
 		return False;
 	}
 
-	# Makes a Tuple object from the key/values specified in %items, and returns it
-	multi	method	makeTuple(%items) {
-		%items = self.vet-hash-for-tuple(%items);
-
-		Tuple.new(%items);
-	}
-	multi	method	makeTuple(@items is copy) {
-		%items = self.vet-array-for-tuple(@items);
-		self.makeTuple(%items);
-	}
-
 	# Allows people to assign to this table
 	multi	method	STORE(\values, :$INITIALIZE) {
 		for values -> $row {
@@ -102,7 +91,7 @@ class	Table::Storage::Memory does Table::Storage {
 				else { Nil }
 			},
 			STORE => -> $, \value {
-#				say "Storing " ~ join('#', key, value);
+				# say "Storing " ~ join('#', key, value);
 				with %!field-indices.AT-KEY(key) {
 					@!fields.ASSIGN-POS($_, value)
 				}

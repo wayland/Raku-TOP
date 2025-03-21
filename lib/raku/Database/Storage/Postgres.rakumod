@@ -324,7 +324,7 @@ class	Table::Storage::Postgres does Table::Storage does Hash::Agnostic {
 	method insert-row($newTuple) { # $newTuple could be either a Tuple or a $row (see fill_from_aoh)
 		my @fieldnames;
 		my @fieldvalues;
-		for $newtuple.kv -> $fieldname, $fieldvalue is copy {
+		for $newTuple.kv -> $fieldname, $fieldvalue is copy {
 			$fieldvalue.can('elems') and $fieldvalue.elems == 0 and $fieldvalue = '';
 			push @fieldnames, $fieldname;
 			push @fieldvalues, self.escape($fieldvalue, :as-string);

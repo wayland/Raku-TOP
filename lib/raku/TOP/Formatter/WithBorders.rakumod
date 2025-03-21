@@ -71,7 +71,8 @@ class    TOP::Formatter::WithBorders {
 		};
 		for $!table[0 ..*] -> $row {
 			for $row.kv -> $key, $cell {
-				%!maxes{$key} = max(%!maxes{$key}, (defined($cell) ?? $cell.chars !! 0));
+				my Str $cellstring = self.get-cell-string($cell);
+				%!maxes{$key} = max(%!maxes{$key}, $cellstring.chars);
 				my $lastone = False; my $thisone = False;
 				for Nil, Int, Num, Str -> $type {
 					%!types{$key}.WHAT ~~ $type and $lastone = True;
@@ -85,6 +86,17 @@ class    TOP::Formatter::WithBorders {
 		my $outer-straight = $.get-character();
 		my $inner-straight = $.get-character(containment => 'inner');
 		$!sformat = "$outer-straight " ~ join(" $inner-straight ", $!table.fields.map({ $.sformat-field(.name) })) ~ " $outer-straight\n";
+	}
+
+	# TODO: Replace with JSON or something
+	method get-cell-string($cell) {
+		my Str $cellstring;
+		if $cell ~~ Hash::Ordered {
+			$cellstring = $cell.raku;
+		} else {
+			$cellstring = defined($cell) ?? "$cell" !! '';
+		}
+		return $cellstring;
 	}
 
 	method	sformat-field($name) {
@@ -136,7 +148,7 @@ class    TOP::Formatter::WithBorders {
 	}
 
 	method	add-row(@items) {
-		$!output ~= (@items ==> map({ .defined ?? $_ !! '' }) ==> sprintf($!sformat));
+		$!output ~= (@items ==> map({ self.get-cell-string($_) }) ==> sprintf($!sformat));
 	}
 
 	# TODO: Figure out how to make this support ASCII box drawing as well

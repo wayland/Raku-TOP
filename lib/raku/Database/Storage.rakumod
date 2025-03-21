@@ -77,12 +77,17 @@ role	Table::Storage does Associative does Positional does TOP::Core {
 	=item error: extra fields create an error
 	=item overflow: extra fields get stuck in a (JSON?) hash/object/assoc field; the name of the field is in $!overflow-field-name
 
+	Can be passed to .new()
+
 	=defn Str	$!overflow-field-name
 
 	The name of the field the overflow fields get put in
+
+	Can be passed to .new()
+
 	=end pod
-	has	Str	$!field-mode = 'lax';
-	has	Str	$!overflow-field-name;
+	has	Str	$!field-mode			is built = 'lax';
+	has	Str	$!overflow-field-name	is built;
 
 	=begin pod
 	=head2 Methods
@@ -299,15 +304,12 @@ role	Table::Storage does Associative does Positional does TOP::Core {
 	}
 
 	# Don't call this directly; instead, call add-field
-	method vet-for-tuple(Associative %items) {
-		for %items.kv -> $key, $value {
-			%!field-indices{$key}:exists or next;
-			self.process-extra-fields-hash($!field-mode, $!frontend-object, $key);
-		}
-		return %items;
+	multi method vet-for-tuple(%items) {
+		my %new_items := self.process-extra-fields-hash($!field-mode, %items);
+		return %new_items;
 	}
 	# Don't call this directly; instead, call add-field
-	method vet-for-tuple(Positional @items is copy) {
+	multi method vet-for-tuple(@items is copy) {
 		my @use_field_names = self.get-field-names($!field-mode);
 		my %items is Hash::Ordered;
 		# Put the first ones in the ordered list of fields
@@ -321,19 +323,33 @@ role	Table::Storage does Associative does Positional does TOP::Core {
 		return %items;
 	}
 
-
-	proto method process-extra-fields-hash(Str $field-mode, $!frontend-object, $key) {*}
-	multi method process-extra-fields-hash('error', $!frontend-object, $key) {
-		die "Error: extra field '$key' while making Tuple from hash\n";
+	proto method process-extra-fields-hash(Str $field-mode, %items) {*}
+	multi method process-extra-fields-hash('error', $!frontend-object, %items) {
+		for %items.kv -> $key, $value {
+			%!field-indices{$key}:exists and next;
+			die "Error: extra field '$key' while making Tuple from hash (and field-mode is 'error')\n";
+		}
+		return %items;
 	}
-	multi method process-extra-fields-hash('lax', $!frontend-object, $key) {
-		self.{$key} = Field.new(relation => $!frontend-object, name => $key);
+	multi method process-extra-fields-hash('lax', %items) {
+		for %items.kv -> $key, $value {
+			%!field-indices{$key}:exists and next;
+			self.{$key} = Field.new(relation => $!frontend-object, name => $key);
+		}
+		return %items;
 	}
-	multi method process-extra-fields-hash('overflow', $!frontend-object, $key) {
-		# TODO: Write method body
-		die "Error: The following method still needs to be written: multi method process-extra-fields-hash('overflow', $!frontend-object, $key) {\n";
+	multi method process-extra-fields-hash('overflow', %items) {
+		for %items.kv -> $key, $value {
+			%!field-indices{$key}:exists and next;
+			if ! (self.{$!overflow-field-name}:exists) {
+				self.{$!overflow-field-name}  = Field.new(relation => $!frontend-object, name => $!overflow-field-name);
+			}
+			%items{$!overflow-field-name}{$key} = $value;
+			%items{$key}:delete;
+		}
+		return %items;
 	}
-	multi method process-extra-fields-array(Str $field-mode, %items, @use_field_names, @items) {
+	multi method process-extra-fields-hash(Str $field-mode, %items, @use_field_names, @items) {
 		die "Error: Unknown value for .field-mode '$field-mode'; exiting\n";
 	}
 
@@ -354,13 +370,13 @@ role	Table::Storage does Associative does Positional does TOP::Core {
 		die "Error: extra fields while making Tuple from array\n";
 	}
 	multi method process-extra-fields-array('lax', %items, @use_field_names, @items) {
-		my %extra_fields = self.make-extra-fields(@use_field_names, @items);
+		my %extra_items := self.make-extra-fields(@use_field_names, @items);
 		for %extra_items.kv -> $key, $item { %items{$key} = $item; }
 		return %items;
 	}
 	multi method process-extra-fields-array('overflow', %items, @use_field_names, @items) {
-		my %extra_fields = self.make-extra-fields(@use_field_names, @items);
-		%items{$!overflow-field-name} = %extra_items;
+		my %extra_items := self.make-extra-fields(@use_field_names, @items);
+		%items{$!overflow-field-name} := %extra_items;
 		return %items;
 	}
 	multi method process-extra-fields-array(Str $field-mode, %items, @use_field_names, @items) {
@@ -368,10 +384,10 @@ role	Table::Storage does Associative does Positional does TOP::Core {
 	}
 
 	# Make a hash of extra fields
-	method make-extra-fields(@use_field_nammes, @items) {
+	method make-extra-fields(@use_field_names, @items) {
 		my $start = @use_field_names.elems;
 		my $end = @items.elems - 1;
-		my %extra_items;
+		my %extra_items is Hash::Ordered;
 		for ((('A'..*)[$start..$end]) Z @items[$start..$end]) -> ($key, $item) {
 			%extra_items{$key} = $item;
 		}
@@ -380,29 +396,13 @@ role	Table::Storage does Associative does Positional does TOP::Core {
 
 	# Makes a Tuple object from the key/values specified in %items, and returns it
 	multi	method	makeTuple(%items) {
-		%items = self.vet-hash-for-tuple(%items);
+		my %newitems = self.vet-for-tuple(%items);
 
-		Tuple.new(%items);
+		Tuple.new(%newitems);
 	}
 	multi	method	makeTuple(@items is copy) {
-		%items = self.vet-array-for-tuple(@items);
+		my %items := self.vet-for-tuple(@items);
 		self.makeTuple(%items);
-	}
-
-	# Allows people to assign to this table
-	multi	method	STORE(\values, :$INITIALIZE) {
-		for values -> $row {
-			@!rows.STORE(self.makeTuple($row), :$INITIALIZE);
-		}
-
-		return self;
-	}
-
-	multi method	add-row(@fields) {
-		@!rows.push: self.makeTuple(@fields);
-	}
-	multi method	add-row(%fields) {
-		@!rows.push: self.makeTuple(%fields);
 	}
 }
 

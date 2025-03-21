@@ -2,8 +2,9 @@
 
 use	IO::Glob;
 
-for sort glob('*.rakutest') -> $script {
-	shell $script;
+for glob('*.rakutest').sort -> $script {
+	say "=== $script ===";
+	shell './' ~ $script ~ ' 2>&1';
 }
 
 

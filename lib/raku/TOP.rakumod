@@ -259,7 +259,7 @@ class	Table does Relation is export {
 		makeTuple fill_from_aoh add-row list
 		fields
 		format parse
-		add-field add-row
+		add-field
 	>;
 	multi method	STORE(\values, :$INITIALIZE) { $!backend-object.STORE(values, :$INITIALIZE); }
 	multi method	AT-POS(Int:D \position) is raw { return-rw $!backend-object.AT-POS(position); }
