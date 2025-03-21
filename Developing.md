@@ -17,7 +17,15 @@ submitting a PR:
 *	Create and check out a new branch for coding on
 *	Write some code making the changes you want
 *	Write some tests covering the new code/cases above
-*	Write POD and comments.  Style is to interleave doco with code
+*	Write POD and comments.  Style is to interleave doco with code.  
+	Function ordering in a class is as follows:
+	*	First, we have the regular functions that people will 
+		normally want to call
+	*	Then, functions that are only really useful to those writing 
+		inherited classes
+	*	Finally, functions that only need comments, not rakudoc,
+		because they do things like eg. implement Associative or 
+		Positional
 *	Clean up; this means that any debugging statements are removed, or
 	somehow disabled
 *	Write up a nice Changelog entry named after your branch/issue.  Things 

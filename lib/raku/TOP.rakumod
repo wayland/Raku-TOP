@@ -340,6 +340,13 @@ class	Table does Relation is export {
 		}
 		return $return-value;
 	}
+
+	=begin pod
+	=head3 .add-row(@fields)
+
+	Can be used to add a row to a table.  This is mainly for internal use by eg. Parsers and Formatters
+	=end pod
+	multi method	add-row(@fields) {...}
 }
 
 =begin pod
