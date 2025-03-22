@@ -19,23 +19,23 @@ Note that the following links don't yet work on raku.land -- you'll need to go t
 
 Also, the CSV one doesn't work yet, but the others should; probably start with TOP, then go to Memory, then as you please. 
 
-  * [class CSV](docs/Markdown/Class/CSV.md)
+  * [class TOP::Parser::CSV](docs/Markdown/Reference/TOP/Parser/CSV.md)
 
-  * [class HalfHuman](docs/Markdown/Class/HalfHuman.md)
+  * [class TOP::Parser::HalfHuman](docs/Markdown/Reference/TOP/Parser/HalfHuman.md)
 
-  * [class WithBorders](docs/Markdown/Class/WithBorders.md)
+  * [class TOP::Formatter::WithBorders](docs/Markdown/Reference/TOP/Formatter/WithBorders.md)
 
-  * [class HalfHuman](docs/Markdown/Class/HalfHuman.md)
+  * [class TOP::Formatter::HalfHuman](docs/Markdown/Reference/TOP/Formatter/HalfHuman.md)
 
-  * [class Storage](docs/Markdown/Class/Storage.md)
+  * [class Database::Storage](docs/Markdown/Reference/Database/Storage.md)
 
-  * [class CSV](docs/Markdown/Class/CSV.md)
+  * [class Database::Storage::CSV](docs/Markdown/Reference/Database/Storage/CSV.md)
 
-  * [class Memory](docs/Markdown/Class/Memory.md)
+  * [class Database::Storage::Memory](docs/Markdown/Reference/Database/Storage/Memory.md)
 
-  * [class Postgres](docs/Markdown/Class/Postgres.md)
+  * [class Database::Storage::Postgres](docs/Markdown/Reference/Database/Storage/Postgres.md)
 
-  * [class TOP](docs/Markdown/Class/TOP.md)
+  * [class lib::raku::TOP](docs/Markdown/Reference/lib/raku/TOP.md)
 
 Formats and their parameters
 ============================

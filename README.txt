@@ -21,23 +21,23 @@ go to github to read them.
 Also, the CSV one doesn't work yet, but the others should; probably start
 with TOP, then go to Memory, then as you please. 
 
-  * class CSV
+  * class TOP::Parser::CSV
 
-  * class HalfHuman
+  * class TOP::Parser::HalfHuman
 
-  * class WithBorders
+  * class TOP::Formatter::WithBorders
 
-  * class HalfHuman
+  * class TOP::Formatter::HalfHuman
 
-  * class Storage
+  * class Database::Storage
 
-  * class CSV
+  * class Database::Storage::CSV
 
-  * class Memory
+  * class Database::Storage::Memory
 
-  * class Postgres
+  * class Database::Storage::Postgres
 
-  * class TOP
+  * class lib::raku::TOP
 
 Formats and their parameters
 

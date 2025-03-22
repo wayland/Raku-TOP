@@ -231,9 +231,9 @@ multi	MAIN('build-docs', @filenames?) { #= Rebuilds documentation (docs dir and 
 		# Generate Class References
 		my (@class-pod);
 		for @class-source-files -> $sourcefile {
-			my ($basename, $target-file) = build-docs($format-name, $format-extension, 'Class', $sourcefile);
+			my ($basename, $target-file, $classname) = build-docs($format-name, $format-extension, 'Reference', $sourcefile);
 
-			push @class-pod, "=item L<class {$basename}|{$target-file}>"
+			push @class-pod, "=item L<class {$classname}|{$target-file}>"
 		}
 
 		# Generate Introductory Docs
@@ -342,12 +342,19 @@ sub	do_cmd($cmd, :$level = 1, :$use = 'shell', :$die = False) {
 }
 
 sub	build-docs($format-name, $format-extension, $type, $sourcefile, :$source-text = Nil) {
-	my $basename = $sourcefile.IO.basename;
-	$basename ~~ s/\.raku(mod|doc)$// or die "File with unrecognised extension: $basename";
+	my $source-basename = $sourcefile.IO.basename;
+	$source-basename ~~ s/\.raku(mod|doc)$// or die "File with unrecognised extension: $source-basename";
+
+	my $source-dirpath = $sourcefile.IO.dirname; # Start with the dir name
+	$source-dirpath ~~ s/^lib\/raku\///; # Extract out the class path parts
+
+	my $classname = $source-dirpath;
+	$classname ~~ s:global/\//::/; # Change path components from Unix filesystem to Raku
+	$classname ~= '::' ~ $source-basename;
 
 	my $target-file = $type eq 'README' 
 		?? "README.$format-extension"
-		!! "docs/$format-name/$type/$basename.$format-extension";
+		!! "docs/$format-name/$type/$source-dirpath/$source-basename.$format-extension";
 	my $use-source-text;
 	if ($source-text ~~ Nil) {
 		$use-source-text = $sourcefile.IO.slurp;
@@ -373,6 +380,6 @@ sub	build-docs($format-name, $format-extension, $type, $sourcefile, :$source-tex
 #	use	Pod::Contents;
 #	say "Got: " ~ join_pod_contents_of $use-source-text, 'TITLE';
 
-	return [$basename, $target-file];
+	return [$source-basename, $target-file, $classname];
 }
 
