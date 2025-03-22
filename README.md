@@ -12,32 +12,7 @@ Raku TOP Introductory Documents
 
 [Raku Introductory Docs](https://wayland.github.io/table-oriented-programming/Raku-TOP/Introduction.xml)
 
-Raku TOP Class References
--------------------------
-
-Note that the following links don't yet work on raku.land -- you'll need to go to github to read them. 
-
-Also, the CSV one doesn't work yet, but the others should; probably start with TOP, then go to Memory, then as you please. 
-
-  * [class TOP::Parser::CSV](docs/Markdown/Reference/TOP/Parser/CSV.md)
-
-  * [class TOP::Parser::HalfHuman](docs/Markdown/Reference/TOP/Parser/HalfHuman.md)
-
-  * [class TOP::Formatter::WithBorders](docs/Markdown/Reference/TOP/Formatter/WithBorders.md)
-
-  * [class TOP::Formatter::HalfHuman](docs/Markdown/Reference/TOP/Formatter/HalfHuman.md)
-
-  * [class Database::Storage](docs/Markdown/Reference/Database/Storage.md)
-
-  * [class Database::Storage::CSV](docs/Markdown/Reference/Database/Storage/CSV.md)
-
-  * [class Database::Storage::Memory](docs/Markdown/Reference/Database/Storage/Memory.md)
-
-  * [class Database::Storage::Postgres](docs/Markdown/Reference/Database/Storage/Postgres.md)
-
-  * [class lib::raku::TOP](docs/Markdown/Reference/lib/raku/TOP.md)
-
-Formats and their parameters
+Formats and their Parameters
 ============================
 
 Some formats are only really used as storage (eg. Memory, Postgres). Some things are only ever used as input/output (eg. WithBorders is generally not very useful except as output).
@@ -63,4 +38,29 @@ Key to Formats
   * **Accept**: No plans to make this, but would gladly accept it if someone made it
 
   * **Tree**: These ones will be made, but not until Tree-Oriented Programming has been inaugurated
+
+Raku TOP Class References
+-------------------------
+
+Note that the following links don't yet work on raku.land -- you'll need to go to github to read them. 
+
+Also, Database::Storage::CSV doesn't work yet, but the others should; probably start with TOP, then go to Memory, then as you please. 
+
+  * [class TOP::Parser::CSV](docs/Markdown/Reference/TOP/Parser/CSV.md)
+
+  * [class TOP::Parser::HalfHuman](docs/Markdown/Reference/TOP/Parser/HalfHuman.md)
+
+  * [class TOP::Formatter::WithBorders](docs/Markdown/Reference/TOP/Formatter/WithBorders.md)
+
+  * [class TOP::Formatter::HalfHuman](docs/Markdown/Reference/TOP/Formatter/HalfHuman.md)
+
+  * [class Database::Storage](docs/Markdown/Reference/Database/Storage.md)
+
+  * [class Database::Storage::CSV](docs/Markdown/Reference/Database/Storage/CSV.md)
+
+  * [class Database::Storage::Memory](docs/Markdown/Reference/Database/Storage/Memory.md)
+
+  * [class Database::Storage::Postgres](docs/Markdown/Reference/Database/Storage/Postgres.md)
+
+  * [class TOP](docs/Markdown/Reference//TOP.md)
 

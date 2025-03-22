@@ -346,11 +346,24 @@ sub	build-docs($format-name, $format-extension, $type, $sourcefile, :$source-tex
 	$source-basename ~~ s/\.raku(mod|doc)$// or die "File with unrecognised extension: $source-basename";
 
 	my $source-dirpath = $sourcefile.IO.dirname; # Start with the dir name
-	$source-dirpath ~~ s/^lib\/raku\///; # Extract out the class path parts
+
+	# Extract out the class path parts
+	if ! ($source-dirpath ~~ s/^lib\/raku\///) {
+		$source-dirpath ~~ s/^lib\/raku$//;
+		say "REMOVED EXTRA: " ~ $source-dirpath;
+	}
+	$source-dirpath ~~ /^\.$/ and $source-dirpath = '';
+	say "source-dirpath: " ~ $source-dirpath;
 
 	my $classname = $source-dirpath;
-	$classname ~~ s:global/\//::/; # Change path components from Unix filesystem to Raku
-	$classname ~= '::' ~ $source-basename;
+	if $classname {
+		$classname ~~ s:global/\//::/; # Change path components from Unix filesystem to Raku
+		$classname ~= '::' ~ $source-basename;
+	} else {
+		$classname = $source-basename;
+	}
+
+	say "classname: " ~ $classname;
 
 	my $target-file = $type eq 'README' 
 		?? "README.$format-extension"

@@ -13,33 +13,7 @@ This package implements TOP in Raku.
 
 Raku Introductory Docs
 
-  Raku TOP Class References
-
-Note that the following links don't yet work on raku.land -- you'll need to
-go to github to read them. 
-
-Also, the CSV one doesn't work yet, but the others should; probably start
-with TOP, then go to Memory, then as you please. 
-
-  * class TOP::Parser::CSV
-
-  * class TOP::Parser::HalfHuman
-
-  * class TOP::Formatter::WithBorders
-
-  * class TOP::Formatter::HalfHuman
-
-  * class Database::Storage
-
-  * class Database::Storage::CSV
-
-  * class Database::Storage::Memory
-
-  * class Database::Storage::Postgres
-
-  * class lib::raku::TOP
-
-Formats and their parameters
+Formats and their Parameters
 
 Some formats are only really used as storage (eg. Memory, Postgres). Some
 things are only ever used as input/output (eg. WithBorders is generally not
@@ -75,3 +49,29 @@ very useful except as output).
 
   * Tree: These ones will be made, but not until Tree-Oriented Programming has
   been inaugurated
+
+  Raku TOP Class References
+
+Note that the following links don't yet work on raku.land -- you'll need to
+go to github to read them. 
+
+Also, Database::Storage::CSV doesn't work yet, but the others should;
+probably start with TOP, then go to Memory, then as you please. 
+
+  * class TOP::Parser::CSV
+
+  * class TOP::Parser::HalfHuman
+
+  * class TOP::Formatter::WithBorders
+
+  * class TOP::Formatter::HalfHuman
+
+  * class Database::Storage
+
+  * class Database::Storage::CSV
+
+  * class Database::Storage::Memory
+
+  * class Database::Storage::Postgres
+
+  * class TOP
