@@ -31,9 +31,9 @@ Parameters that can be passed to Database::Storage (with defaults)
 
   * `$format => 'WithBorders'`
 
-  * `$show-headers =` True>
+  * `$show-headers => True`
 
-  * `$outer-line-type =` 'Double'> (other options are Light and Heavy)
+  * `$outer-line-type => 'Double'` (other options are Light and Heavy)
 
-  * `$inner-line-type =` 'Light'> (other options are Double and Heavy)
+  * `$inner-line-type => 'Light'` (other options are Double and Heavy)
 
