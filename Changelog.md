@@ -7,6 +7,7 @@
 *	In Table::Storage::Memory.makeTuple(@):
 	*	Changed to read existing fields before making up its own
 	*	Allowed for $!field-mode
+*	Ensured that documentation builder sensibly puts links into directories
 
 ## 0.0.5
 

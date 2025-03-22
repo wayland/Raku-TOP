@@ -28,8 +28,8 @@ submitting a PR:
 		Positional
 *	Clean up; this means that any debugging statements are removed, or
 	somehow disabled
-*	Write up a nice Changelog entry named after your branch/issue.  Things 
-	that might help prompt your memory:
+*	Write up a nice Changelog entry (in Changelog.md) named after your 
+	branch/issue.  Things that might help prompt your memory:
 	*	Original ticket you're resolving
 	*	Diffs
 	*	Changelog messages
