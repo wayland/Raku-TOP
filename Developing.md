@@ -33,7 +33,7 @@ submitting a PR:
 	*	Original ticket you're resolving
 	*	Diffs
 	*	Changelog messages
-*	Commit to git (you can do this earlier as well)
+*	Commit to git (you can do this earlier as well) and push to GitHub
 *	If tests pass, submit PR.  PR body should be Changelog entry
 
 # Release Process
