@@ -8,51 +8,55 @@ use	Test;
 use	TOP;
 
 subtest {
-	plan 2;
+	subtest {
+		plan 2;
 
-	my $table = Table.new(name => 'input', action => 'ensure', field-mode => 'error');
-	isa-ok($table, Table, 'Made table');
-	dies-ok({ $table.parse(
-		command => 'ls -l /usr',
-	) }, "Dies correctly when encountering unknown fields when field-mode is error");
-}, "Test field-mode = 'error'";
+		my $table = Table.new(name => 'input', action => 'ensure', field-mode => 'error');
+		isa-ok($table, Table, 'Made table');
+		dies-ok({ $table.parse(
+			command => 'ls -l /usr',
+		) }, "Dies correctly when encountering unknown fields when field-mode is error");
+	}, "Test field-mode = 'error'";
 
-subtest {
-	plan 2;
+	subtest {
+		plan 2;
 
-	my $table = Table.new(name => 'input2', action => 'ensure', field-mode => 'overflow', overflow-field-name => 'C');
-	isa-ok($table, Table, 'Made table');
-	$table.parse(
-		command => 'ls -l /usr',
-	);
+		my $table = Table.new(name => 'input2', action => 'ensure', field-mode => 'overflow', overflow-field-name => 'C');
+		isa-ok($table, Table, 'Made table');
+		$table.parse(
+			command => 'ls -l /usr',
+		);
 
-	my $out-table = $table.format(
-		'WithBorders',
-	#	show-headers => False,
-	);
-	my $ls-test-output = q:to/END/;
-╔═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
-║ C                                                                                                                                                                                       ║
-╟─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╢
-║                                                                                                                                                                                         ║
-║ Hash::Ordered.new(:A("drwxr-xr-x"),:B(IntStr.new(1, "1")),:C("root"),:D("root"),:E(IntStr.new(4096, "4096")),:F("Oct"),:G(IntStr.new(5, "5")),:H("05:49"),:I("bin"))                    ║
-║ Hash::Ordered.new(:A("drwxr-xr-x"),:B(IntStr.new(1, "1")),:C("root"),:D("root"),:E(IntStr.new(4096, "4096")),:F("Oct"),:G(IntStr.new(5, "5")),:H("05:49"),:I("include"))                ║
-║ Hash::Ordered.new(:A("drwxr-xr-x"),:B(IntStr.new(1, "1")),:C("root"),:D("root"),:E(IntStr.new(4096, "4096")),:F("Oct"),:G(IntStr.new(5, "5")),:H("05:49"),:I("lib"))                    ║
-║ Hash::Ordered.new(:A("drwxr-xr-x"),:B(IntStr.new(1, "1")),:C("root"),:D("root"),:E(IntStr.new(4096, "4096")),:F("Sep"),:G(IntStr.new(6, "6")),:H(IntStr.new(2024, "2024")),:I("local")) ║
-║ Hash::Ordered.new(:A("drwxr-xr-x"),:B(IntStr.new(1, "1")),:C("root"),:D("root"),:E(IntStr.new(4096, "4096")),:F("Oct"),:G(IntStr.new(5, "5")),:H("05:49"),:I("sbin"))                   ║
-║ Hash::Ordered.new(:A("drwxr-xr-x"),:B(IntStr.new(1, "1")),:C("root"),:D("root"),:E(IntStr.new(4096, "4096")),:F("Oct"),:G(IntStr.new(5, "5")),:H("05:49"),:I("share"))                  ║
-╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+#	        my $select-table = $table.select(<A B C D E I>);
+
+		my $out-table = $table.format(
+			'WithBorders',
+		#	show-headers => False,
+		);
+		my $ls-test-output = q:to/END/;
+╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ C                                                                                                                                                                          ║
+╟────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╢
+║                                                                                                                                                                            ║
+║ Hash::Ordered.new(:A("drwxr-xr-x"),:B(IntStr.new(1, "1")),:C("root"),:D("root"),:E(IntStr.new(4096, "4096")),:F("Mar"),:G(IntStr.new(22, "22")),:H("02:13"),:I("bin"))     ║
+║ Hash::Ordered.new(:A("drwxr-xr-x"),:B(IntStr.new(1, "1")),:C("root"),:D("root"),:E(IntStr.new(4096, "4096")),:F("Mar"),:G(IntStr.new(22, "22")),:H("02:13"),:I("include")) ║
+║ Hash::Ordered.new(:A("drwxr-xr-x"),:B(IntStr.new(1, "1")),:C("root"),:D("root"),:E(IntStr.new(4096, "4096")),:F("Mar"),:G(IntStr.new(22, "22")),:H("02:13"),:I("lib"))     ║
+║ Hash::Ordered.new(:A("drwxr-xr-x"),:B(IntStr.new(5, "5")),:C("root"),:D("root"),:E(IntStr.new(4096, "4096")),:F("Feb"),:G(IntStr.new(13, "13")),:H("23:04"),:I("local"))   ║
+║ Hash::Ordered.new(:A("drwxr-xr-x"),:B(IntStr.new(1, "1")),:C("root"),:D("root"),:E(IntStr.new(4096, "4096")),:F("Mar"),:G(IntStr.new(22, "22")),:H("02:13"),:I("sbin"))    ║
+║ Hash::Ordered.new(:A("drwxr-xr-x"),:B(IntStr.new(1, "1")),:C("root"),:D("root"),:E(IntStr.new(4096, "4096")),:F("Mar"),:G(IntStr.new(22, "22")),:H("02:13"),:I("share"))   ║
+╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 END
 
-	is($out-table, $ls-test-output, 'ls table is as expected');
-}, "Test field-mode = 'overflow'";
+		is($out-table, $ls-test-output, 'ls table is as expected');
+	}, "Test field-mode = 'overflow'";
 
-subtest {
-	plan 2;
+	subtest {
+		plan 2;
 
-	my $table = Table.new(name => 'input', action => 'ensure', field-mode => 'blargh!');
-	isa-ok($table, Table, 'Made table');
-	dies-ok({ $table.parse(
-		command => 'ls -l /usr',
-	) }, "Dies correctly when encountering a rubbish field-mode");
-}, "Test field-mode = 'blargh!'";
+		my $table = Table.new(name => 'input', action => 'ensure', field-mode => 'blargh!');
+		isa-ok($table, Table, 'Made table');
+		dies-ok({ $table.parse(
+			command => 'ls -l /usr',
+		) }, "Dies correctly when encountering a rubbish field-mode");
+	}, "Test field-mode = 'blargh!'";
+}, "Test table modes";

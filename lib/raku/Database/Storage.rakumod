@@ -205,7 +205,7 @@ role	Table::Storage does Associative does Positional does TOP::Core {
 
 		$formatter.prepare-table();
 		$formatter.output-header();
-		for self[0..*] -> $row {
+		for self[0..*-1] -> $row {
 			$formatter.output-row($row);
 		}
 		$formatter.output-footer();

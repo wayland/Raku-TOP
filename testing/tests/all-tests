@@ -1,11 +1,27 @@
 #!/usr/bin/raku
 
 use	IO::Glob;
+use	Hash::Ordered;
 
+say "Raku version in use: " ~ $*RAKU.compiler.version;
+
+my %exit-codes is Hash::Ordered;
 for glob('*.rakutest').sort -> $script {
 	say "\n\n=== $script ===";
 	$*OUT.flush;
-	shell './' ~ $script;
+	my Proc $proc = shell './' ~ $script;
+	while $proc.exitcode == -1 {
+		sleep 1;
+	}
+	%exit-codes{"$script"} = $proc.exitcode;
 }
 
+my Int $our-exit = 0;
+for %exit-codes.kv -> $script, $code {
+	if $code > 0 {
+		printf "Exit code %3d for script %s\n", $code, $script;
+		$our-exit = max($our-exit, $code);
+	}
+}
 
+exit $our-exit;

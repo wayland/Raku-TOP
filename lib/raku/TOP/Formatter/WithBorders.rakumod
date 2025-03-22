@@ -69,7 +69,7 @@ class    TOP::Formatter::WithBorders {
 				%!maxes{$name} = $name.chars;
 			}
 		};
-		for $!table[0 ..*] -> $row {
+		for $!table[0 ..*-1] -> $row {
 			for $row.kv -> $key, $cell {
 				my Str $cellstring = self.get-cell-string($cell);
 				%!maxes{$key} = max(%!maxes{$key}, $cellstring.chars);
@@ -114,6 +114,7 @@ class    TOP::Formatter::WithBorders {
 			$!table.fields.map({ $straight x %!maxes{.name} })
 		);
 		if $!show-headers {
+			# TODO: See if we can't centre the headers in the columns
 			$.add-row($!table.fields.map({ .name }));
 			my $straight = $.get-character(containment => 'inner', shape => 'Straight', position => 'Horizontal');
 			my $left     =             $.get-character(                        shape => 'T',     position => 'Left' ) ~ $straight;

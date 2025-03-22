@@ -257,7 +257,7 @@ class	Table does Relation is export {
 		elems EXISTS-POS DELETE-POS ASSIGN-POS BIND-POS
 		AT-KEY BIND-KEY CLEAR DELETE-KEY EXISTS-KEY
 		makeTuple fill_from_aoh add-row list
-		fields
+		fields field-indices
 		format parse
 		add-field
 	>;
@@ -337,6 +337,49 @@ class	Table does Relation is export {
 			if $matcher($thisrow) {
 				$return-value.add-row($thisrow);
 			}
+		}
+		return $return-value;
+	}
+
+	=begin pod
+	=head3 select(@fields)
+
+	Creates a new table with only a selection of columns, not all of them
+
+	Recognises a lone '*' as a request for all fields
+	=end pod
+	# TODO: Implement renames, using a hash
+	method select(@fields) {
+		# Set up @use_fields with the fields we're going to use
+		my @use_fields;
+		for @fields -> $name {
+			if $name eq '*' {
+				@use_fields.push: self.fields.map({ .name });
+			} else {
+				@use_fields.push($name);
+				if ! (self.field-indices{$name}:exists) {
+					die "Error: unable to find field '$name' in source table";
+				}
+			}
+		}
+		# Set up %new_fields as an index of what we're going to use, and add the appropriate fields to the new Table in $return-value
+		my Table $return-value = Table.new(name => ~UUID.new(), action => 'ensure');
+		my %new_fields;
+		for @use_fields -> $name {
+			$return-value.add-field(relation => self, name => $name);
+			%new_fields{$name} = 1;
+		}
+		# Loop over rows
+		for 0..^self.elems -> $row-id {
+			my $thisrow = self[$row-id];
+			my %newrow is Hash::Ordered;
+			# Loop over fields and just include the right ones
+			for @fields -> $name {
+				%new_fields{$name}:exists or next;
+				$thisrow{$name}:exists or next;
+				%newrow{$name} = $thisrow{$name};
+			}
+			$return-value.add-row(%newrow);
 		}
 		return $return-value;
 	}

@@ -48,7 +48,7 @@ class    TOP::Formatter::HalfHuman {
 
 	method    prepare-table() {
 		# Calculate field maxes and types
-		for $!table[0 ..*] -> $row {
+		for $!table[0 ..*-1] -> $row {
 			for $row.kv -> $key, $cell {
 				%!maxes{$key} = max(%!maxes{$key}, $cell.chars);
 				my $lastone = False; my $thisone = False;
