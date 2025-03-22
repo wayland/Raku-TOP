@@ -350,10 +350,8 @@ sub	build-docs($format-name, $format-extension, $type, $sourcefile, :$source-tex
 	# Extract out the class path parts
 	if ! ($source-dirpath ~~ s/^lib\/raku\///) {
 		$source-dirpath ~~ s/^lib\/raku$//;
-		say "REMOVED EXTRA: " ~ $source-dirpath;
 	}
 	$source-dirpath ~~ /^\.$/ and $source-dirpath = '';
-	say "source-dirpath: " ~ $source-dirpath;
 
 	my $classname = $source-dirpath;
 	if $classname {
@@ -362,8 +360,6 @@ sub	build-docs($format-name, $format-extension, $type, $sourcefile, :$source-tex
 	} else {
 		$classname = $source-basename;
 	}
-
-	say "classname: " ~ $classname;
 
 	my $target-file = $type eq 'README' 
 		?? "README.$format-extension"

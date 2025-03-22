@@ -29,7 +29,7 @@ Many of the functions in this class are called by Database::Storage::format()
 
 Parameters that can be passed to Database::Storage (with defaults)
 
-  * `$format =` 'WithBorders'>
+  * `$format => 'WithBorders'`
 
   * `$show-headers =` True>
 

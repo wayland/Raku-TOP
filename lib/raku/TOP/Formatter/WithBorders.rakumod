@@ -24,13 +24,13 @@ Many of the functions in this class are called by Database::Storage::format()
 
 Parameters that can be passed to Database::Storage (with defaults)
 
-=item1 C<$format => 'WithBorders'>
+=item1 C<<$format => 'WithBorders'>>
 
-=item1 C<$show-headers => True>
+=item1 C<<$show-headers => True>>
 
-=item1 C<$outer-line-type => 'Double'> (other options are Light and Heavy)
+=item1 C<<$outer-line-type => 'Double'>> (other options are Light and Heavy)
 
-=item1 C<$inner-line-type => 'Light'> (other options are Double and Heavy)
+=item1 C<<$inner-line-type => 'Light'>> (other options are Double and Heavy)
 
 =end pod
 

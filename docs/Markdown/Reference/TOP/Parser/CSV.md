@@ -25,5 +25,5 @@ TOP::Parser::CSV
 
 The class for parsing CSVs into a table. Uses Text::CSV. 
 
-Called by Database::Storage::parse()
+Called by Database::Storage.parse() -- see there for documentation
 
