@@ -384,7 +384,8 @@ hr {
       <tr class="toc-level-2"><td class="toc-number">6.2</td><td class="toc-text"><a href="#Methods">Methods</a></td></tr>
  <tr class="toc-level-3"><td class="toc-number">6.2.1</td><td class="toc-text"><a href="#.new">.new</a></td></tr>
                                   <tr class="toc-level-3"><td class="toc-number">6.2.2</td><td class="toc-text"><a href="#grep">grep</a></td></tr>
-  <tr class="toc-level-3"><td class="toc-number">6.2.3</td><td class="toc-text"><a href="#.add-row(@fields)">.add-row(@fields)</a></td></tr>
+  <tr class="toc-level-3"><td class="toc-number">6.2.3</td><td class="toc-text"><a href="#select(@fields,_:$destination-table)">select(@fields, :$destination-table)</a></td></tr>
+    <tr class="toc-level-3"><td class="toc-number">6.2.4</td><td class="toc-text"><a href="#.add-row(@fields)">.add-row(@fields)</a></td></tr>
   <tr class="toc-level-1"><td class="toc-number">7</td><td class="toc-text"><a href="#Database">Database</a></td></tr>
    <tr class="toc-level-2"><td class="toc-number">7.1</td><td class="toc-text"><a href="#Attributes">Attributes</a></td></tr>
    <tr class="toc-level-2"><td class="toc-number">7.2</td><td class="toc-text"><a href="#Methods">Methods</a></td></tr>
@@ -463,14 +464,14 @@ hr {
 <p>The Relation class&#39; main function at this point is to be composed int the Table class; at some point there will also be a View class, at which point it will become more relevant.</p>
 <h1 id="Table"><a class="u" href="#___top" title="go to top of document">Table</a></h1>
 <pre class="pod-block-code">class	Table does Relation is export {</pre>
-<p>The Table class is one of the main drivers of TOP. It represents the various backend table classes to the Raku language, so that they can all be accessed via the same API.</p>
+<p>The Table class is one of the main drivers of TOP. It represents the various storage table classes to the Raku language, so that they can all be accessed via the same API.</p>
 <h2 id="Attributes"><a class="u" href="#___top" title="go to top of document">Attributes</a></h2>
 <dl>
-<dt>$.backend-object</dt>
+<dt>$.storage-object</dt>
 <dd></dd>
 
 </dl>
-<p>Holds the backend object (Table::Storage::Postgres, Table::Storage::Memory, etc) that talks to the table in its backend store; the translation layer between Table and the datastore.</p>
+<p>Holds the storage object (Table::Storage::Postgres, Table::Storage::Memory, etc) that talks to the table in its backend store; the translation layer between Table and the datastore.</p>
 <dl>
 <dt>Str $.name</dt>
 <dd></dd>
@@ -480,7 +481,7 @@ hr {
 <h2 id="Methods"><a class="u" href="#___top" title="go to top of document">Methods</a></h2>
 <h3 id=".new"><a class="u" href="#___top" title="go to top of document">.new</a></h3>
 <p>Creates a new Table.</p>
-<pre class="pod-block-code">.new(Database :$database, Str :$backend = &#39;Memory&#39;, Str :$action = &#39;use&#39;)</pre>
+<pre class="pod-block-code">.new(Database :$database, Str :$storage-type = &#39;Memory&#39;, Str :$action = &#39;use&#39;)</pre>
 <dl>
 <dt>Database :$database</dt>
 <dd></dd>
@@ -488,11 +489,11 @@ hr {
 </dl>
 <p>The database to which this table should be attached.</p>
 <dl>
-<dt>Str :$backend = &#39;Memory&#39;;</dt>
+<dt>Str :$storage-type = &#39;Memory&#39;;</dt>
 <dd></dd>
 
 </dl>
-<p>The name of the backend to use when creating this table. The default is that it&#39;s an in-memory table.</p>
+<p>The name of the Storage to use when creating this table. The default is that it&#39;s an in-memory table.</p>
 <dl>
 <dt>Str :$action = &#39;use&#39;</dt>
 <dd></dd>
@@ -508,6 +509,10 @@ hr {
 </tbody>
 </table><h3 id="grep"><a class="u" href="#___top" title="go to top of document">grep</a></h3>
 <p>Implements grep on Relation. </p>
+<h3 id="select(@fields,_:$destination-table)"><a class="u" href="#___top" title="go to top of document">select(@fields, :$destination-table)</a></h3>
+<p>Creates a new table with only a selection of columns, not all of them</p>
+<p>Recognises a lone &#39;*&#39; as a request for all fields</p>
+<p>If $destination-table is provided, then that&#39;s used as a basis for the new table, otherwise one is just created</p>
 <h3 id=".add-row(@fields)"><a class="u" href="#___top" title="go to top of document">.add-row(@fields)</a></h3>
 <p>Can be used to add a row to a table. This is mainly for internal use by eg. Parsers and Formatters</p>
 <h1 id="Database"><a class="u" href="#___top" title="go to top of document">Database</a></h1>
@@ -515,22 +520,22 @@ hr {
 <p>This is the Database class from which all other Database classes descend.</p>
 <h2 id="Attributes"><a class="u" href="#___top" title="go to top of document">Attributes</a></h2>
 <dl>
-<dt>$.backend-object</dt>
+<dt>$.storage-object</dt>
 <dd></dd>
 
 </dl>
-<p>The backend object that talks to the data store for us.</p>
+<p>The storage object that talks to the data store for us.</p>
 <h2 id="Methods"><a class="u" href="#___top" title="go to top of document">Methods</a></h2>
 <h3 id=".new"><a class="u" href="#___top" title="go to top of document">.new</a></h3>
 <p>Creates a new Database (ie. database object -- may be attaching to an existing database)</p>
-<pre class="pod-block-code">.new(Str$.backend = &#39;Memory&#39;)</pre>
+<pre class="pod-block-code">.new(Str $.storage-type = &#39;Memory&#39;)</pre>
 <p>Parameters to .new are:</p>
 <dl>
-<dt>Str $.backend = &#39;Memory&#39;</dt>
+<dt>Str $.storage-type = &#39;Memory&#39;</dt>
 <dd></dd>
 
 </dl>
-<p>The backend that will be used by this database. The default is that it&#39;s the in-memory backend.</p>
+<p>The Storage that will be used by this database. The default is that it&#39;s the in-memory Storage.</p>
 <h3 id="method_useTable"><a class="u" href="#___top" title="go to top of document">method useTable</a></h3>
 <pre class="pod-block-code">method	useTable(:$name)</pre>
 <p>Creates and returns an object representing the named table in this database.</p>

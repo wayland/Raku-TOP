@@ -112,16 +112,16 @@ Table
 
     class	Table does Relation is export {
 
-The Table class is one of the main drivers of TOP. It represents the various backend table classes to the Raku language, so that they can all be accessed via the same API.
+The Table class is one of the main drivers of TOP. It represents the various storage table classes to the Raku language, so that they can all be accessed via the same API.
 
 Attributes
 ----------
 
-**$.backend-object**
+**$.storage-object**
 
 
 
-Holds the backend object (Table::Storage::Postgres, Table::Storage::Memory, etc) that talks to the table in its backend store; the translation layer between Table and the datastore.
+Holds the storage object (Table::Storage::Postgres, Table::Storage::Memory, etc) that talks to the table in its backend store; the translation layer between Table and the datastore.
 
 **Str $.name**
 
@@ -136,7 +136,7 @@ Methods
 
 Creates a new Table.
 
-    .new(Database :$database, Str :$backend = 'Memory', Str :$action = 'use')
+    .new(Database :$database, Str :$storage-type = 'Memory', Str :$action = 'use')
 
 **Database :$database**
 
@@ -144,11 +144,11 @@ Creates a new Table.
 
 The database to which this table should be attached.
 
-**Str :$backend = 'Memory';**
+**Str :$storage-type = 'Memory';**
 
 
 
-The name of the backend to use when creating this table. The default is that it's an in-memory table.
+The name of the Storage to use when creating this table. The default is that it's an in-memory table.
 
 **Str :$action = 'use'**
 
@@ -169,6 +169,14 @@ What kind of action to take when creating the table.
 
 Implements grep on Relation. 
 
+### select(@fields, :$destination-table)
+
+Creates a new table with only a selection of columns, not all of them
+
+Recognises a lone '*' as a request for all fields
+
+If $destination-table is provided, then that's used as a basis for the new table, otherwise one is just created
+
 ### .add-row(@fields)
 
 Can be used to add a row to a table. This is mainly for internal use by eg. Parsers and Formatters
@@ -183,11 +191,11 @@ This is the Database class from which all other Database classes descend.
 Attributes
 ----------
 
-**$.backend-object**
+**$.storage-object**
 
 
 
-The backend object that talks to the data store for us.
+The storage object that talks to the data store for us.
 
 Methods
 -------
@@ -196,15 +204,15 @@ Methods
 
 Creates a new Database (ie. database object -- may be attaching to an existing database)
 
-    .new(Str$.backend = 'Memory')
+    .new(Str $.storage-type = 'Memory')
 
 Parameters to .new are:
 
-**Str $.backend = 'Memory'**
+**Str $.storage-type = 'Memory'**
 
 
 
-The backend that will be used by this database. The default is that it's the in-memory backend.
+The Storage that will be used by this database. The default is that it's the in-memory Storage.
 
 ### method useTable
 

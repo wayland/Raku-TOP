@@ -1,7 +1,7 @@
 NAME
 ====
 
-Postgres Storage - The Postgres driver for Raku TOP
+Postgres Storage - The Postgres Storage classes for Raku TOP
 
 TITLE
 =====
@@ -11,7 +11,7 @@ Postgres Storage
 SUBTITLE
 ========
 
-The Postgres driver for Raku TOP
+The Postgres Storage classes for Raku TOP
 
 AUTHOR
 ======
@@ -46,7 +46,7 @@ Methods
 
 **Table :$table**
 
-The frontend table object that's going to reference this backend
+The frontend table object that's going to reference this Storage
 
 **Str :$action = 'use'**
 

@@ -1,0 +1,22 @@
+TOP::FieldMode
+==============
+
+The objects descended from this are the ones that action Table!field-mode
+
+Attributes
+----------
+
+### .vet-for-tuple and friends
+
+This is where the field modes are implemented. It's been designed so that, if someone wants to add a new field mode, they should be able to do so just by implementing the following methods:
+
+  * process-extra-fields-hash
+
+  * process-extra-fields-array
+
+  * get-field-names
+
+Note that each of the above is passed $!field-mode as the first parameter, and this selects the appropriate field mode. 
+
+Possibly in future, each field-mode should instead be a class with all these methods attached. 
+

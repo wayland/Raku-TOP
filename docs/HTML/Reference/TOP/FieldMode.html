@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <title>Postgres Storage</title>
+    <title></title>
     <meta charset="UTF-8"/>
     <style>hr,
 img {
@@ -370,49 +370,29 @@ hr {
     <nav class="indexgroup">
 <table id="TOC">
 <caption><h2 id="TOC_Title">Table of Contents</h2></caption>
-    <tr class="toc-level-1"><td class="toc-number">1</td><td class="toc-text"><a href="#Database::Storage::Postgres">Database::Storage::Postgres</a></td></tr>
-               <tr class="toc-level-2"><td class="toc-number">1.1</td><td class="toc-text"><a href="#Methods">Methods</a></td></tr>
- <tr class="toc-level-3"><td class="toc-number">1.1.1</td><td class="toc-text"><a href="#.useTable">.useTable</a></td></tr>
-     
+<tr class="toc-level-1"><td class="toc-number">1</td><td class="toc-text"><a href="#TOP::FieldMode">TOP::FieldMode</a></td></tr>
+  <tr class="toc-level-2"><td class="toc-number">1.1</td><td class="toc-text"><a href="#Attributes">Attributes</a></td></tr>
+ <tr class="toc-level-3"><td class="toc-number">1.1.1</td><td class="toc-text"><a href="#.vet-for-tuple_and_friends">.vet-for-tuple and friends</a></td></tr>
+      
 </table>
 </nav>
 
 
     <div class="pod-body">
-    <h1 id="Database::Storage::Postgres"><a class="u" href="#___top" title="go to top of document">Database::Storage::Postgres</a></h1>
-<pre class="pod-block-code">class	Database::Storage::Postgres does Database::Storage {
-
-</pre>
-<p>Currently uses a cursor for all reads. What we&#39;d like to change is:</p>
-<ul><li><p>The user can specify a mode:</p>
+    <h1 id="TOP::FieldMode"><a class="u" href="#___top" title="go to top of document">TOP::FieldMode</a></h1>
+<p>The objects descended from this are the ones that action Table!field-mode</p>
+<h2 id="Attributes"><a class="u" href="#___top" title="go to top of document">Attributes</a></h2>
+<h3 id=".vet-for-tuple_and_friends"><a class="u" href="#___top" title="go to top of document">.vet-for-tuple and friends</a></h3>
+<p>This is where the field modes are implemented. It&#39;s been designed so that, if someone wants to add a new field mode, they should be able to do so just by implementing the following methods:</p>
+<ul><li><p>process-extra-fields-hash</p>
 </li>
-<ul><li><p><strong>Key:</strong> Uses a key field (default: primary key) to track rows; doesn&#39;t matter if we miss some when paginating, etc (ie. if others have been added into the sequence)</p>
+<li><p>process-extra-fields-array</p>
 </li>
-<li><p><strong>NumKey:</strong> Like Key, but the key has to be numeric</p>
-</li>
-<li><p><strong>Sort+Key:</strong> Like Key, but also applies an ordering to the table (ie. an ordering other than by Key)</p>
-</li>
-<li><p><strong>Cursor:</strong> Uses cursors to match things up; could be suitable for eg. batch jobs</p>
+<li><p>get-field-names</p>
 </li>
 </ul>
-</ul>
-<p>The current (only) behaviour is Cursor. We&#39;d like to make the other options available, and default to NumKey (since it&#39;s probably the quickest, and loads the database least).</p>
-<h2 id="Methods"><a class="u" href="#___top" title="go to top of document">Methods</a></h2>
-<h3 id=".useTable"><a class="u" href="#___top" title="go to top of document">.useTable</a></h3>
-<pre class="pod-block-code">method	useTable(Table :$table, Str :$action = &#39;use&#39;, :%fields = {}) {
-</pre>
-<dl>
-<dt>Table :$table</dt>
-<dd><p>The frontend table object that&#39;s going to reference this Storage</p>
-</dd>
-<dt>Str :$action = &#39;use&#39;</dt>
-<dd><p>Documented in TOP Table.new()</p>
-</dd>
-<dt>:%fields = {}</dt>
-<dd><p>The fields to be used on the table.</p>
-</dd>
-
-</dl>
+<p>Note that each of the above is passed $!field-mode as the first parameter, and this selects the appropriate field mode. </p>
+<p>Possibly in future, each field-mode should instead be a class with all these methods attached. </p>
 
     </div>
 

@@ -375,9 +375,9 @@ hr {
   <tr class="toc-level-3"><td class="toc-number">1.1.1</td><td class="toc-text"><a href="#.useTable">.useTable</a></td></tr>
    <tr class="toc-level-1"><td class="toc-number">2</td><td class="toc-text"><a href="#Table::Storage">Table::Storage</a></td></tr>
     <tr class="toc-level-2"><td class="toc-number">2.1</td><td class="toc-text"><a href="#Attributes">Attributes</a></td></tr>
-            <tr class="toc-level-2"><td class="toc-number">2.2</td><td class="toc-text"><a href="#Methods">Methods</a></td></tr>
+   <tr class="toc-level-2"><td class="toc-number">2.2</td><td class="toc-text"><a href="#Methods">Methods</a></td></tr>
  <tr class="toc-level-3"><td class="toc-number">2.2.1</td><td class="toc-text"><a href="#.new">.new</a></td></tr>
-        <tr class="toc-level-3"><td class="toc-number">2.2.2</td><td class="toc-text"><a href="#exists">exists</a></td></tr>
+               <tr class="toc-level-3"><td class="toc-number">2.2.2</td><td class="toc-text"><a href="#exists">exists</a></td></tr>
     <tr class="toc-level-3"><td class="toc-number">2.2.3</td><td class="toc-text"><a href="#format">format</a></td></tr>
    <tr class="toc-level-4"><td class="toc-number">2.2.3.1</td><td class="toc-text"><a href="#Str_$format_=_'HalfHuman';">Str $format = &#39;HalfHuman&#39;;</a></td></tr>
   <tr class="toc-level-4"><td class="toc-number">2.2.3.2</td><td class="toc-text"><a href="#%parameters">%parameters</a></td></tr>
@@ -385,22 +385,21 @@ hr {
    <tr class="toc-level-4"><td class="toc-number">2.2.4.1</td><td class="toc-text"><a href="#Str_$format_=_'HalfHuman';">Str $format = &#39;HalfHuman&#39;;</a></td></tr>
   <tr class="toc-level-4"><td class="toc-number">2.2.4.2</td><td class="toc-text"><a href="#%parameters">%parameters</a></td></tr>
   <tr class="toc-level-3"><td class="toc-number">2.2.5</td><td class="toc-text"><a href="#.add-field">.add-field</a></td></tr>
-     <tr class="toc-level-3"><td class="toc-number">2.2.6</td><td class="toc-text"><a href="#.vet-for-tuple_and_friends">.vet-for-tuple and friends</a></td></tr>
-      
+    
 </table>
 </nav>
 
 
     <div class="pod-body">
     <h1 id="Database::Storage"><a class="u" href="#___top" title="go to top of document">Database::Storage</a></h1>
-<p>The parent class for all the different Database Drivers (backends).</p>
+<p>The parent class for all the different Database Storage classes (aka drivers, backends).</p>
 <pre class="pod-block-code">role	Database::Storage
 
 </pre>
 <h2 id="Methods"><a class="u" href="#___top" title="go to top of document">Methods</a></h2>
 <h1>Any: Name of the database</h1><h3 id=".useTable"><a class="u" href="#___top" title="go to top of document">.useTable</a></h3>
 <pre class="pod-block-code">method	useTable(Table :$table, *%params)</pre>
-<p>Returns a table belonging to the database. Parameters vary from driver to driver.</p>
+<p>Returns a table belonging to the database. Parameters vary depending on the Storage type.</p>
 <h1 id="Table::Storage"><a class="u" href="#___top" title="go to top of document">Table::Storage</a></h1>
 <pre class="pod-block-code">role	Table::Storage does Associative does Positional {
 
@@ -418,27 +417,6 @@ hr {
 </dd>
 
 </dl>
-<dl>
-<dt>Str $!field-mode = &#39;lax&#39;</dt>
-<dd></dd>
-
-</dl>
-<p>$!field-mode could be one of the following:</p>
-<ul><li><p>lax: extra fields create new columns (default)</p>
-</li>
-<li><p>error: extra fields create an error</p>
-</li>
-<li><p>overflow: extra fields get stuck in a (JSON?) hash/object/assoc field; the name of the field is in $!overflow-field-name</p>
-</li>
-</ul>
-<p>Can be passed to .new()</p>
-<dl>
-<dt>Str $!overflow-field-name</dt>
-<dd></dd>
-
-</dl>
-<p>The name of the field the overflow fields get put in</p>
-<p>Can be passed to .new()</p>
 <h2 id="Methods"><a class="u" href="#___top" title="go to top of document">Methods</a></h2>
 <h3 id=".new"><a class="u" href="#___top" title="go to top of document">.new</a></h3>
 <p>Creates a Table::Storage.</p>
@@ -446,7 +424,7 @@ hr {
 <p>Parameters to .new are:</p>
 <dl>
 <dt>Relation $frontend-object</dt>
-<dd><p>The frontend object that is using this backend object.</p>
+<dd><p>The frontend object that is using this storage object.</p>
 </dd>
 
 </dl>
@@ -468,6 +446,25 @@ hr {
 </dd>
 
 </dl>
+<dl>
+<dt>Str $field-mode = &#39;Automatic&#39;</dt>
+<dd></dd>
+
+</dl>
+<p>$!field-mode could be one of the following:</p>
+<ul><li><p>Automatic: extra fields create new columns (default); like a spreadsheet</p>
+</li>
+<li><p>Error: extra fields create an error; like a RDBMS</p>
+</li>
+<li><p>overflow: extra fields get stuck in a (JSON?) hash/object/assoc field; the name of the field is in $!overflow-field-name</p>
+</li>
+</ul>
+<dl>
+<dt>Str $overflow-field-name</dt>
+<dd></dd>
+
+</dl>
+<p>The name of the field the overflow fields get put in</p>
 <h3 id="exists"><a class="u" href="#___top" title="go to top of document">exists</a></h3>
 <p>Returns True if the table already exists.</p>
 <pre class="pod-block-code">method	.exists(Str :$true-error, Str :$false-error)</pre>
@@ -501,17 +498,6 @@ hr {
 </dd>
 
 </dl>
-<h3 id=".vet-for-tuple_and_friends"><a class="u" href="#___top" title="go to top of document">.vet-for-tuple and friends</a></h3>
-<p>This is where the field modes are implemented. It&#39;s been designed so that, if someone wants to add a new field mode, they should be able to do so just by implementing the following methods:</p>
-<ul><li><p>process-extra-fields-hash</p>
-</li>
-<li><p>process-extra-fields-array</p>
-</li>
-<li><p>get-field-names</p>
-</li>
-</ul>
-<p>Note that each of the above is passed $!field-mode as the first parameter, and this selects the appropriate field mode. </p>
-<p>Possibly in future, each field-mode should instead be a class with all these methods attached. </p>
 
     </div>
 

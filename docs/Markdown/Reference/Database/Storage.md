@@ -1,7 +1,7 @@
 NAME
 ====
 
-Raku TOP Storage - The common driver for Raku TOP backends
+Raku TOP Storage - The parent roles Raku TOP Storage classes
 
 TITLE
 =====
@@ -11,7 +11,7 @@ Raku TOP Storage
 SUBTITLE
 ========
 
-The common driver for Raku TOP backends
+The parent roles Raku TOP Storage classes
 
 AUTHOR
 ======
@@ -21,7 +21,7 @@ Tim Nelson - https://github.com/wayland
 Database::Storage
 =================
 
-The parent class for all the different Database Drivers (backends).
+The parent class for all the different Database Storage classes (aka drivers, backends).
 
     role	Database::Storage
 
@@ -32,7 +32,7 @@ Methods
 
     method	useTable(Table :$table, *%params)
 
-Returns a table belonging to the database. Parameters vary from driver to driver.
+Returns a table belonging to the database. Parameters vary depending on the Storage type.
 
 Table::Storage
 ==============
@@ -50,28 +50,6 @@ Stores the fields
 
 For looking up fields by name
 
-**Str $!field-mode = 'lax'**
-
-
-
-$!field-mode could be one of the following:
-
-  * lax: extra fields create new columns (default)
-
-  * error: extra fields create an error
-
-  * overflow: extra fields get stuck in a (JSON?) hash/object/assoc field; the name of the field is in $!overflow-field-name
-
-Can be passed to .new()
-
-**Str $!overflow-field-name**
-
-
-
-The name of the field the overflow fields get put in
-
-Can be passed to .new()
-
 Methods
 -------
 
@@ -85,7 +63,7 @@ Parameters to .new are:
 
 **Relation $frontend-object**
 
-The frontend object that is using this backend object.
+The frontend object that is using this storage object.
 
 **Database::Storage :$database**
 
@@ -98,6 +76,24 @@ The action to take -- see the parameter of the same name on the frontend object
 **Str %fields**
 
 If relevant, the fields to use in creating/altering the table
+
+**Str $field-mode = 'Automatic'**
+
+
+
+$!field-mode could be one of the following:
+
+  * Automatic: extra fields create new columns (default); like a spreadsheet
+
+  * Error: extra fields create an error; like a RDBMS
+
+  * overflow: extra fields get stuck in a (JSON?) hash/object/assoc field; the name of the field is in $!overflow-field-name
+
+**Str $overflow-field-name**
+
+
+
+The name of the field the overflow fields get put in
 
 ### exists
 
@@ -148,18 +144,4 @@ The name of the field being added
 **Any:U $type**
 
 The type of the field, as a Raku type
-
-### .vet-for-tuple and friends
-
-This is where the field modes are implemented. It's been designed so that, if someone wants to add a new field mode, they should be able to do so just by implementing the following methods:
-
-  * process-extra-fields-hash
-
-  * process-extra-fields-array
-
-  * get-field-names
-
-Note that each of the above is passed $!field-mode as the first parameter, and this selects the appropriate field mode. 
-
-Possibly in future, each field-mode should instead be a class with all these methods attached. 
 

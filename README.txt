@@ -13,6 +13,27 @@ This package implements TOP in Raku.
 
 Raku Introductory Docs
 
+  The Object Model Overview
+
+Any classes below in () are not implemented yet
+
+Conceptually, what we're moddeling is: * Relation * Table *
+(DataDictionary) * (View) * (TupleSet) * Tuple * (Section) * Field * (Lot)
+* Database * Join
+
+Most of the above concepts are directly from Relational Set Theory. The
+exceptions are: * DataDictionary: Just a set of tables that explain what
+the rest of the database is doing; may be implemented differently * Lot: A
+group of columns * TupleSet: A set of tuples, usually that are the result
+of a query
+
+In addition to the above, we have: * Storage: This is data we can
+read/write; used for modelling SQL databases, but could also be in-memory
+tables, spreadsheets, CSV files, etc * Formatters: This is for outputting
+data. Could be tables drawn with CLI box characters, CSV files, etc *
+Parsers: This is for reading from tables. This includes reading in
+space-separated data, CSV files, etc
+
 Formats and their Parameters
 
 Some formats are only really used as storage (eg. Memory, Postgres). Some
@@ -55,16 +76,24 @@ very useful except as output).
 Note that the following links don't yet work on raku.land -- you'll need to
 go to github to read them. 
 
-Also, Database::Storage::CSV doesn't work yet, but the others should;
-probably start with TOP, then go to Memory, then as you please. 
+Also, Database::Storage::CSV doesn't work yet (TODO), but the others
+should; probably start with TOP, then go to Memory, then as you please. 
 
   * class TOP::Parser::CSV
 
   * class TOP::Parser::HalfHuman
 
+  * class TOP::FieldMode::Error
+
+  * class TOP::FieldMode::Automatic
+
+  * class TOP::FieldMode::Overflow
+
   * class TOP::Formatter::WithBorders
 
   * class TOP::Formatter::HalfHuman
+
+  * class TOP::FieldMode
 
   * class Database::Storage
 
