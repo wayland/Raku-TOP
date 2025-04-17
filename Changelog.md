@@ -1,6 +1,6 @@
 # Changelog
 
-## Cleanups-1
+## 0.0.6: Cleanups-1
 
 *	Changed Driver to Storage
 *	Replaced TODO.md with Changelog.md and Developing.md
@@ -8,6 +8,7 @@
 	*	Changed to read existing fields before making up its own
 	*	Allowed for $!field-mode
 *	Ensured that documentation builder sensibly puts links into directories
+*	Broke field modes out into their own classes
 
 ## 0.0.5
 

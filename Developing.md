@@ -16,7 +16,8 @@ submitting a PR:
 
 *	Create and check out a new branch for coding on
 *	Write some code making the changes you want
-*	Write some tests covering the new code/cases above
+*	Write some tests covering the new code/cases above; use
+	`./project build && ./project test`
 *	Write POD and comments.  Style is to interleave doco with code.  
 	Function ordering in a class is as follows:
 	*	First, we have the regular functions that people will 
@@ -38,8 +39,13 @@ submitting a PR:
 
 # Release Process
 
-*	Review the most recent changes, including that the doco works in 
-	Github
+*	Rebuild documentation
+	*	Run `./project build-docs`
+	*	Deal with any relevant errors (usually missing directories)
+	*	Do another commit
+	*	Review changes, including that the doco works in Github
+*	Ensure changelog has relevant version number in it
+*	Review all the changes on this branch one final time
 *	Do a release to Github/Fez using `./project release`
 *	If there are any interesting changes, announce on #raku
 
