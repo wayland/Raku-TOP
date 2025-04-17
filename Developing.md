@@ -46,7 +46,9 @@ submitting a PR:
 	*	Deal with any relevant errors (usually missing directories)
 	*	Do another commit
 	*	Review changes, including that the doco works in Github
-*	Ensure changelog has relevant version number in it
+*	Version Number:
+	*	Ensure changelog has relevant version number in it
+	*	Update META6.json to have relevant version number
 *	Review all the changes on this branch one final time
 *	Do a release to Github/Fez using `./project release`
 *	If there are any interesting changes, announce on #raku
