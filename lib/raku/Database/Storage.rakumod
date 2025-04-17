@@ -1,6 +1,8 @@
 use	v6.d;
 use	TOP;
 
+use	TOP::FieldMode;
+
 =begin pod
 
 =NAME Raku TOP Storage - The common driver for Raku TOP backends
@@ -70,26 +72,6 @@ role	Table::Storage does Associative does Positional does TOP::Core {
 	has	Str			@!field-names;		# For keeping the fields in order
 
 	=begin pod
-	=defn Str	$!field-mode = 'lax'
-
-	$!field-mode could be one of the following:
-	=item lax: extra fields create new columns (default)
-	=item error: extra fields create an error
-	=item overflow: extra fields get stuck in a (JSON?) hash/object/assoc field; the name of the field is in $!overflow-field-name
-
-	Can be passed to .new()
-
-	=defn Str	$!overflow-field-name
-
-	The name of the field the overflow fields get put in
-
-	Can be passed to .new()
-
-	=end pod
-	has	Str	$!field-mode			is built = 'lax';
-	has	Str	$!overflow-field-name	is built;
-
-	=begin pod
 	=head2 Methods
 	=head3 .new
 
@@ -109,6 +91,9 @@ role	Table::Storage does Associative does Positional does TOP::Core {
 	has	Database::Storage	$!database			is built;		# Links to the database
 	# TODO: Make the above "is required" once the Memory driver supports it
 
+	# The object that implements the field mode
+	has	TOP::FieldMode	$!field-mode-object;
+
 	# Only used during initialisation
 	has	Bool		$!init-create = False;
 	has	Bool		$!init-alter = False;
@@ -127,7 +112,26 @@ role	Table::Storage does Associative does Positional does TOP::Core {
 			=defn Str %fields
 			If relevant, the fields to use in creating/altering the table
 			=end pod
-			:%fields
+			:%fields,
+
+			=begin pod
+			=defn Str	$field-mode = 'Automatic'
+
+			$!field-mode could be one of the following:
+			=item Automatic: extra fields create new columns (default); like a spreadsheet
+			=item Error: extra fields create an error; like a RDBMS
+			=item overflow: extra fields get stuck in a (JSON?) hash/object/assoc field; the name of the field is in $!overflow-field-name
+
+			=end pod
+			Str	:$field-mode = 'Automatic',
+
+			=begin pod
+			=defn Str	$overflow-field-name
+
+			The name of the field the overflow fields get put in
+
+			=end pod
+			:$overflow-field-name where Str|Nil = Nil;
 	) {
 		my $name = $frontend-object.name;
 
@@ -153,6 +157,15 @@ role	Table::Storage does Associative does Positional does TOP::Core {
 			my Bool $conforms = self.relation-conforms(%fields);
 			$conforms or $!init-alter = True;
 		}
+
+		# Set up Field Mode
+		$!field-mode-object = self.load-library(
+			type => "TOP::FieldMode::$field-mode",
+			table => $!frontend-object,
+			:$field-mode,
+			:$overflow-field-name,
+#			|%parameters
+		);
 	}
 
 	=begin pod
@@ -295,7 +308,7 @@ role	Table::Storage does Associative does Positional does TOP::Core {
 		=defn Any:U $type
 		The type of the field, as a Raku type
 		=end pod
-		Any:U :$type
+		Any:U :$type,
 	) {
 		%!field-indices{$name}:exists and die "Error: Can't create field '$name' because it already exists";
 		self.{$name} = Field.new(:$relation, :$name, :$type);
@@ -303,123 +316,14 @@ role	Table::Storage does Associative does Positional does TOP::Core {
 		#@!field-names.push($name);
 	}
 
-	=begin pod
-	=head3 .vet-for-tuple and friends
-
-	This is where the field modes are implemented.  It's been designed so that, 
-	if someone wants to add a new field mode, they should be able to do so just 
-	by implementing the following methods:
-
-	=item process-extra-fields-hash
-	=item process-extra-fields-array
-	=item get-field-names
-
-	Note that each of the above is passed $!field-mode as the first parameter, 
-	and this selects the appropriate field mode.  
-
-	Possibly in future, each field-mode should instead be a class with all 
-	these methods attached.  
-
-	=end pod
-	# Don't call this directly; instead, call add-field
-	multi method vet-for-tuple(%items) {
-		my %new_items := self.process-extra-fields-hash($!field-mode, %items);
-		return %new_items;
-	}
-	# Don't call this directly; instead, call add-field
-	multi method vet-for-tuple(@items is copy) {
-		my @use_field_names = self.get-field-names($!field-mode);
-		my %items is Hash::Ordered;
-		# Put the first ones in the ordered list of fields
-		for @use_field_names Z @items -> ($field, $item) {
-			%items{$field} = $item;
-		}
-		# If we've got fields left over...
-		my $count = @items.elems - @use_field_names.elems;
-		$count > 0 and self.process-extra-fields-array($!field-mode, %items, @use_field_names, @items);
-		# TODO: Need to check if %items has been changed or discarded
-		return %items;
-	}
-
-	proto method process-extra-fields-hash(Str $field-mode, %items) {*}
-	multi method process-extra-fields-hash('error', $!frontend-object, %items) {
-		for %items.kv -> $key, $value {
-			%!field-indices{$key}:exists and next;
-			die "Error: extra field '$key' while making Tuple from hash (and field-mode is 'error')\n";
-		}
-		return %items;
-	}
-	multi method process-extra-fields-hash('lax', %items) {
-		for %items.kv -> $key, $value {
-			%!field-indices{$key}:exists and next;
-			self.{$key} = Field.new(relation => $!frontend-object, name => $key);
-		}
-		return %items;
-	}
-	multi method process-extra-fields-hash('overflow', %items) {
-		for %items.kv -> $key, $value {
-			%!field-indices{$key}:exists and next;
-			if ! (self.{$!overflow-field-name}:exists) {
-				self.{$!overflow-field-name}  = Field.new(relation => $!frontend-object, name => $!overflow-field-name);
-			}
-			%items{$!overflow-field-name}{$key} = $value;
-			%items{$key}:delete;
-		}
-		return %items;
-	}
-	multi method process-extra-fields-hash(Str $field-mode, %items, @use_field_names, @items) {
-		die "Error: Unknown value for .field-mode '$field-mode'; exiting\n";
-	}
-
-
-	# Gets a list of field names to use when automatically matching up values
-	proto method get-field-names(Str $field-mode) {*}
-	multi method get-field-names('overflow') {
-		# If the field-mode is overflow, then don't include the overflow field in the list of fields to eat things up automatically
-		return @!fields.grep: { .name ne $!overflow-field-name } ==> map { .name }
-	}
-	multi method get-field-names(Str $field-mode) {
-		return @!fields.map: { .name };
-	}
-
-	# Process any fields beyond the ones that already exist
-	proto method process-extra-fields-array(Str $field-mode, %items, @use_field_names, @items) {*}
-	multi method process-extra-fields-array('error', %items, @use_field_names, @items) {
-		die "Error: extra fields while making Tuple from array\n";
-	}
-	multi method process-extra-fields-array('lax', %items, @use_field_names, @items) {
-		my %extra_items := self.make-extra-fields(@use_field_names, @items);
-		for %extra_items.kv -> $key, $item { %items{$key} = $item; }
-		return %items;
-	}
-	multi method process-extra-fields-array('overflow', %items, @use_field_names, @items) {
-		my %extra_items := self.make-extra-fields(@use_field_names, @items);
-		%items{$!overflow-field-name} := %extra_items;
-		return %items;
-	}
-	multi method process-extra-fields-array(Str $field-mode, %items, @use_field_names, @items) {
-		die "Error: Unknown value for .field-mode '$field-mode'; exiting\n";
-	}
-
-	# Make a hash of extra fields
-	method make-extra-fields(@use_field_names, @items) {
-		my $start = @use_field_names.elems;
-		my $end = @items.elems - 1;
-		my %extra_items is Hash::Ordered;
-		for ((('A'..*)[$start..$end]) Z @items[$start..$end]) -> ($key, $item) {
-			%extra_items{$key} = $item;
-		}
-		return %extra_items;
-	}
-
 	# Makes a Tuple object from the key/values specified in %items, and returns it
 	multi	method	makeTuple(%items) {
-		my %newitems = self.vet-for-tuple(%items);
+		my %newitems = $!field-mode-object.vet-for-tuple(%items);
 
 		Tuple.new(%newitems);
 	}
-	multi	method	makeTuple(@items is copy) {
-		my %items := self.vet-for-tuple(@items);
+	multi	method	makeTuple(@items) {
+		my %items := $!field-mode-object.vet-for-tuple(@items);
 		self.makeTuple(%items);
 	}
 }

@@ -342,14 +342,16 @@ class	Table does Relation is export {
 	}
 
 	=begin pod
-	=head3 select(@fields)
+	=head3 select(@fields, :$destination-table)
 
 	Creates a new table with only a selection of columns, not all of them
 
 	Recognises a lone '*' as a request for all fields
+
+	If $destination-table is provided, then that's used as a basis for the new table, otherwise one is just created
 	=end pod
-	# TODO: Implement renames, using a hash
-	method select(@fields) {
+	# TODO: Implement field renames, using a hash
+	method select(@fields, :$destination-table where Table|Nil = Nil ) {
 		# Set up @use_fields with the fields we're going to use
 		my @use_fields;
 		for @fields -> $name {
@@ -362,11 +364,19 @@ class	Table does Relation is export {
 				}
 			}
 		}
+
+		# Set up the new table in $return-value
+		my Table $return-value;
+		if $destination-table !~~ Nil {
+			$return-value := $destination-table;
+		} else {
+			$return-value = Table.new(name => ~UUID.new(), action => 'ensure');
+		}
+
 		# Set up %new_fields as an index of what we're going to use, and add the appropriate fields to the new Table in $return-value
-		my Table $return-value = Table.new(name => ~UUID.new(), action => 'ensure');
 		my %new_fields;
 		for @use_fields -> $name {
-			$return-value.add-field(relation => self, name => $name);
+#			$return-value.add-field(relation => self, name => $name);
 			%new_fields{$name} = 1;
 		}
 		# Loop over rows

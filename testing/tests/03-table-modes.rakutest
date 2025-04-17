@@ -11,44 +11,51 @@ subtest {
 	subtest {
 		plan 2;
 
-		my $table = Table.new(name => 'input', action => 'ensure', field-mode => 'error');
+		my $table = Table.new(name => 'input', action => 'ensure', field-mode => 'Error');
 		isa-ok($table, Table, 'Made table');
 		dies-ok({ $table.parse(
 			command => 'ls -l /usr',
-		) }, "Dies correctly when encountering unknown fields when field-mode is error");
-	}, "Test field-mode = 'error'";
+		) }, "Dies correctly when encountering unknown fields when field-mode is Error");
+	}, "Test field-mode = 'Error'";
 
 	subtest {
 		plan 2;
 
-		my $table = Table.new(name => 'input2', action => 'ensure', field-mode => 'overflow', overflow-field-name => 'C');
+		my $table = Table.new(name => 'input2', action => 'ensure');
 		isa-ok($table, Table, 'Made table');
 		$table.parse(
 			command => 'ls -l /usr',
 		);
 
-#	        my $select-table = $table.select(<A B C D E I>);
+		my $select-table = Table.new(
+			name => 'input3',
+			action => 'ensure',
+			field-mode => 'Overflow',
+			overflow-field-name => 'C'
+		);
+		$select-table.add-field(name => 'A');
+	    $select-table = $table.select(<A B C D E I>, destination-table => $select-table);
 
-		my $out-table = $table.format(
+		my $out-table = $select-table.format(
 			'WithBorders',
 		#	show-headers => False,
 		);
 		my $ls-test-output = q:to/END/;
-╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
-║ C                                                                                                                                                                          ║
-╟────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╢
-║                                                                                                                                                                            ║
-║ Hash::Ordered.new(:A("drwxr-xr-x"),:B(IntStr.new(1, "1")),:C("root"),:D("root"),:E(IntStr.new(4096, "4096")),:F("Mar"),:G(IntStr.new(22, "22")),:H("02:13"),:I("bin"))     ║
-║ Hash::Ordered.new(:A("drwxr-xr-x"),:B(IntStr.new(1, "1")),:C("root"),:D("root"),:E(IntStr.new(4096, "4096")),:F("Mar"),:G(IntStr.new(22, "22")),:H("02:13"),:I("include")) ║
-║ Hash::Ordered.new(:A("drwxr-xr-x"),:B(IntStr.new(1, "1")),:C("root"),:D("root"),:E(IntStr.new(4096, "4096")),:F("Mar"),:G(IntStr.new(22, "22")),:H("02:13"),:I("lib"))     ║
-║ Hash::Ordered.new(:A("drwxr-xr-x"),:B(IntStr.new(5, "5")),:C("root"),:D("root"),:E(IntStr.new(4096, "4096")),:F("Feb"),:G(IntStr.new(13, "13")),:H("23:04"),:I("local"))   ║
-║ Hash::Ordered.new(:A("drwxr-xr-x"),:B(IntStr.new(1, "1")),:C("root"),:D("root"),:E(IntStr.new(4096, "4096")),:F("Mar"),:G(IntStr.new(22, "22")),:H("02:13"),:I("sbin"))    ║
-║ Hash::Ordered.new(:A("drwxr-xr-x"),:B(IntStr.new(1, "1")),:C("root"),:D("root"),:E(IntStr.new(4096, "4096")),:F("Mar"),:G(IntStr.new(22, "22")),:H("02:13"),:I("share"))   ║
-╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+╔════════════╤════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ A          │ C                                                                                              ║
+╟────────────┼────────────────────────────────────────────────────────────────────────────────────────────────╢
+║ total      │ ${:B(IntStr.new(24, "24"))}                                                                    ║
+║ drwxr-xr-x │ ${:B(IntStr.new(1, "1")), :C("root"), :D("root"), :E(IntStr.new(4096, "4096")), :I("bin")}     ║
+║ drwxr-xr-x │ ${:B(IntStr.new(1, "1")), :C("root"), :D("root"), :E(IntStr.new(4096, "4096")), :I("include")} ║
+║ drwxr-xr-x │ ${:B(IntStr.new(1, "1")), :C("root"), :D("root"), :E(IntStr.new(4096, "4096")), :I("lib")}     ║
+║ drwxr-xr-x │ ${:B(IntStr.new(5, "5")), :C("root"), :D("root"), :E(IntStr.new(4096, "4096")), :I("local")}   ║
+║ drwxr-xr-x │ ${:B(IntStr.new(1, "1")), :C("root"), :D("root"), :E(IntStr.new(4096, "4096")), :I("sbin")}    ║
+║ drwxr-xr-x │ ${:B(IntStr.new(1, "1")), :C("root"), :D("root"), :E(IntStr.new(4096, "4096")), :I("share")}   ║
+╚════════════╧════════════════════════════════════════════════════════════════════════════════════════════════╝
 END
 
 		is($out-table, $ls-test-output, 'ls table is as expected');
-	}, "Test field-mode = 'overflow'";
+	}, "Test field-mode = 'Overflow'";
 
 	subtest {
 		plan 2;

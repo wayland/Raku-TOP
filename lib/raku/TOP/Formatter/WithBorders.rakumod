@@ -91,7 +91,7 @@ class    TOP::Formatter::WithBorders {
 	# TODO: Replace with JSON or something
 	method get-cell-string($cell) {
 		my Str $cellstring;
-		if $cell ~~ Hash::Ordered {
+		if $cell ~~ Associative {
 			$cellstring = $cell.raku;
 		} else {
 			$cellstring = defined($cell) ?? "$cell" !! '';
