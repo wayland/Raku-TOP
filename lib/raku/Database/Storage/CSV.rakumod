@@ -32,8 +32,8 @@ class	Database::Storage::CSV does Database::Storage {
 
 	method	useTable(Table :$table, Str :$filename) {
 		$!frontend-object = $table;
-		my $backend-table = Table::Storage::Memory.new(frontend-object => $table, action => 'use', :$filename);
+		my $storage-table = Table::Storage::Memory.new(frontend-object => $table, action => 'use', :$filename);
 
-		return $backend-table;
+		return $storage-table;
 	}
 }

@@ -172,14 +172,14 @@ class	Database::Storage::Memory does Database::Storage {
 	method	useTable(Table :$table, *%params) {
 		%tables{$table.name} and return %tables{$table.name};
 
-		my Table::Storage::Memory $backend-table = Table::Storage::Memory.new(
+		my Table::Storage::Memory $storage-table = Table::Storage::Memory.new(
 			frontend-object => $table,
 			|%params
 		);
 
-		%tables{$table.name} = $backend-table;
+		%tables{$table.name} = $storage-table;
 
-		return $backend-table;
+		return $storage-table;
 	}
 }
 

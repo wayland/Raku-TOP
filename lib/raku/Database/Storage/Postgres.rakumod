@@ -10,11 +10,11 @@ class	Table::Storage::Postgres does Table::Storage {...}
 
 =begin pod
 
-=NAME Postgres Storage - The Postgres driver for Raku TOP
+=NAME Postgres Storage - The Postgres Storage classes for Raku TOP
 
 =TITLE Postgres Storage
 
-=SUBTITLE The Postgres driver for Raku TOP
+=SUBTITLE The Postgres Storage classes for Raku TOP
 
 =AUTHOR Tim Nelson - https://github.com/wayland
 
@@ -100,7 +100,7 @@ class	Database::Storage::Postgres does Database::Storage {
 	=end code
 
 	=defn Table :$table
-	The frontend table object that's going to reference this backend
+	The frontend table object that's going to reference this Storage
 	=defn Str :$action = 'use'
 	Documented in TOP Table.new()
 
@@ -399,7 +399,7 @@ class	Table::Storage::Postgres does Table::Storage does Hash::Agnostic {
 				my $result = self.query(qq[UPDATE {$!frontend-object.name} SET $set-string WHERE $where-string]);
 			},
 		);
-#		say "Table backend: " ~ $p.VAR.^name;
+#		say "Table Storage: " ~ $p.VAR.^name;
 		return-rw $p;
 	}
 

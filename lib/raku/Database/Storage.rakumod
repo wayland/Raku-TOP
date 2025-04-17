@@ -5,17 +5,17 @@ use	TOP::FieldMode;
 
 =begin pod
 
-=NAME Raku TOP Storage - The common driver for Raku TOP backends
+=NAME Raku TOP Storage - The parent roles Raku TOP Storage classes
 
 =TITLE Raku TOP Storage
 
-=SUBTITLE The common driver for Raku TOP backends
+=SUBTITLE The parent roles Raku TOP Storage classes
 
 =AUTHOR Tim Nelson - https://github.com/wayland
 
 =head1 Database::Storage
 
-The parent class for all the different Database Drivers (backends).
+The parent class for all the different Database Storage classes (aka drivers, backends).
 
 =begin code
 
@@ -33,7 +33,7 @@ role	Database::Storage {
 
 		method	useTable(Table :$table, *%params)
 
-	Returns a table belonging to the database.  Parameters vary from driver to driver.
+	Returns a table belonging to the database.  Parameters vary depending on the Storage type.
 	=end pod
 	method	useTable(Table :$table, *%params) {...}
 	#method	useTable(Table :$table, Str :$action = 'use', :%fields = {}) {
@@ -81,7 +81,7 @@ role	Table::Storage does Associative does Positional does TOP::Core {
 
 	Parameters to .new are:
 	=defn Relation $frontend-object
-	The frontend object that is using this backend object.
+	The frontend object that is using this storage object.
 	=end pod
 	has	Relation			$!frontend-object	is built is required;
 	=begin pod
@@ -89,7 +89,7 @@ role	Table::Storage does Associative does Positional does TOP::Core {
 	The Database::Storage with which this Table::Storage is connected.
 	=end pod
 	has	Database::Storage	$!database			is built;		# Links to the database
-	# TODO: Make the above "is required" once the Memory driver supports it
+	# TODO: Make the above "is required" once the Memory Storage supports it
 
 	# The object that implements the field mode
 	has	TOP::FieldMode	$!field-mode-object;

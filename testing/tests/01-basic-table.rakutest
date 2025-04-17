@@ -34,20 +34,20 @@ subtest {
 
 		$pgdb = Database.new(
 			# Database
-			backend => 'Postgres',
+			storage-type => 'Postgres',
 			# Postgres
 			database-name => 'raku_top',
 			username => 'postgres',
 		);
 		isa-ok($pgdb, Database, 'Database.new() returns a Database');
-	#	dd $pgdb.backend-object.handle.execute("SELECT table_name FROM information_schema. tables WHERE table_schema='public'").allrows();
+	#	dd $pgdb.storage-object.handle.execute("SELECT table_name FROM information_schema. tables WHERE table_schema='public'").allrows();
 		# If the docker container didn't persist the database, then this wouldn't be necessary, and would fail
-		$pgdb.backend-object.handle.execute("DROP TABLE IF EXISTS countries");
+		$pgdb.storage-object.handle.execute("DROP TABLE IF EXISTS countries");
 
 		%tables = %(
 	#		CSV => Table.new(
 	#				filename => $full_filename,
-	#				backend => 'CSV',
+	#				storage-type => 'CSV',
 	#				),
 			Memory => Table.new(name => 'countries', action => 'can-create'),
 			Postgres => $pgdb.useTable(name => 'countries'),
@@ -60,7 +60,7 @@ subtest {
 	#	say "Type $type";
 		my Table $table := %tables{$type};
 	#	dd $table;
-	#	say $table.backend-object;
+	#	say $table.storage-object;
 		subtest {
 			plan 11;
 
@@ -86,7 +86,7 @@ subtest {
 		$type eq 'Postgres' and do {
 			my %data is Hash::Ordered = %('AFG' => 'Narnia', 'ALA' => 'Middle-Earth');
 			for %data.kv -> $alpha, $name {
-				my $sth = $table.backend-object.query(qq{SELECT * FROM countries WHERE "alpha-3" = '$alpha';});
+				my $sth = $table.storage-object.query(qq{SELECT * FROM countries WHERE "alpha-3" = '$alpha';});
 				my ($item) = $sth.allrows(:array-of-hash);
 				is($item<name>, $name, "Fetch works directly from database as well ($name)");
 			}
