@@ -39,6 +39,8 @@ submitting a PR:
 
 # Release Process
 
+*	Check that tests run successfully on GitHub as well.  Despite the
+	use of Docker, I've sometimes seen differences
 *	Rebuild documentation
 	*	Run `./project build-docs`
 	*	Deal with any relevant errors (usually missing directories)
