@@ -1,4 +1,5 @@
 use	TOP;
+use	TOP::FieldMode;
 
 class	TOP::FieldMode::Overflow is TOP::FieldMode {
 	has	Str     $!overflow-field-name	is built;
