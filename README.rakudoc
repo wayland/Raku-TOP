@@ -4,8 +4,7 @@
 
 This package implements TOP in Raku.  
 
-=item For more information on TOP (Table Oriented Programming): L<https://wayland.github.io/table-oriented-programming/TOP/Introduction/What.xml>
-=item Information on the plans for Raku TOP: L<https://wayland.github.io/table-oriented-programming/Raku-TOP/Introduction.xml>
+For more information on TOP (Table Oriented Programming): L<What is Table-Oriented Programming?|https://wayland.github.io/table-oriented-programming/TOP/Introduction/What.xml>
 
 =head2 Raku TOP Introductory Documents
 
@@ -16,27 +15,27 @@ This package implements TOP in Raku.
 Any classes below in () are not implemented yet
 
 Conceptually, what we're moddeling is:
-*	Relation
-	*	Table
-		*	(DataDictionary)
-	*	(View)
-	*	(TupleSet)
-*	Tuple
-*	(Section)
-	*	Field
-	*	(Lot)
-*	Database
-*	Join
+=item1 Relation
+=item2 Table
+=item3 (DataDictionary)
+=item2 (View)
+=item2 (TupleSet)
+=item1 Tuple
+=item1 (Section)
+=item2 Field
+=item2 (Lot)
+=item1 Database
+=item1 Join
 
 Most of the above concepts are directly from Relational Set Theory.  The exceptions are:
-*	DataDictionary: Just a set of tables that explain what the rest of the database is doing; may be implemented differently
-*	Lot: A group of columns
-*	TupleSet: A set of tuples, usually that are the result of a query
+=item	DataDictionary: Just a set of tables that explain what the rest of the database is doing; may be implemented differently
+=item	Lot: A group of columns
+=item	TupleSet: A set of tuples, usually that are the result of a query
 
 In addition to the above, we have:
-*	Storage: This is data we can read/write; used for modelling SQL databases, but could also be in-memory tables, spreadsheets, CSV files, etc
-*	Formatters: This is for outputting data.  Could be tables drawn with CLI box characters, CSV files, etc
-*	Parsers: This is for reading from tables.  This includes reading in space-separated data, CSV files, etc
+=item	Storage: This is data we can read/write; used for modelling SQL databases, but could also be in-memory tables, spreadsheets, CSV files, etc
+=item	Formatters: This is for outputting data.  Could be tables drawn with CLI box characters, CSV files, etc
+=item	Parsers: This is for reading from tables.  This includes reading in space-separated data, CSV files, etc
 
 =head1 Formats and their Parameters
 
@@ -79,5 +78,9 @@ Also, Database::Storage::CSV doesn't work yet (TODO), but the others should; pro
 then as you please.  
 
 #include class-refs
+
+=head2 Plans for Raku TOP
+
+For more information on the plans for Raku TOP, see L<Raku TOP TODO|https://wayland.github.io/table-oriented-programming/Raku-TOP/TODO.xml>
 
 =end pod

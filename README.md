@@ -3,9 +3,7 @@ Raku TOP: Table-Oriented Programming (TOP) in the Raku programming language
 
 This package implements TOP in Raku. 
 
-  * For more information on TOP (Table Oriented Programming): [https://wayland.github.io/table-oriented-programming/TOP/Introduction/What.xml](https://wayland.github.io/table-oriented-programming/TOP/Introduction/What.xml)
-
-  * Information on the plans for Raku TOP: [https://wayland.github.io/table-oriented-programming/Raku-TOP/Introduction.xml](https://wayland.github.io/table-oriented-programming/Raku-TOP/Introduction.xml)
+For more information on TOP (Table Oriented Programming): [What is Table-Oriented Programming?](https://wayland.github.io/table-oriented-programming/TOP/Introduction/What.xml)
 
 Raku TOP Introductory Documents
 -------------------------------
@@ -17,11 +15,45 @@ The Object Model Overview
 
 Any classes below in () are not implemented yet
 
-Conceptually, what we're moddeling is: * Relation * Table * (DataDictionary) * (View) * (TupleSet) * Tuple * (Section) * Field * (Lot) * Database * Join
+Conceptually, what we're moddeling is:
 
-Most of the above concepts are directly from Relational Set Theory. The exceptions are: * DataDictionary: Just a set of tables that explain what the rest of the database is doing; may be implemented differently * Lot: A group of columns * TupleSet: A set of tuples, usually that are the result of a query
+  * Relation
 
-In addition to the above, we have: * Storage: This is data we can read/write; used for modelling SQL databases, but could also be in-memory tables, spreadsheets, CSV files, etc * Formatters: This is for outputting data. Could be tables drawn with CLI box characters, CSV files, etc * Parsers: This is for reading from tables. This includes reading in space-separated data, CSV files, etc
+    * Table
+
+      * (DataDictionary)
+
+    * (View)
+
+    * (TupleSet)
+
+  * Tuple
+
+  * (Section)
+
+    * Field
+
+    * (Lot)
+
+  * Database
+
+  * Join
+
+Most of the above concepts are directly from Relational Set Theory. The exceptions are:
+
+  * DataDictionary: Just a set of tables that explain what the rest of the database is doing; may be implemented differently
+
+  * Lot: A group of columns
+
+  * TupleSet: A set of tuples, usually that are the result of a query
+
+In addition to the above, we have:
+
+  * Storage: This is data we can read/write; used for modelling SQL databases, but could also be in-memory tables, spreadsheets, CSV files, etc
+
+  * Formatters: This is for outputting data. Could be tables drawn with CLI box characters, CSV files, etc
+
+  * Parsers: This is for reading from tables. This includes reading in space-separated data, CSV files, etc
 
 Formats and their Parameters
 ============================
@@ -82,4 +114,9 @@ Also, Database::Storage::CSV doesn't work yet (TODO), but the others should; pro
   * [class Database::Storage::Postgres](docs/Markdown/Reference/Database/Storage/Postgres.md)
 
   * [class TOP](docs/Markdown/Reference//TOP.md)
+
+Plans for Raku TOP
+------------------
+
+For more information on the plans for Raku TOP, see [Raku TOP TODO](https://wayland.github.io/table-oriented-programming/Raku-TOP/TODO.xml)
 

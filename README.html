@@ -371,12 +371,13 @@ hr {
 <table id="TOC">
 <caption><h2 id="TOC_Title">Table of Contents</h2></caption>
 <tr class="toc-level-1"><td class="toc-number">1</td><td class="toc-text"><a href="#Raku_TOP:_Table-Oriented_Programming_(TOP)_in_the_Raku_programming_language">Raku TOP: Table-Oriented Programming (TOP) in the Raku programming language</a></td></tr>
-      <tr class="toc-level-2"><td class="toc-number">1.1</td><td class="toc-text"><a href="#Raku_TOP_Introductory_Documents">Raku TOP Introductory Documents</a></td></tr>
+    <tr class="toc-level-2"><td class="toc-number">1.1</td><td class="toc-text"><a href="#Raku_TOP_Introductory_Documents">Raku TOP Introductory Documents</a></td></tr>
   <tr class="toc-level-2"><td class="toc-number">1.2</td><td class="toc-text"><a href="#The_Object_Model_Overview">The Object Model Overview</a></td></tr>
-     <tr class="toc-level-1"><td class="toc-number">2</td><td class="toc-text"><a href="#Formats_and_their_Parameters">Formats and their Parameters</a></td></tr>
+                      <tr class="toc-level-1"><td class="toc-number">2</td><td class="toc-text"><a href="#Formats_and_their_Parameters">Formats and their Parameters</a></td></tr>
                                                                         <tr class="toc-level-2"><td class="toc-number">2.1</td><td class="toc-text"><a href="#Key_to_Formats">Key to Formats</a></td></tr>
            <tr class="toc-level-2"><td class="toc-number">2.2</td><td class="toc-text"><a href="#Raku_TOP_Class_References">Raku TOP Class References</a></td></tr>
-               
+                <tr class="toc-level-2"><td class="toc-number">2.3</td><td class="toc-text"><a href="#Plans_for_Raku_TOP">Plans for Raku TOP</a></td></tr>
+  
 </table>
 </nav>
 
@@ -384,18 +385,54 @@ hr {
     <div class="pod-body">
     <h1 id="Raku_TOP:_Table-Oriented_Programming_(TOP)_in_the_Raku_programming_language"><a class="u" href="#___top" title="go to top of document">Raku TOP: Table-Oriented Programming (TOP) in the Raku programming language</a></h1>
 <p>This package implements TOP in Raku. </p>
-<ul><li><p>For more information on TOP (Table Oriented Programming): <a href="https://wayland.github.io/table-oriented-programming/TOP/Introduction/What.xml">https://wayland.github.io/table-oriented-programming/TOP/Introduction/What.xml</a></p>
-</li>
-<li><p>Information on the plans for Raku TOP: <a href="https://wayland.github.io/table-oriented-programming/Raku-TOP/Introduction.xml">https://wayland.github.io/table-oriented-programming/Raku-TOP/Introduction.xml</a></p>
-</li>
-</ul>
+<p>For more information on TOP (Table Oriented Programming): <a href="https://wayland.github.io/table-oriented-programming/TOP/Introduction/What.xml">What is Table-Oriented Programming?</a></p>
 <h2 id="Raku_TOP_Introductory_Documents"><a class="u" href="#___top" title="go to top of document">Raku TOP Introductory Documents</a></h2>
 <p><a href="https://wayland.github.io/table-oriented-programming/Raku-TOP/Introduction.xml">Raku Introductory Docs</a></p>
 <h2 id="The_Object_Model_Overview"><a class="u" href="#___top" title="go to top of document">The Object Model Overview</a></h2>
 <p>Any classes below in () are not implemented yet</p>
-<p>Conceptually, what we&#39;re moddeling is: * Relation * Table * (DataDictionary) * (View) * (TupleSet) * Tuple * (Section) * Field * (Lot) * Database * Join</p>
-<p>Most of the above concepts are directly from Relational Set Theory. The exceptions are: * DataDictionary: Just a set of tables that explain what the rest of the database is doing; may be implemented differently * Lot: A group of columns * TupleSet: A set of tuples, usually that are the result of a query</p>
-<p>In addition to the above, we have: * Storage: This is data we can read/write; used for modelling SQL databases, but could also be in-memory tables, spreadsheets, CSV files, etc * Formatters: This is for outputting data. Could be tables drawn with CLI box characters, CSV files, etc * Parsers: This is for reading from tables. This includes reading in space-separated data, CSV files, etc</p>
+<p>Conceptually, what we&#39;re moddeling is:</p>
+<ul><li><p>Relation</p>
+</li>
+<ul><li><p>Table</p>
+</li>
+<ul><li><p>(DataDictionary)</p>
+</li>
+</ul>
+<li><p>(View)</p>
+</li>
+<li><p>(TupleSet)</p>
+</li>
+</ul>
+<li><p>Tuple</p>
+</li>
+<li><p>(Section)</p>
+</li>
+<ul><li><p>Field</p>
+</li>
+<li><p>(Lot)</p>
+</li>
+</ul>
+<li><p>Database</p>
+</li>
+<li><p>Join</p>
+</li>
+</ul>
+<p>Most of the above concepts are directly from Relational Set Theory. The exceptions are:</p>
+<ul><li><p>DataDictionary: Just a set of tables that explain what the rest of the database is doing; may be implemented differently</p>
+</li>
+<li><p>Lot: A group of columns</p>
+</li>
+<li><p>TupleSet: A set of tuples, usually that are the result of a query</p>
+</li>
+</ul>
+<p>In addition to the above, we have:</p>
+<ul><li><p>Storage: This is data we can read/write; used for modelling SQL databases, but could also be in-memory tables, spreadsheets, CSV files, etc</p>
+</li>
+<li><p>Formatters: This is for outputting data. Could be tables drawn with CLI box characters, CSV files, etc</p>
+</li>
+<li><p>Parsers: This is for reading from tables. This includes reading in space-separated data, CSV files, etc</p>
+</li>
+</ul>
 <h1 id="Formats_and_their_Parameters"><a class="u" href="#___top" title="go to top of document">Formats and their Parameters</a></h1>
 <p>Some formats are only really used as storage (eg. Memory, Postgres). Some things are only ever used as input/output (eg. WithBorders is generally not very useful except as output).</p>
 <table class="pod-table">
@@ -447,6 +484,8 @@ hr {
 <li><p><a href="docs/HTML/Reference//TOP.html">class TOP</a></p>
 </li>
 </ul>
+<h2 id="Plans_for_Raku_TOP"><a class="u" href="#___top" title="go to top of document">Plans for Raku TOP</a></h2>
+<p>For more information on the plans for Raku TOP, see <a href="https://wayland.github.io/table-oriented-programming/Raku-TOP/TODO.xml">Raku TOP TODO</a></p>
 
     </div>
 
