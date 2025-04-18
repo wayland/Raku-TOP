@@ -1,5 +1,6 @@
 The goal is to implement table-oriented programming in such a way as it 
-integrates with Data-Oriented Programming.  
+integrates with Data-Oriented Programming (the other components are
+Tree-Oriented Programming and Logic Programming).  
 
 # Plans
 
