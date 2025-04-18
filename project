@@ -139,9 +139,15 @@ class	Process::GitStatus does AsyncProcess {
 	}
 }
 
-multi	MAIN('release', Str :$skip = '') { #= Create a release, including pushing to github and fez.  --skip can take a comma-separated list of steps (FezList, FezReview, FitTag, GitStatus)
+multi	MAIN('release', Str :$skip = '') { #= Create a release, including pushing to github and fez.  --skip can take a comma-separated list of steps (git, fez)
 	# Create %skips
 	split(/\,/, $skip) ==> map({ $_ => 1 }) ==> my %skips;
+
+	# Ensure we're logged in to fez
+	# TODO: If this makes us log in each time, rather than just attempting, see if we can't put it later in the process (after the "die for problems")
+	%skips{'fez'}:exists or do {
+		do_cmd(qq{fez login}, die => True);
+	};
 
 	# Fetch version from META6.json
 	my %metadata = from-json("META6.json".IO.slurp);
