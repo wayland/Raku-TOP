@@ -47,7 +47,9 @@ submitting a PR:
 	*	Run `./project build-docs`
 	*	Deal with any relevant errors (usually missing directories)
 	*	Do another commit
-	*	Review changes, including that the doco works in Github
+	*	Review changes, including:
+		*	That the doco works in Github
+		*	That Changelog works on GitHub
 *	Commit to git and push to GitHub
 
 ## Pull Request Stage

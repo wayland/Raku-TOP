@@ -48,6 +48,7 @@ Made the following:
 *	Update github action to run new tests
 
 ## 0.0.1
+```
 DONE	Put in a copy of the artistic license; see if we can do dual license (Artistic + GPL)
 DONE	Finish off tests for Memory and Postgres types
 DONE	Write github tests based on DBIish (but comment out lots)
@@ -63,3 +64,4 @@ DONE	Rewrite https://wayland.github.io/table-oriented-programming/Raku-TOP/Intro
 	-	The TODO list below (aka Iterations) is incorporated into it
 	-	Maybe also TODO items from the code are incorporated
 DONE	Clean up browser tabs relating to TOP
+```
