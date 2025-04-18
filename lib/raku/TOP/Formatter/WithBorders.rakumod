@@ -20,17 +20,17 @@ The class for formatting tables so that they have borders made out of
 characters.  Currently these are the Unicode box-drawing characters, but 
 someday ASCII may be added as an option.  
 
-Many of the functions in this class are called by Database::Driver::format()
+Many of the functions in this class are called by Database::Storage::format()
 
-Parameters that can be passed to Database::Driver (with defaults)
+Parameters that can be passed to Database::Storage (with defaults)
 
-=item1 C<$format => 'WithBorders'>
+=item1 C<<$format => 'WithBorders'>>
 
-=item1 C<$show-headers => True>
+=item1 C<<$show-headers => True>>
 
-=item1 C<$outer-line-type => 'Double'> (other options are Light and Heavy)
+=item1 C<<$outer-line-type => 'Double'>> (other options are Light and Heavy)
 
-=item1 C<$inner-line-type => 'Light'> (other options are Double and Heavy)
+=item1 C<<$inner-line-type => 'Light'>> (other options are Double and Heavy)
 
 =end pod
 
@@ -69,9 +69,10 @@ class    TOP::Formatter::WithBorders {
 				%!maxes{$name} = $name.chars;
 			}
 		};
-		for $!table[0 ..*] -> $row {
+		for $!table[0 ..*-1] -> $row {
 			for $row.kv -> $key, $cell {
-				%!maxes{$key} = max(%!maxes{$key}, (defined($cell) ?? $cell.chars !! 0));
+				my Str $cellstring = self.get-cell-string($cell);
+				%!maxes{$key} = max(%!maxes{$key}, $cellstring.chars);
 				my $lastone = False; my $thisone = False;
 				for Nil, Int, Num, Str -> $type {
 					%!types{$key}.WHAT ~~ $type and $lastone = True;
@@ -85,6 +86,17 @@ class    TOP::Formatter::WithBorders {
 		my $outer-straight = $.get-character();
 		my $inner-straight = $.get-character(containment => 'inner');
 		$!sformat = "$outer-straight " ~ join(" $inner-straight ", $!table.fields.map({ $.sformat-field(.name) })) ~ " $outer-straight\n";
+	}
+
+	# TODO: Replace with JSON or something
+	method get-cell-string($cell) {
+		my Str $cellstring;
+		if $cell ~~ Associative {
+			$cellstring = $cell.raku;
+		} else {
+			$cellstring = defined($cell) ?? "$cell" !! '';
+		}
+		return $cellstring;
 	}
 
 	method	sformat-field($name) {
@@ -102,6 +114,7 @@ class    TOP::Formatter::WithBorders {
 			$!table.fields.map({ $straight x %!maxes{.name} })
 		);
 		if $!show-headers {
+			# TODO: See if we can't centre the headers in the columns
 			$.add-row($!table.fields.map({ .name }));
 			my $straight = $.get-character(containment => 'inner', shape => 'Straight', position => 'Horizontal');
 			my $left     =             $.get-character(                        shape => 'T',     position => 'Left' ) ~ $straight;
@@ -136,7 +149,7 @@ class    TOP::Formatter::WithBorders {
 	}
 
 	method	add-row(@items) {
-		$!output ~= (@items ==> map({ .defined ?? $_ !! '' }) ==> sprintf($!sformat));
+		$!output ~= (@items ==> map({ self.get-cell-string($_) }) ==> sprintf($!sformat));
 	}
 
 	# TODO: Figure out how to make this support ASCII box drawing as well

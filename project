@@ -139,9 +139,15 @@ class	Process::GitStatus does AsyncProcess {
 	}
 }
 
-multi	MAIN('release', Str :$skip = '') { #= Create a release, including pushing to github and fez.  
+multi	MAIN('release', Str :$skip = '') { #= Create a release, including pushing to github and fez.  --skip can take a comma-separated list of steps (git, fez)
 	# Create %skips
 	split(/\,/, $skip) ==> map({ $_ => 1 }) ==> my %skips;
+
+	# Ensure we're logged in to fez
+	# TODO: If this makes us log in each time, rather than just attempting, see if we can't put it later in the process (after the "die for problems")
+	%skips{'fez'}:exists or do {
+		do_cmd(qq{fez login}, die => True);
+	};
 
 	# Fetch version from META6.json
 	my %metadata = from-json("META6.json".IO.slurp);
@@ -231,9 +237,9 @@ multi	MAIN('build-docs', @filenames?) { #= Rebuilds documentation (docs dir and 
 		# Generate Class References
 		my (@class-pod);
 		for @class-source-files -> $sourcefile {
-			my ($basename, $target-file) = build-docs($format-name, $format-extension, 'Class', $sourcefile);
+			my ($basename, $target-file, $classname) = build-docs($format-name, $format-extension, 'Reference', $sourcefile);
 
-			push @class-pod, "=item L<class {$basename}|{$target-file}>"
+			push @class-pod, "=item L<class {$classname}|{$target-file}>"
 		}
 
 		# Generate Introductory Docs
@@ -253,8 +259,8 @@ multi	MAIN('build-docs', @filenames?) { #= Rebuilds documentation (docs dir and 
 
 multi	MAIN('find-common') { #= Finds the methods which are the same across all database drivers
 	# Locate methods in files and classes/roles
-	my (@files-to-check) = qx{find lib/raku/Database/Driver -name '*.rakumod'}.lines;
-	push @files-to-check, 'lib/raku/Database/Driver.rakumod';
+	my (@files-to-check) = qx{find lib/raku/Database/Storage -name '*.rakumod'}.lines;
+	push @files-to-check, 'lib/raku/Database/Storage.rakumod';
 
 	my @methodlocs;
 	for @files-to-check -> $file {
@@ -314,9 +320,7 @@ my $docker_compose_command = "docker-compose -f testing/docker/docker-compose.ym
 multi	MAIN('test') { #= Runs the tests for the project in a docker container.  This means we can run them as a github action, and easily change raku versions
 	do_cmd("$docker_compose_command up -d");
 	my $project-name = $*CWD.IO.basename.lc;
-	for <01-basic-table.rakutest 02-formatters-parsers.rakutest> -> $testfile {
-		do_cmd("docker exec {$project-name}_raku_1 /bin/bash -lc ./$testfile 2>&1");
-	}
+	do_cmd("docker exec {$project-name}_raku_1 /bin/bash -lc ./all-tests 2>&1");
 }
 
 multi	MAIN('build') { #= Build the docker image
@@ -344,12 +348,28 @@ sub	do_cmd($cmd, :$level = 1, :$use = 'shell', :$die = False) {
 }
 
 sub	build-docs($format-name, $format-extension, $type, $sourcefile, :$source-text = Nil) {
-	my $basename = $sourcefile.IO.basename;
-	$basename ~~ s/\.raku(mod|doc)$// or die "File with unrecognised extension: $basename";
+	my $source-basename = $sourcefile.IO.basename;
+	$source-basename ~~ s/\.raku(mod|doc)$// or die "File with unrecognised extension: $source-basename";
+
+	my $source-dirpath = $sourcefile.IO.dirname; # Start with the dir name
+
+	# Extract out the class path parts
+	if ! ($source-dirpath ~~ s/^lib\/raku\///) {
+		$source-dirpath ~~ s/^lib\/raku$//;
+	}
+	$source-dirpath ~~ /^\.$/ and $source-dirpath = '';
+
+	my $classname = $source-dirpath;
+	if $classname {
+		$classname ~~ s:global/\//::/; # Change path components from Unix filesystem to Raku
+		$classname ~= '::' ~ $source-basename;
+	} else {
+		$classname = $source-basename;
+	}
 
 	my $target-file = $type eq 'README' 
 		?? "README.$format-extension"
-		!! "docs/$format-name/$type/$basename.$format-extension";
+		!! "docs/$format-name/$type/$source-dirpath/$source-basename.$format-extension";
 	my $use-source-text;
 	if ($source-text ~~ Nil) {
 		$use-source-text = $sourcefile.IO.slurp;
@@ -375,6 +395,6 @@ sub	build-docs($format-name, $format-extension, $type, $sourcefile, :$source-tex
 #	use	Pod::Contents;
 #	say "Got: " ~ join_pod_contents_of $use-source-text, 'TITLE';
 
-	return [$basename, $target-file];
+	return [$source-basename, $target-file, $classname];
 }
 

@@ -371,11 +371,13 @@ hr {
 <table id="TOC">
 <caption><h2 id="TOC_Title">Table of Contents</h2></caption>
 <tr class="toc-level-1"><td class="toc-number">1</td><td class="toc-text"><a href="#Raku_TOP:_Table-Oriented_Programming_(TOP)_in_the_Raku_programming_language">Raku TOP: Table-Oriented Programming (TOP) in the Raku programming language</a></td></tr>
-      <tr class="toc-level-2"><td class="toc-number">1.1</td><td class="toc-text"><a href="#Raku_TOP_Introductory_Documents">Raku TOP Introductory Documents</a></td></tr>
-  <tr class="toc-level-2"><td class="toc-number">1.2</td><td class="toc-text"><a href="#Raku_TOP_Class_References">Raku TOP Class References</a></td></tr>
-            <tr class="toc-level-1"><td class="toc-number">2</td><td class="toc-text"><a href="#Formats_and_their_parameters">Formats and their parameters</a></td></tr>
-                                                              <tr class="toc-level-2"><td class="toc-number">2.1</td><td class="toc-text"><a href="#Key_to_Formats">Key to Formats</a></td></tr>
-          
+    <tr class="toc-level-2"><td class="toc-number">1.1</td><td class="toc-text"><a href="#Raku_TOP_Introductory_Documents">Raku TOP Introductory Documents</a></td></tr>
+  <tr class="toc-level-2"><td class="toc-number">1.2</td><td class="toc-text"><a href="#The_Object_Model_Overview">The Object Model Overview</a></td></tr>
+                      <tr class="toc-level-1"><td class="toc-number">2</td><td class="toc-text"><a href="#Formats_and_their_Parameters">Formats and their Parameters</a></td></tr>
+                                                                        <tr class="toc-level-2"><td class="toc-number">2.1</td><td class="toc-text"><a href="#Key_to_Formats">Key to Formats</a></td></tr>
+           <tr class="toc-level-2"><td class="toc-number">2.2</td><td class="toc-text"><a href="#Raku_TOP_Class_References">Raku TOP Class References</a></td></tr>
+                <tr class="toc-level-2"><td class="toc-number">2.3</td><td class="toc-text"><a href="#Plans_for_Raku_TOP">Plans for Raku TOP</a></td></tr>
+  
 </table>
 </nav>
 
@@ -383,43 +385,62 @@ hr {
     <div class="pod-body">
     <h1 id="Raku_TOP:_Table-Oriented_Programming_(TOP)_in_the_Raku_programming_language"><a class="u" href="#___top" title="go to top of document">Raku TOP: Table-Oriented Programming (TOP) in the Raku programming language</a></h1>
 <p>This package implements TOP in Raku. </p>
-<ul><li><p>For more information on TOP (Table Oriented Programming): <a href="https://wayland.github.io/table-oriented-programming/TOP/Introduction/What.xml">https://wayland.github.io/table-oriented-programming/TOP/Introduction/What.xml</a></p>
-</li>
-<li><p>Information on the plans for Raku TOP: <a href="https://wayland.github.io/table-oriented-programming/Raku-TOP/Introduction.xml">https://wayland.github.io/table-oriented-programming/Raku-TOP/Introduction.xml</a></p>
-</li>
-</ul>
+<p>For more information on TOP (Table Oriented Programming): <a href="https://wayland.github.io/table-oriented-programming/TOP/Introduction/What.xml">What is Table-Oriented Programming?</a></p>
 <h2 id="Raku_TOP_Introductory_Documents"><a class="u" href="#___top" title="go to top of document">Raku TOP Introductory Documents</a></h2>
 <p><a href="https://wayland.github.io/table-oriented-programming/Raku-TOP/Introduction.xml">Raku Introductory Docs</a></p>
-<h2 id="Raku_TOP_Class_References"><a class="u" href="#___top" title="go to top of document">Raku TOP Class References</a></h2>
-<p>Note that the following links don&#39;t yet work on raku.land -- you&#39;ll need to go to github to read them. </p>
-<p>Also, the CSV one doesn&#39;t work yet, but the others should; probably start with TOP, then go to Memory, then as you please. </p>
-<ul><li><p><a href="docs/HTML/Class/CSV.html">class CSV</a></p>
+<h2 id="The_Object_Model_Overview"><a class="u" href="#___top" title="go to top of document">The Object Model Overview</a></h2>
+<p>Any classes below in () are not implemented yet</p>
+<p>Conceptually, what we&#39;re moddeling is:</p>
+<ul><li><p>Relation</p>
 </li>
-<li><p><a href="docs/HTML/Class/HalfHuman.html">class HalfHuman</a></p>
+<ul><li><p>Table</p>
 </li>
-<li><p><a href="docs/HTML/Class/WithBorders.html">class WithBorders</a></p>
-</li>
-<li><p><a href="docs/HTML/Class/HalfHuman.html">class HalfHuman</a></p>
-</li>
-<li><p><a href="docs/HTML/Class/CSV.html">class CSV</a></p>
-</li>
-<li><p><a href="docs/HTML/Class/Memory.html">class Memory</a></p>
-</li>
-<li><p><a href="docs/HTML/Class/Postgres.html">class Postgres</a></p>
-</li>
-<li><p><a href="docs/HTML/Class/Driver.html">class Driver</a></p>
-</li>
-<li><p><a href="docs/HTML/Class/TOP.html">class TOP</a></p>
+<ul><li><p>(DataDictionary)</p>
 </li>
 </ul>
-<h1 id="Formats_and_their_parameters"><a class="u" href="#___top" title="go to top of document">Formats and their parameters</a></h1>
+<li><p>(View)</p>
+</li>
+<li><p>(TupleSet)</p>
+</li>
+</ul>
+<li><p>Tuple</p>
+</li>
+<li><p>(Section)</p>
+</li>
+<ul><li><p>Field</p>
+</li>
+<li><p>(Lot)</p>
+</li>
+</ul>
+<li><p>Database</p>
+</li>
+<li><p>Join</p>
+</li>
+</ul>
+<p>Most of the above concepts are directly from Relational Set Theory. The exceptions are:</p>
+<ul><li><p>DataDictionary: Just a set of tables that explain what the rest of the database is doing; may be implemented differently</p>
+</li>
+<li><p>Lot: A group of columns</p>
+</li>
+<li><p>TupleSet: A set of tuples, usually that are the result of a query</p>
+</li>
+</ul>
+<p>In addition to the above, we have:</p>
+<ul><li><p>Storage: This is data we can read/write; used for modelling SQL databases, but could also be in-memory tables, spreadsheets, CSV files, etc</p>
+</li>
+<li><p>Formatters: This is for outputting data. Could be tables drawn with CLI box characters, CSV files, etc</p>
+</li>
+<li><p>Parsers: This is for reading from tables. This includes reading in space-separated data, CSV files, etc</p>
+</li>
+</ul>
+<h1 id="Formats_and_their_Parameters"><a class="u" href="#___top" title="go to top of document">Formats and their Parameters</a></h1>
 <p>Some formats are only really used as storage (eg. Memory, Postgres). Some things are only ever used as input/output (eg. WithBorders is generally not very useful except as output).</p>
 <table class="pod-table">
 <thead><tr>
 <th>Format</th> <th>Storage</th> <th>Parser</th> <th>Formatter</th> <th>Tree Format</th>
 </tr></thead>
 <tbody>
-<tr> <td>Memory</td> <td>Yes</td> <td>No</td> <td>No</td> <td></td> </tr> <tr> <td>Postgres</td> <td>Yes</td> <td>No</td> <td>No</td> <td></td> </tr> <tr> <td>HalfHuman</td> <td>No</td> <td>Yes</td> <td>Yes</td> <td></td> </tr> <tr> <td>WithBorders</td> <td>No</td> <td>No</td> <td>Yes</td> <td></td> </tr> <tr> <td>CSV</td> <td>Yes</td> <td>Yes</td> <td>Make</td> <td></td> </tr> <tr> <td>HTML</td> <td>Make</td> <td>Make</td> <td>Make</td> <td>XML</td> </tr> <tr> <td>Spreadsheet</td> <td>Make</td> <td>No</td> <td>No</td> <td>XML</td> </tr> <tr> <td>JSON</td> <td>Make</td> <td>Make</td> <td>Make</td> <td>JSON</td> </tr> <tr> <td>Pod6</td> <td>?</td> <td>?</td> <td>Make</td> <td>AST</td> </tr> <tr> <td>SQLite</td> <td>Accept</td> <td>No</td> <td>No</td> <td></td> </tr> <tr> <td>MySQL</td> <td>Accept</td> <td>No</td> <td>No</td> <td></td> </tr> <tr> <td>Postgres option with not using cursors (has to support both cursor and non-cursor)</td> <td>Accept</td> <td>No</td> <td>No</td> <td></td> </tr>
+<tr> <td>Memory</td> <td>Yes</td> <td>No</td> <td>No</td> <td></td> </tr> <tr> <td>Postgres</td> <td>Yes</td> <td>No</td> <td>No</td> <td></td> </tr> <tr> <td>HalfHuman</td> <td>No</td> <td>Yes</td> <td>Yes</td> <td></td> </tr> <tr> <td>WithBorders</td> <td>No</td> <td>No</td> <td>Yes</td> <td></td> </tr> <tr> <td>CSV</td> <td>Yes</td> <td>Yes</td> <td>Make</td> <td></td> </tr> <tr> <td>HTML</td> <td>Make</td> <td>Make</td> <td>Make</td> <td>XML</td> </tr> <tr> <td>Spreadsheet</td> <td>Make</td> <td>No</td> <td>No</td> <td>XML</td> </tr> <tr> <td>JSON</td> <td>Make</td> <td>Make</td> <td>Make</td> <td>JSON</td> </tr> <tr> <td>Pod6</td> <td>?</td> <td>?</td> <td>Make</td> <td>AST</td> </tr> <tr> <td>SQLite</td> <td>Accept</td> <td>No</td> <td>No</td> <td></td> </tr> <tr> <td>MySQL</td> <td>Accept</td> <td>No</td> <td>No</td> <td></td> </tr> <tr> <td>Postgres option with not using cursors (has to support both cursor and non-cursor)</td> <td>Accept</td> <td>No</td> <td>No</td> <td></td> </tr> <tr> <td>Dan | Accept</td> <td>?</td> <td>?</td> <td></td> <td></td> </tr> <tr> <td>DataQueryWorkflows</td> <td>Accept</td> <td>?</td> <td>?</td> <td></td> </tr>
 </tbody>
 </table><h2 id="Key_to_Formats"><a class="u" href="#___top" title="go to top of document">Key to Formats</a></h2>
 <ul><li><p><strong>Yes</strong>: This item exists</p>
@@ -433,6 +454,38 @@ hr {
 <li><p><strong>Tree</strong>: These ones will be made, but not until Tree-Oriented Programming has been inaugurated</p>
 </li>
 </ul>
+<h2 id="Raku_TOP_Class_References"><a class="u" href="#___top" title="go to top of document">Raku TOP Class References</a></h2>
+<p>Note that the following links don&#39;t yet work on raku.land -- you&#39;ll need to go to github to read them. </p>
+<p>Also, Database::Storage::CSV doesn&#39;t work yet (TODO), but the others should; probably start with TOP, then go to Memory, then as you please. </p>
+<ul><li><p><a href="docs/HTML/Reference/TOP/Parser/CSV.html">class TOP::Parser::CSV</a></p>
+</li>
+<li><p><a href="docs/HTML/Reference/TOP/Parser/HalfHuman.html">class TOP::Parser::HalfHuman</a></p>
+</li>
+<li><p><a href="docs/HTML/Reference/TOP/FieldMode/Error.html">class TOP::FieldMode::Error</a></p>
+</li>
+<li><p><a href="docs/HTML/Reference/TOP/FieldMode/Automatic.html">class TOP::FieldMode::Automatic</a></p>
+</li>
+<li><p><a href="docs/HTML/Reference/TOP/FieldMode/Overflow.html">class TOP::FieldMode::Overflow</a></p>
+</li>
+<li><p><a href="docs/HTML/Reference/TOP/Formatter/WithBorders.html">class TOP::Formatter::WithBorders</a></p>
+</li>
+<li><p><a href="docs/HTML/Reference/TOP/Formatter/HalfHuman.html">class TOP::Formatter::HalfHuman</a></p>
+</li>
+<li><p><a href="docs/HTML/Reference/TOP/FieldMode.html">class TOP::FieldMode</a></p>
+</li>
+<li><p><a href="docs/HTML/Reference/Database/Storage.html">class Database::Storage</a></p>
+</li>
+<li><p><a href="docs/HTML/Reference/Database/Storage/CSV.html">class Database::Storage::CSV</a></p>
+</li>
+<li><p><a href="docs/HTML/Reference/Database/Storage/Memory.html">class Database::Storage::Memory</a></p>
+</li>
+<li><p><a href="docs/HTML/Reference/Database/Storage/Postgres.html">class Database::Storage::Postgres</a></p>
+</li>
+<li><p><a href="docs/HTML/Reference//TOP.html">class TOP</a></p>
+</li>
+</ul>
+<h2 id="Plans_for_Raku_TOP"><a class="u" href="#___top" title="go to top of document">Plans for Raku TOP</a></h2>
+<p>For more information on the plans for Raku TOP, see <a href="https://wayland.github.io/table-oriented-programming/Raku-TOP/TODO.xml">Raku TOP TODO</a></p>
 
     </div>
 

@@ -1,0 +1,69 @@
+#!/usr/bin/raku
+
+use v6.e.PREVIEW;
+
+use	lib 'lib/raku';
+
+use	Test;
+use	TOP;
+
+subtest {
+	subtest {
+		plan 2;
+
+		my $table = Table.new(name => 'input', action => 'ensure', field-mode => 'Error');
+		isa-ok($table, Table, 'Made table');
+		dies-ok({ $table.parse(
+			command => 'ls -l /usr',
+		) }, "Dies correctly when encountering unknown fields when field-mode is Error");
+	}, "Test field-mode = 'Error'";
+
+	subtest {
+		plan 2;
+
+		my $table = Table.new(name => 'input2', action => 'ensure');
+		isa-ok($table, Table, 'Made table');
+		$table.parse(
+			command => 'ls -l /usr',
+		);
+
+		my $select-table = Table.new(
+			name => 'input3',
+			action => 'ensure',
+			field-mode => 'Overflow',
+			overflow-field-name => 'C'
+		);
+		$select-table.add-field(name => 'A');
+	    $select-table = $table.select(<A B C D E I>, destination-table => $select-table);
+
+		my $out-table = $select-table.format(
+			'WithBorders',
+		#	show-headers => False,
+		);
+		my $ls-test-output = q:to/END/;
+╔════════════╤════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ A          │ C                                                                                              ║
+╟────────────┼────────────────────────────────────────────────────────────────────────────────────────────────╢
+║ total      │ ${:B(IntStr.new(24, "24"))}                                                                    ║
+║ drwxr-xr-x │ ${:B(IntStr.new(1, "1")), :C("root"), :D("root"), :E(IntStr.new(4096, "4096")), :I("bin")}     ║
+║ drwxr-xr-x │ ${:B(IntStr.new(1, "1")), :C("root"), :D("root"), :E(IntStr.new(4096, "4096")), :I("include")} ║
+║ drwxr-xr-x │ ${:B(IntStr.new(1, "1")), :C("root"), :D("root"), :E(IntStr.new(4096, "4096")), :I("lib")}     ║
+║ drwxr-xr-x │ ${:B(IntStr.new(5, "5")), :C("root"), :D("root"), :E(IntStr.new(4096, "4096")), :I("local")}   ║
+║ drwxr-xr-x │ ${:B(IntStr.new(1, "1")), :C("root"), :D("root"), :E(IntStr.new(4096, "4096")), :I("sbin")}    ║
+║ drwxr-xr-x │ ${:B(IntStr.new(1, "1")), :C("root"), :D("root"), :E(IntStr.new(4096, "4096")), :I("share")}   ║
+╚════════════╧════════════════════════════════════════════════════════════════════════════════════════════════╝
+END
+
+		is($out-table, $ls-test-output, 'ls table is as expected');
+	}, "Test field-mode = 'Overflow'";
+
+	subtest {
+		plan 2;
+
+		my $table = Table.new(name => 'input', action => 'ensure', field-mode => 'blargh!');
+		isa-ok($table, Table, 'Made table');
+		dies-ok({ $table.parse(
+			command => 'ls -l /usr',
+		) }, "Dies correctly when encountering a rubbish field-mode");
+	}, "Test field-mode = 'blargh!'";
+}, "Test table modes";

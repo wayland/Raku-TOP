@@ -28,7 +28,7 @@ process them as easily as humans..  In particular, the rules are:
 =item1 No column be completely blank (suggestion: If there's no value, put a 
 dash)
 
-Many of the functions in this class are called by Database::Driver::format()
+Many of the functions in this class are called by Database::Storage::format()
 
 =end pod
 
@@ -48,7 +48,7 @@ class    TOP::Formatter::HalfHuman {
 
 	method    prepare-table() {
 		# Calculate field maxes and types
-		for $!table[0 ..*] -> $row {
+		for $!table[0 ..*-1] -> $row {
 			for $row.kv -> $key, $cell {
 				%!maxes{$key} = max(%!maxes{$key}, $cell.chars);
 				my $lastone = False; my $thisone = False;

@@ -3,43 +3,63 @@ language
 
 This package implements TOP in Raku. 
 
-  * For more information on TOP (Table Oriented Programming):
-  https://wayland.github.io/table-oriented-programming/TOP/Introduction/What.xml
-
-  * Information on the plans for Raku TOP:
-  https://wayland.github.io/table-oriented-programming/Raku-TOP/Introduction.xml
+For more information on TOP (Table Oriented Programming): What is
+Table-Oriented Programming?
 
   Raku TOP Introductory Documents
 
 Raku Introductory Docs
 
-  Raku TOP Class References
+  The Object Model Overview
 
-Note that the following links don't yet work on raku.land -- you'll need to
-go to github to read them. 
+Any classes below in () are not implemented yet
 
-Also, the CSV one doesn't work yet, but the others should; probably start
-with TOP, then go to Memory, then as you please. 
+Conceptually, what we're moddeling is:
 
-  * class CSV
+  * Relation
 
-  * class HalfHuman
+    * Table
 
-  * class WithBorders
+      * (DataDictionary)
 
-  * class HalfHuman
+    * (View)
 
-  * class CSV
+    * (TupleSet)
 
-  * class Memory
+  * Tuple
 
-  * class Postgres
+  * (Section)
 
-  * class Driver
+    * Field
 
-  * class TOP
+    * (Lot)
 
-Formats and their parameters
+  * Database
+
+  * Join
+
+Most of the above concepts are directly from Relational Set Theory. The
+exceptions are:
+
+  * DataDictionary: Just a set of tables that explain what the rest of the
+  database is doing; may be implemented differently
+
+  * Lot: A group of columns
+
+  * TupleSet: A set of tuples, usually that are the result of a query
+
+In addition to the above, we have:
+
+  * Storage: This is data we can read/write; used for modelling SQL databases,
+  but could also be in-memory tables, spreadsheets, CSV files, etc
+
+  * Formatters: This is for outputting data. Could be tables drawn with CLI box
+  characters, CSV files, etc
+
+  * Parsers: This is for reading from tables. This includes reading in
+  space-separated data, CSV files, etc
+
+Formats and their Parameters
 
 Some formats are only really used as storage (eg. Memory, Postgres). Some
 things are only ever used as input/output (eg. WithBorders is generally not
@@ -58,6 +78,8 @@ very useful except as output).
   SQLite                                                                              Accept   No      No         
   MySQL                                                                               Accept   No      No         
   Postgres option with not using cursors (has to support both cursor and non-cursor)  Accept   No      No         
+  Dan | Accept                                                                        ?        ?                  
+  DataQueryWorkflows                                                                  Accept   ?       ?          
 
 
   Key to Formats
@@ -73,3 +95,41 @@ very useful except as output).
 
   * Tree: These ones will be made, but not until Tree-Oriented Programming has
   been inaugurated
+
+  Raku TOP Class References
+
+Note that the following links don't yet work on raku.land -- you'll need to
+go to github to read them. 
+
+Also, Database::Storage::CSV doesn't work yet (TODO), but the others
+should; probably start with TOP, then go to Memory, then as you please. 
+
+  * class TOP::Parser::CSV
+
+  * class TOP::Parser::HalfHuman
+
+  * class TOP::FieldMode::Error
+
+  * class TOP::FieldMode::Automatic
+
+  * class TOP::FieldMode::Overflow
+
+  * class TOP::Formatter::WithBorders
+
+  * class TOP::Formatter::HalfHuman
+
+  * class TOP::FieldMode
+
+  * class Database::Storage
+
+  * class Database::Storage::CSV
+
+  * class Database::Storage::Memory
+
+  * class Database::Storage::Postgres
+
+  * class TOP
+
+  Plans for Raku TOP
+
+For more information on the plans for Raku TOP, see Raku TOP TODO

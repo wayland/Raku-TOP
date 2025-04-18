@@ -1,0 +1,20 @@
+NAME
+TOP::Parser::HalfHuman
+
+AUTHOR
+Tim Nelson - https://github.com/wayland
+
+TITLE
+TOP::Parser::HalfHuman
+
+SUBTITLE
+Parsing tables in HalfHuman format
+
+TOP::Parser::HalfHuman
+
+    class   TOP::Parser::HalfHuman {}
+
+
+
+The class for parsing HalfHuman text (such as many Unix commands). See
+TOP::Formatter::HalfHuman for details. 

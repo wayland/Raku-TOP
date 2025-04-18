@@ -7,89 +7,89 @@ use	CSV::Parser;
 
 use	lib 'lib/raku';
 
-plan 6;
-use-ok "TOP";
-use	TOP;
-
-say "Prepping for tests";
-
-my $full_filename = 'all-countries.csv';
-my $file_handle = open $full_filename, :r;
-my $parser = CSV::Parser.new(
-	:$file_handle,
-	:contains_header_row,
-);
-my @rows;
-until $file_handle.eof {
-	my %data;
-	for $parser.get_line().kv -> $key, $value {
-		%data{$key} = $key ~~ /\-code$/ ?? << $value >> !! $value;
-	};
-	@rows.push(%data);
-}
-
-my %tables;
-my $pgdb;
 subtest {
-	plan 2;
+	plan 6;
+	use-ok "TOP";
+	use	TOP;
 
-	$pgdb = Database.new(
-		# Database
-		backend => 'Postgres',
-		# Postgres
-		database-name => 'raku_top',
-		username => 'postgres',
+	my $full_filename = 'all-countries.csv';
+	my $file_handle = open $full_filename, :r;
+	my $parser = CSV::Parser.new(
+		:$file_handle,
+		:contains_header_row,
 	);
-	isa-ok($pgdb, Database, 'Database.new() returns a Database');
-#	dd $pgdb.backend-object.handle.execute("SELECT table_name FROM information_schema. tables WHERE table_schema='public'").allrows();
-	# If the docker container didn't persist the database, then this wouldn't be necessary, and would fail
-	$pgdb.backend-object.handle.execute("DROP TABLE IF EXISTS countries");
+	my @rows;
+	until $file_handle.eof {
+		my %data;
+		for $parser.get_line().kv -> $key, $value {
+			%data{$key} = $key ~~ /\-code$/ ?? << $value >> !! $value;
+		};
+		@rows.push(%data);
+	}
 
-	%tables = %(
-#		CSV => Table.new(
-#				filename => $full_filename,
-#				backend => 'CSV',
-#				),
-		Memory => Table.new(name => 'countries', action => 'can-create'),
-		Postgres => $pgdb.useTable(name => 'countries'),
-	);
-
-	use-ok 'TOP';
-}, "Test loading of modules";
-
-for <Memory Postgres> -> $type {
-#	say "Type $type";
-	my Table $table := %tables{$type};
-#	dd $table;
-#	say $table.backend-object;
+	my %tables;
+	my $pgdb;
 	subtest {
-		plan 11;
+		plan 2;
 
-		isa-ok($table, Table, "Made a Table of type $type");
-		does-ok($table, Relation, 'Table is a Relation');
+		$pgdb = Database.new(
+			# Database
+			storage-type => 'Postgres',
+			# Postgres
+			database-name => 'raku_top',
+			username => 'postgres',
+		);
+		isa-ok($pgdb, Database, 'Database.new() returns a Database');
+	#	dd $pgdb.storage-object.handle.execute("SELECT table_name FROM information_schema. tables WHERE table_schema='public'").allrows();
+		# If the docker container didn't persist the database, then this wouldn't be necessary, and would fail
+		$pgdb.storage-object.handle.execute("DROP TABLE IF EXISTS countries");
 
-		lives-ok({ $table.fill_from_aoh(@rows) }, "Didn't die when filling from array-of-hash");
+		%tables = %(
+	#		CSV => Table.new(
+	#				filename => $full_filename,
+	#				storage-type => 'CSV',
+	#				),
+			Memory => Table.new(name => 'countries', action => 'can-create'),
+			Postgres => $pgdb.useTable(name => 'countries'),
+		);
 
-		is($table[0]<name>, 'Afghanistan', 'Test access by row, then column');
-		is($table<name>[0], 'Afghanistan', 'Test access by column, then row');
+		use-ok 'TOP';
+	}, "Test loading of modules";
 
-		# Now need to test setting
-		lives-ok({ $table[0]<name> = 'Narnia' }, "Didn't die when setting by row, then column");
-		is($table<name>[0], 'Narnia', "...and when fetching by column, then row, got the same result");
+	for <Memory Postgres> -> $type {
+	#	say "Type $type";
+		my Table $table := %tables{$type};
+	#	dd $table;
+	#	say $table.storage-object;
+		subtest {
+			plan 11;
 
-		lives-ok({ $table<name>[1] = 'Middle-Earth' }, "Didn't die when setting by column, then row");
-		is($table[1]<name>, 'Middle-Earth', "...and when fetching by row, then column, got the same result");
+			isa-ok($table, Table, "Made a Table of type $type");
+			does-ok($table, Relation, 'Table is a Relation');
 
-		is($table.fields.elems, 11, "Found 11 fields in the table");
-		is($table.elems, 249, "Found 249 rows in the table");
-	}, "Testing $type";
-	# Test it with raw Postgres to ensure caching isn't causing problems
-	$type eq 'Postgres' and do {
-		my %data is Hash::Ordered = %('AFG' => 'Narnia', 'ALA' => 'Middle-Earth');
-		for %data.kv -> $alpha, $name {
-			my $sth = $table.backend-object.query(qq{SELECT * FROM countries WHERE "alpha-3" = '$alpha';});
-			my ($item) = $sth.allrows(:array-of-hash);
-			is($item<name>, $name, "Fetch works directly from database as well ($name)");
-		}
-	};
-}
+			lives-ok({ $table.fill_from_aoh(@rows) }, "Didn't die when filling from array-of-hash");
+
+			is($table[0]<name>, 'Afghanistan', 'Test access by row, then column');
+			is($table<name>[0], 'Afghanistan', 'Test access by column, then row');
+
+			# Now need to test setting
+			lives-ok({ $table[0]<name> = 'Narnia' }, "Didn't die when setting by row, then column");
+			is($table<name>[0], 'Narnia', "...and when fetching by column, then row, got the same result");
+
+			lives-ok({ $table<name>[1] = 'Middle-Earth' }, "Didn't die when setting by column, then row");
+			is($table[1]<name>, 'Middle-Earth', "...and when fetching by row, then column, got the same result");
+
+			is($table.fields.elems, 11, "Found 11 fields in the table");
+			is($table.elems, 249, "Found 249 rows in the table");
+		}, "Testing $type";
+		# Test it with raw Postgres to ensure caching isn't causing problems
+		$type eq 'Postgres' and do {
+			my %data is Hash::Ordered = %('AFG' => 'Narnia', 'ALA' => 'Middle-Earth');
+			for %data.kv -> $alpha, $name {
+				my $sth = $table.storage-object.query(qq{SELECT * FROM countries WHERE "alpha-3" = '$alpha';});
+				my ($item) = $sth.allrows(:array-of-hash);
+				is($item<name>, $name, "Fetch works directly from database as well ($name)");
+			}
+		};
+	}
+}, "Basic Table tests";

@@ -7,55 +7,55 @@ use	lib 'lib/raku';
 use	Test;
 use	TOP;
 
-plan 3;
+subtest {
+	plan 3;
 
-my $table = Table.new(name => 'input', action => 'ensure');
-isa-ok($table, Table, 'Made table');
-$table.parse(
-	command => 'ls -l /usr',
-);
+	my $table = Table.new(name => 'input', action => 'ensure');
+	isa-ok($table, Table, 'Made table');
 
-my $out-table = $table.format(
-	'WithBorders',
-#	show-headers => False,
-);
-my $ls-test-output = q:to/END/;
-╔════════════╤════╤══════╤══════╤══════╤═════╤═══╤═══════╤═════════╗
-║ A          │  B │ C    │ D    │    E │ F   │ G │ H     │ I       ║
-╟────────────┼────┼──────┼──────┼──────┼─────┼───┼───────┼─────────╢
-║ total      │ 24 │      │      │      │     │   │       │         ║
-║ drwxr-xr-x │  1 │ root │ root │ 4096 │ Oct │ 5 │ 05:49 │ bin     ║
-║ drwxr-xr-x │  1 │ root │ root │ 4096 │ Oct │ 5 │ 05:49 │ include ║
-║ drwxr-xr-x │  1 │ root │ root │ 4096 │ Oct │ 5 │ 05:49 │ lib     ║
-║ drwxr-xr-x │  1 │ root │ root │ 4096 │ Sep │ 6 │ 2024  │ local   ║
-║ drwxr-xr-x │  1 │ root │ root │ 4096 │ Oct │ 5 │ 05:49 │ sbin    ║
-║ drwxr-xr-x │  1 │ root │ root │ 4096 │ Oct │ 5 │ 05:49 │ share   ║
-╚════════════╧════╧══════╧══════╧══════╧═════╧═══╧═══════╧═════════╝
+	$table.parse(
+		command => 'ls -l /usr',
+	);
+
+	my $select-table = $table.select(<A B C D E I>);
+
+	my $out-table = $select-table.format(
+		'WithBorders',
+	#	show-headers => False,
+	);
+	my $ls-test-output = q:to/END/;
+╔════════════╤════╤══════╤══════╤══════╤═════════╗
+║ A          │  B │ C    │ D    │    E │ I       ║
+╟────────────┼────┼──────┼──────┼──────┼─────────╢
+║ total      │ 24 │      │      │      │         ║
+║ drwxr-xr-x │  1 │ root │ root │ 4096 │ bin     ║
+║ drwxr-xr-x │  1 │ root │ root │ 4096 │ include ║
+║ drwxr-xr-x │  1 │ root │ root │ 4096 │ lib     ║
+║ drwxr-xr-x │  5 │ root │ root │ 4096 │ local   ║
+║ drwxr-xr-x │  1 │ root │ root │ 4096 │ sbin    ║
+║ drwxr-xr-x │  1 │ root │ root │ 4096 │ share   ║
+╚════════════╧════╧══════╧══════╧══════╧═════════╝
 END
 
-is($out-table, $ls-test-output, 'ls table is as expected');
-print $out-table;
+	is($out-table, $ls-test-output, 'ls table is as expected');
 
-my $btable = Table.new(name => 'boxchars', action => 'ensure');
-say "Calling with CSV";
-$btable.parse(
-	format => 'CSV',
-	filename => 'data/BoxDrawingCharacters.csv',
-);
+	my $btable = Table.new(name => 'boxchars', action => 'ensure');
+	$btable.parse(
+		format => 'CSV',
+		filename => 'data/BoxDrawingCharacters.csv',
+	);
 
-my $table2 = $btable.grep({
-	.{'Primary Weight'} ~~ /^(Double)$/ 
-	and .{'Block Name'} eq 'Box'
-});
-dd $table2;
+	my $table2 = $btable.grep({
+		.{'Primary Weight'} ~~ /^(Double)$/ 
+		and .{'Block Name'} eq 'Box'
+	});
 
-say "Formatting";
-my $bout-table = $table2.format(
-	'WithBorders',
-#	show-headers => False,
-);
+	my $bout-table = $table2.format(
+		'WithBorders',
+	#	show-headers => False,
+	);
 
-my $boxchars-test-output = q:to/END/;
+	my $boxchars-test-output = q:to/END/;
 ╔══════════╤═════╤════════╤══════╤════════════╤═══════════════╤══════════════════╤═══════╤════════════════╤═══════════════╤══════════════════╤══════════════════╤═════════════════╤════════════════════╗
 ║ Block ID │ Row │ Column │ Char │ Block Name │ Overall Shape │ Overall Position │ Style │ Primary Weight │ Primary Shape │ Primary Position │ Secondary Weight │ Secondary Shape │ Secondary Position ║
 ╟──────────┼─────┼────────┼──────┼────────────┼───────────────┼──────────────────┼───────┼────────────────┼───────────────┼──────────────────┼──────────────────┼─────────────────┼────────────────────╢
@@ -87,4 +87,5 @@ my $boxchars-test-output = q:to/END/;
 ╚══════════╧═════╧════════╧══════╧════════════╧═══════════════╧══════════════════╧═══════╧════════════════╧═══════════════╧══════════════════╧══════════════════╧═════════════════╧════════════════════╝
 END
 
-is($bout-table, $boxchars-test-output, 'box characters table is as expected');
+	is($bout-table, $boxchars-test-output, 'box characters table is as expected');
+}, "Formatters and Parsers tests";

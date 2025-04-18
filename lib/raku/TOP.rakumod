@@ -33,21 +33,21 @@ role	TOP::Core {
 
 	=head1 method load-library
 
-	method	load-library(Str :$type = 'Database::Driver::Memory', *%parameters)
+	method	load-library(Str :$type = 'Database::Storage::Memory', *%parameters)
 
 	Loads the library in question, and makes an object of the named type
 	=end pod
-	method	load-library(Str :$type = 'Database::Driver::Memory', *%parameters) {
+	method	load-library(Str :$type = 'Database::Storage::Memory', *%parameters) {
 		%!library-locks{$type}:exists or %!library-locks{$type} = Lock.new();
 		my $library-object = %!library-locks{$type}.protect: {
 			# Load the relevant module
 			my \M = (require ::($type));
 
-			# Check that it's a real driver
-			#			unless M ~~ Database::Driver {
-			#				warn "$module doesn't do Database::Driver role!";
+			# Check that it's a real Storage class
+			#			unless M ~~ Database::Storage {
+			#				warn "$module doesn't do Database::Storage role!";
 			#			}
-			# TODO: The above ended up with circular references; need to figure out what the fix is; possibly move Database::Driver into this file
+			# TODO: The above ended up with circular references; need to figure out what the fix is; possibly move Database::Storage into this file
 
 			# Create the object
 			M.new(|%parameters);
@@ -205,18 +205,18 @@ role	Relation is SetHash does TOP::Core does Associative does Positional {}
 	class	Table does Relation is export {
 
 The Table class is one of the main drivers of TOP.  It represents the various
-backend table classes to the Raku language, so that they can all be accessed
+storage table classes to the Raku language, so that they can all be accessed
 via the same API.
 
 =head2 Attributes
 
-=defn $.backend-object
+=defn $.storage-object
 
-Holds the backend object (Table::Driver::Postgres, Table::Driver::Memory, etc)
+Holds the storage object (Table::Storage::Postgres, Table::Storage::Memory, etc)
 that talks to the table in its backend store; the translation layer between
 Table and the datastore.
 =end pod
-=comment See below for declaration of $.backend-object
+=comment See below for declaration of $.storage-object
 
 class	Table does Relation is export {
 	=begin pod
@@ -224,7 +224,7 @@ class	Table does Relation is export {
 
 	The table name.
 	=end pod
-	has	Str				$.name		is built is rw; # rw is so it can be set by backend classes where useful
+	has	Str				$.name		is built is rw; # rw is so it can be set by Storage classes where useful
 
 	=begin pod
 	=head2 Methods
@@ -232,7 +232,7 @@ class	Table does Relation is export {
 
 	Creates a new Table.
 
-		.new(Database :$database, Str :$backend = 'Memory', Str :$action = 'use')
+		.new(Database :$database, Str :$storage-type = 'Memory', Str :$action = 'use')
 
 	=defn Database :$database
 
@@ -242,27 +242,27 @@ class	Table does Relation is export {
 	has	Database		$!database	is built;
 
 	=begin pod
-	=defn Str :$backend = 'Memory';
+	=defn Str :$storage-type = 'Memory';
 
-	The name of the backend to use when creating this table.  The default is
+	The name of the Storage to use when creating this table.  The default is
 	that it's an in-memory table.
 
 	=end pod
-	has	Str				$!backend	is built = 'Memory';
+	has	Str				$!storage-type	is built = 'Memory';
 
-	# See above for doco on $.backend-object
-	# Would like to make this a Table::Driver (which would include subclasses) once I solve the recursive use issue
+	# See above for doco on $.storage-object
+	# Would like to make this a Table::Storage (which would include subclasses) once I solve the recursive use issue
 	# TODO: Can we use a stub somewhere?
-	has		$.backend-object handles <
+	has		$.storage-object handles <
 		elems EXISTS-POS DELETE-POS ASSIGN-POS BIND-POS
 		AT-KEY BIND-KEY CLEAR DELETE-KEY EXISTS-KEY
 		makeTuple fill_from_aoh add-row list
-		fields
+		fields field-indices
 		format parse
 		add-field
 	>;
-	multi method	STORE(\values, :$INITIALIZE) { $!backend-object.STORE(values, :$INITIALIZE); }
-	multi method	AT-POS(Int:D \position) is raw { return-rw $!backend-object.AT-POS(position); }
+	multi method	STORE(\values, :$INITIALIZE) { $!storage-object.STORE(values, :$INITIALIZE); }
+	multi method	AT-POS(Int:D \position) is raw { return-rw $!storage-object.AT-POS(position); }
 
 	# TODO: The formatting on the following table should use tabs -- try to improve it after the Pod6 rewite
 
@@ -284,34 +284,34 @@ class	Table does Relation is export {
 	=end pod
 	# Hash::Agnostic overrides new and doesn't do TWEAK et. al. -- if that gets fixed, this can go away
 	# TODO: Try to remove this next function; may need to take lizmat's suggestion of blessing the object -- https://irclogs.raku.org/raku/2024-08-17.html#15:41
-	multi method new(Database :$database, Str :$backend, Str :$name, Str :$action = 'use', *%parameters) {
+	multi method new(Database :$database, Str :$storage-type, Str :$name, Str :$action = 'use', *%parameters) {
 		my $rv = callsame;
-		$rv.TWEAK(:$database, :$backend, :$name, :$action, |%parameters);
+		$rv.TWEAK(:$database, :$storage-type, :$name, :$action, |%parameters);
 		return $rv;
 	}
 
 	# TODO: After code cleanup (see new, above), see if we need to comment this function
-	submethod	TWEAK(Database :$database, Str :$backend, Str :$name, Str :$action = 'use', *%parameters) {
+	submethod	TWEAK(Database :$database, Str :$storage-type, Str :$name, Str :$action = 'use', *%parameters) {
 		# This section because Hash::Agnostic overrides new and doesn't do TWEAK
 		defined $database and $!database = $database;
-		$!backend = defined($backend) ?? $backend !! 'Memory';
+		$!storage-type = defined($storage-type) ?? $storage-type !! 'Memory';
 		defined $name and $!name = $name;
 		# End Hash::Agnostic fix
 		defined $!database and do {
-			$!backend = $!database.backend;
+			$!storage-type = $!database.storage-type;
 		};
 		if ! defined $!database {
 			$!database = Database.new(
-				:$!backend,
+				:$!storage-type,
 			);
 		}
-		# Create the actual backend table object
-		$!backend-object = $!database.backend-object.useTable(
+		# Create the actual storage table object
+		$!storage-object = $!database.storage-object.useTable(
 			table => self,
 			:$action,
 			|%parameters
 		);
-		# Has to be after the backend creation because some object types derive the name from other attributes
+		# Has to be after the Storage creation because some object types derive the name from other attributes
 		defined self.name or die "Error: all tables must be named!";
 	}
 
@@ -340,6 +340,66 @@ class	Table does Relation is export {
 		}
 		return $return-value;
 	}
+
+	=begin pod
+	=head3 select(@fields, :$destination-table)
+
+	Creates a new table with only a selection of columns, not all of them
+
+	Recognises a lone '*' as a request for all fields
+
+	If $destination-table is provided, then that's used as a basis for the new table, otherwise one is just created
+	=end pod
+	# TODO: Implement field renames, using a hash
+	method select(@fields, :$destination-table where Table|Nil = Nil ) {
+		# Set up @use_fields with the fields we're going to use
+		my @use_fields;
+		for @fields -> $name {
+			if $name eq '*' {
+				@use_fields.push: self.fields.map({ .name });
+			} else {
+				@use_fields.push($name);
+				if ! (self.field-indices{$name}:exists) {
+					die "Error: unable to find field '$name' in source table";
+				}
+			}
+		}
+
+		# Set up the new table in $return-value
+		my Table $return-value;
+		if $destination-table !~~ Nil {
+			$return-value := $destination-table;
+		} else {
+			$return-value = Table.new(name => ~UUID.new(), action => 'ensure');
+		}
+
+		# Set up %new_fields as an index of what we're going to use, and add the appropriate fields to the new Table in $return-value
+		my %new_fields;
+		for @use_fields -> $name {
+#			$return-value.add-field(relation => self, name => $name);
+			%new_fields{$name} = 1;
+		}
+		# Loop over rows
+		for 0..^self.elems -> $row-id {
+			my $thisrow = self[$row-id];
+			my %newrow is Hash::Ordered;
+			# Loop over fields and just include the right ones
+			for @fields -> $name {
+				%new_fields{$name}:exists or next;
+				$thisrow{$name}:exists or next;
+				%newrow{$name} = $thisrow{$name};
+			}
+			$return-value.add-row(%newrow);
+		}
+		return $return-value;
+	}
+
+	=begin pod
+	=head3 .add-row(@fields)
+
+	Can be used to add a row to a table.  This is mainly for internal use by eg. Parsers and Formatters
+	=end pod
+#	method	add-row(@fields) {...}
 }
 
 =begin pod
@@ -355,13 +415,13 @@ This is the Database class from which all other Database classes descend.
 
 class	Database does TOP::Core {
 	=begin pod
-	=defn $.backend-object
+	=defn $.storage-object
 
-	The backend object that talks to the data store for us.
+	The storage object that talks to the data store for us.
 	=end pod
-	has		$.backend-object;	# Public for use by Table; make protected with friend
+	has		$.storage-object;	# Public for use by Table; make protected with friend
 
-	has		%loaded-drivers;	# TODO: In some future iteration, this will store a list of the drivers that have been loaded
+	has		%loaded-storage-classes;	# TODO: In some future iteration, this will store a list of the Storage classes that have been loaded
 
 	=begin pod
 	=head2 Methods
@@ -370,20 +430,20 @@ class	Database does TOP::Core {
 	Creates a new Database (ie. database object -- may be attaching to an
 	existing database)
 
-		.new(Str$.backend = 'Memory')
+		.new(Str $.storage-type = 'Memory')
 
 	Parameters to .new are:
 
-	=defn Str $.backend = 'Memory'
+	=defn Str $.storage-type = 'Memory'
 
-	The backend that will be used by this database.  The default is that it's
-	the in-memory backend.
+	The Storage that will be used by this database.  The default is that it's
+	the in-memory Storage.
 
 	=end pod
-	has	Str	$.backend	is built = 'Memory';
+	has	Str	$.storage-type	is built = 'Memory';
 
-	submethod	TWEAK(Str :$backend, *%parameters) {
-		$!backend-object = self.load-library(type => "Database::Driver::$!backend", |%parameters);
+	submethod	TWEAK(Str :$storage-type, *%parameters) {
+		$!storage-object = self.load-library(type => "Database::Storage::$!storage-type", |%parameters);
 	}
 
 	=begin pod
@@ -401,7 +461,7 @@ class	Database does TOP::Core {
 		%parameters<action>:delete;
 		my Table $table = Table.new(
 			database => self,
-			:$!backend,
+			:$!storage-type,
 			action => $action,
 			:$name,
 			parameters => %parameters,
