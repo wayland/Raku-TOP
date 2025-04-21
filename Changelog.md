@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased: Portability++ 1
+
+### Missing-Module-Bugfixes
+
+* Added in a bunch of "depends" and "provides"
+* Moved "data" to "resources", and adjusted code so that it'll read %?RESOURCES
+
 ## 0.0.6: Cleanups-1
 
 *	Changed Driver to Storage
