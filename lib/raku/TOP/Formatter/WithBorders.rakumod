@@ -48,7 +48,7 @@ my $resource = %?RESOURCES{$resource-label};
 # Just some error-checking code
 $resource ~~ Resource::Distribution or do {
 	note "Could not find resource '$resource-label' in distribution";
-	say `ls -laF ; ls -laF resources ; cat META6.json`;
+	say qx{ls -laF ; ls -laF resources ; cat META6.json};
 	say "Resource is: " ~ $resource.raku;
 };
 $border-characters-table.parse(
