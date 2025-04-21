@@ -71,8 +71,10 @@ submitting a PR:
 # Release Process
 
 *	Create and check out a new branch for this release called `release-<version>`
+*	Merge any necessary branches/changes
 *	Version Number:
-	*	Update Changelog with relevant version number
+	*	Update Changelog with relevant version number; give version a 
+		name at this point
 	*	Update META6.json to have relevant version number
 *	Review all the changes on this branch one final time
 *	Do a release to Github/Fez using `./project release`
