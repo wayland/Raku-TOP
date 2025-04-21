@@ -34,6 +34,7 @@ ENV LIBDIR=/home/raku/lib/raku
 RUN mkdir -p $LIBDIR
 COPY lib/raku $LIBDIR/
 
+COPY META6.json META6.json
 COPY resources resources
 COPY testing/tests/* ./
 COPY testing/docker/pgpass .pgpass

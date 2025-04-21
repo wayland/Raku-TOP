@@ -43,9 +43,17 @@ our	$border-characters-table = $border-db.useTable(
 	name => 'boxchars',
 	action => 'ensure',
 );
+my $resource-label = "BoxDrawingCharacters.csv";
+my $resource = %?RESOURCES{$resource-label};
+# Just some error-checking code
+$resource ~~ Resource::Distribution or do {
+	note "Could not find resource '$resource-label' in distribution";
+	say `ls -laF ; ls -laF resources ; cat META6.json`;
+	say "Resource is: " ~ $resource.raku;
+};
 $border-characters-table.parse(
         format => 'CSV',
-	handle => %?RESOURCES<BoxDrawingCharacters.csv>.open,
+	handle => $resource.open(),
 );
 
 class    TOP::Formatter::WithBorders {
