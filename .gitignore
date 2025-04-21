@@ -5,6 +5,9 @@
 .precomp
 lib/.precomp
 
+# Distribution files
+sdist
+
 # IDE files
 .idea
 TOP.iml

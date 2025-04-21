@@ -45,7 +45,7 @@ our	$border-characters-table = $border-db.useTable(
 );
 $border-characters-table.parse(
         format => 'CSV',
-        filename => 'data/BoxDrawingCharacters.csv',
+	handle => %?RESOURCES<BoxDrawingCharacters.csv>.open,
 );
 
 class    TOP::Formatter::WithBorders {

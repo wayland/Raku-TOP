@@ -56,7 +56,8 @@ submitting a PR:
 ## Pull Request Stage
 
 *	If tests pass, submit PR.  PR body should be Changelog entry
-*	Merge branch to main
+*	Repo owner will (after feedback) merge branch to main.  Merge
+	Request body should be Changelog entry.  
 
 # Release Process
 
