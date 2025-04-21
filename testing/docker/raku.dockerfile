@@ -32,10 +32,9 @@ RUN \
 ##### Install private raku packages
 ENV LIBDIR=/home/raku/lib/raku
 RUN mkdir -p $LIBDIR
-#COPY Slang/DataFlow.rakumod $LIBDIR/Slang/DataFlow.rakumod
 COPY lib/raku $LIBDIR/
 
-COPY data data
+COPY resources resources
 COPY testing/tests/* ./
 COPY testing/docker/pgpass .pgpass
 #RUN ls -laF ./
