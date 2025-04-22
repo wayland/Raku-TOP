@@ -35,7 +35,8 @@ Parameters that can be passed to Database::Storage (with defaults)
 =end pod
 
 
-use    TOP;
+use	TOP;
+use	Resource::Distribution;
 
 our $border-db = Database.new(name => 'borderdb');
 
