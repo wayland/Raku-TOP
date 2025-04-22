@@ -46,7 +46,7 @@ our	$border-characters-table = $border-db.useTable(
 my $resource-label = "BoxDrawingCharacters.csv";
 my $resource = %?RESOURCES{$resource-label};
 # Just some error-checking code
-if $resource.^name ne 'Resource::Distribution' {
+if $resource !~~ Distribution::Resource {
 	note "Could not find resource '$resource-label' in distribution";
 	say qx{ls -laF ; ls -laF resources ; cat META6.json};
 	say "Resource is: " ~ $resource.raku;
