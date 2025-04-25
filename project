@@ -79,11 +79,14 @@ class	Process::FezList does AsyncProcess {
 		my @lines = qqx{fez list}.lines;
 		my %versions;
 		for @lines -> $line {
-			my %params = FezListItem.parse(
+			my $params = FezListItem.parse(
 				$line,
 				:args(@($!name)),
 				actions => FezListItemActions.new(),
 			).made;
+			$params or next;
+
+			my %params = @$params;
 			%versions{%params<ver>} = 1;
 		}
 		return %versions{$!version}.not, %versions{$!version};
@@ -145,9 +148,10 @@ multi	MAIN('release', Str :$skip = '') { #= Create a release, including pushing 
 
 	# Ensure we're logged in to fez
 	# TODO: If this makes us log in each time, rather than just attempting, see if we can't put it later in the process (after the "die for problems")
-	%skips{'fez'}:exists or do {
-		do_cmd(qq{fez login}, die => True);
-	};
+#	%skips{'fez'}:exists or do {
+#		do_cmd(qq{fez login}, die => True);
+#	};
+	say "Warning; please check that you're logged in to fez";
 
 	# Fetch version from META6.json
 	my %metadata = from-json("META6.json".IO.slurp);
