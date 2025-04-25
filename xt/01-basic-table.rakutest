@@ -3,17 +3,19 @@
 use v6.e.PREVIEW;
 
 use	Test;
+use	Test::META;
 use	CSV::Parser;
 
-use	lib 'lib/raku';
-
 subtest {
-	plan 6;
+	plan 7;
 	use-ok "TOP";
-	use	TOP;
+	use	TOP :tests :DEFAULT;
+	meta-ok();
 
-	my $full_filename = 'all-countries.csv';
-	my $file_handle = open $full_filename, :r;
+	my $resource-name = 'all-countries.csv';
+	my $resources = table-oriented-programming-resources($resource-name);
+	my $resource = $resources{$resource-name};
+	my $file_handle = $resource.open();
 	my $parser = CSV::Parser.new(
 		:$file_handle,
 		:contains_header_row,

@@ -6,7 +6,8 @@ use	Hash::Ordered;
 say "Raku version in use: " ~ $*RAKU.compiler.version;
 
 my %exit-codes is Hash::Ordered;
-for glob('*.rakutest').sort -> $script {
+#for (glob('t/*.rakutest'), glob('xt/*.rakutest')).sort -> $script {
+for glob('xt/*.rakutest').sort -> $script {
 	say "\n\n=== $script ===";
 	$*OUT.flush;
 	my Proc $proc = shell './' ~ $script;

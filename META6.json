@@ -1,23 +1,41 @@
 {
-	"name": "TOP",
-	"description": "Table-Oriented Programming (TOP) module for Raku",
-	"version": "0.0.6",
-	"license": "Artistic-2.0",
-	"source-url": "https://github.com/wayland/Raku-TOP.git",
-
-	"auth": "zef:wayland",
-	"authors": "Tim Nelson",
-
-	"build-depends": [
-	],
-	"depends": [
-	],
-	"perl": "v6.e.PREVIEW",
-	"provides": {
-		"TOP": "lib/raku/TOP.rakumod"
-	},
-	"resources": [
-	],
-	"test-depends": [
-	]
+  "auth": "zef:wayland",
+  "authors": "Tim Nelson",
+  "build-depends": [
+    "Test::META"
+  ],
+  "depends": [
+    "Text::CSV",
+    "CSV::Parser",
+    "DBIish",
+    "Slang::Otherwise",
+    "Hash::Ordered",
+    "UUID"
+  ],
+  "description": "Table-Oriented Programming (TOP) module for Raku",
+  "license": "Artistic-2.0",
+  "name": "TOP",
+  "perl": "v6.e.PREVIEW",
+  "provides": {
+    "Database::Storage": "lib/raku/Database/Storage.rakumod",
+    "Database::Storage::Memory": "lib/raku/Database/Storage/Memory.rakumod",
+    "Database::Storage::Postgres": "lib/raku/Database/Storage/Postgres.rakumod",
+    "TOP": "lib/raku/TOP.rakumod",
+    "TOP::FieldMode": "lib/raku/TOP/FieldMode.rakumod",
+    "TOP::FieldMode::Automatic": "lib/raku/TOP/FieldMode/Automatic.rakumod",
+    "TOP::FieldMode::Error": "lib/raku/TOP/FieldMode/Error.rakumod",
+    "TOP::FieldMode::Overflow": "lib/raku/TOP/FieldMode/Overflow.rakumod",
+    "TOP::Formatter::HalfHuman": "lib/raku/TOP/Formatter/HalfHuman.rakumod",
+    "TOP::Formatter::WithBorders": "lib/raku/TOP/Formatter/WithBorders.rakumod",
+    "TOP::Parser::CSV": "lib/raku/TOP/Parser/CSV.rakumod",
+    "TOP::Parser::HalfHuman": "lib/raku/TOP/Parser/HalfHuman.rakumod"
+  },
+  "resources": [
+    "BoxDrawingCharacters.csv",
+    "all-countries.csv"
+  ],
+  "source-url": "https://github.com/wayland/Raku-TOP.git",
+  "test-depends": [
+  ],
+  "version": "0.0.7"
 }

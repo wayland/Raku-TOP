@@ -79,11 +79,14 @@ class	Process::FezList does AsyncProcess {
 		my @lines = qqx{fez list}.lines;
 		my %versions;
 		for @lines -> $line {
-			my %params = FezListItem.parse(
+			my $params = FezListItem.parse(
 				$line,
 				:args(@($!name)),
 				actions => FezListItemActions.new(),
 			).made;
+			$params or next;
+
+			my %params = @$params;
 			%versions{%params<ver>} = 1;
 		}
 		return %versions{$!version}.not, %versions{$!version};
@@ -145,9 +148,10 @@ multi	MAIN('release', Str :$skip = '') { #= Create a release, including pushing 
 
 	# Ensure we're logged in to fez
 	# TODO: If this makes us log in each time, rather than just attempting, see if we can't put it later in the process (after the "die for problems")
-	%skips{'fez'}:exists or do {
-		do_cmd(qq{fez login}, die => True);
-	};
+#	%skips{'fez'}:exists or do {
+#		do_cmd(qq{fez login}, die => True);
+#	};
+	say "Warning; please check that you're logged in to fez";
 
 	# Fetch version from META6.json
 	my %metadata = from-json("META6.json".IO.slurp);
@@ -315,11 +319,12 @@ multi	MAIN('find-common') { #= Finds the methods which are the same across all d
 	}
 }
 
-my $docker_compose_command = "docker-compose -f testing/docker/docker-compose.yml --project-directory .";
+my $docker_compose_command = "docker-compose -f docker/docker-compose.yml --project-directory .";
 
 multi	MAIN('test') { #= Runs the tests for the project in a docker container.  This means we can run them as a github action, and easily change raku versions
 	do_cmd("$docker_compose_command up -d");
 	my $project-name = $*CWD.IO.basename.lc;
+	do_cmd("docker exec {$project-name}_raku_1 /bin/bash -lc 'zef test .' 2>&1");
 	do_cmd("docker exec {$project-name}_raku_1 /bin/bash -lc ./all-tests 2>&1");
 }
 

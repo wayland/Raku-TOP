@@ -34,8 +34,7 @@ Parameters that can be passed to Database::Storage (with defaults)
 
 =end pod
 
-
-use    TOP;
+use	TOP :tests :DEFAULT;
 
 our $border-db = Database.new(name => 'borderdb');
 
@@ -43,9 +42,14 @@ our	$border-characters-table = $border-db.useTable(
 	name => 'boxchars',
 	action => 'ensure',
 );
+my $resource-name = "BoxDrawingCharacters.csv";
+my $resources = table-oriented-programming-resources($resource-name);
+my $resource = $resources{$resource-name};
+my $file_handle = $resource.open();
+
 $border-characters-table.parse(
         format => 'CSV',
-        filename => 'data/BoxDrawingCharacters.csv',
+	handle => $resource.open(),
 );
 
 class    TOP::Formatter::WithBorders {

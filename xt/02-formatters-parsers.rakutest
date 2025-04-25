@@ -2,10 +2,8 @@
 
 use v6.e.PREVIEW;
 
-use	lib 'lib/raku';
-
 use	Test;
-use	TOP;
+use	TOP :tests :DEFAULT;
 
 subtest {
 	plan 3;
@@ -40,9 +38,15 @@ END
 	is($out-table, $ls-test-output, 'ls table is as expected');
 
 	my $btable = Table.new(name => 'boxchars', action => 'ensure');
+
+	my $resource-name = 'BoxDrawingCharacters.csv';
+        my $resources = table-oriented-programming-resources($resource-name);
+        my $resource = $resources{$resource-name};
+        my $resource-handle = $resource.open();
+
 	$btable.parse(
 		format => 'CSV',
-		filename => 'data/BoxDrawingCharacters.csv',
+		handle => $resource-handle,
 	);
 
 	my $table2 = $btable.grep({

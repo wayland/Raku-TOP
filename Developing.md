@@ -38,33 +38,46 @@ submitting a PR:
 	*	Finally, functions that only need comments, not rakudoc,
 		because they do things like eg. implement Associative or 
 		Positional
-*	Write up a nice Changelog entry (in Changelog.md) named after your 
-	branch/issue.  Things that might help prompt your memory:
-	*	Original ticket you're resolving
-	*	Diffs
-	*	Changelog messages
-*	Do a commit here to keep the commits cleaner
+*	Changelog (in Changelog.md):
+	*	Create new entry by:
+		*	Adding a new "Version" at the top called 
+			"## Unreleased:"
+		*	Add a sub-section for your branch called
+			"### <branchname>"
+	*	Write up a nice Changelog entry.  Things that might help 
+		prompt your memory:
+		*	Original ticket you're resolving
+		*	git diffs
+		*	git log messages
+*	Do a commit here to keep the commits cleaner (ie. to keep the next
+	step out of your main commit)
 *	Rebuild documentation
 	*	Run `./project build-docs`
 	*	Deal with any relevant errors (usually missing directories)
 	*	Do another commit
 	*	Review changes, including:
-		*	That the doco works in Github
+		*	That the doco works in Github (and especially that 
+			links work)
 		*	That Changelog works on GitHub
 *	Commit to git and push to GitHub
 
 ## Pull Request Stage
 
-*	If tests pass, submit PR.  PR body should be Changelog entry
-*	Merge branch to main
+*	Check if tests pass; if not, bounce back to the Coding stage
+*	Submit PR.  PR body should be Changelog entry
+*	Repo owner will (after feedback) merge branch to main.  Merge
+	Request body should be Changelog entry.  
 
 # Release Process
 
 *	Create and check out a new branch for this release called `release-<version>`
+*	Merge any necessary branches/changes
 *	Version Number:
-	*	Update Changelog with relevant version number
+	*	Update Changelog with relevant version number; give version a 
+		name at this point
 	*	Update META6.json to have relevant version number
 *	Review all the changes on this branch one final time
 *	Do a release to Github/Fez using `./project release`
 *	If there are any interesting changes, announce on #raku
+
 

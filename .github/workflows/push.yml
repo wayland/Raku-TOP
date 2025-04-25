@@ -12,7 +12,7 @@ jobs:
 
       # Pull the latest image to build, and avoid caching pull-only images.
       # (docker pull is faster than caching in most cases.)
-      - run: docker compose -f testing/docker/docker-compose.yml --project-directory . pull
+      - run: docker compose -f docker/docker-compose.yml --project-directory . pull
 
       # In this step, this action saves a list of existing images,
       # the cache is created without them in the post run.
@@ -24,10 +24,12 @@ jobs:
 #      - run: docker compose up --build
 
       - name: Build the stack
-        run: docker compose -f testing/docker/docker-compose.yml --project-directory . up -d
+        run: docker compose -f docker/docker-compose.yml --project-directory . up -d
       - name: LS
         run: docker exec raku-top-raku-1 /bin/bash -lc ls -laF
-      - name: Test
+      - name: Base-Tests
+        run: docker exec raku-top-raku-1 /bin/bash -lc 'zef install .'
+      - name: Build-Tests
         run: docker exec raku-top-raku-1 /bin/bash -lc ./all-tests
 #        run: docker run --network container:raku 
 
