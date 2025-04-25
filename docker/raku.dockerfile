@@ -13,32 +13,26 @@ RUN apk update && apk upgrade && apk add --no-cache $PKGS $PKGS_TMP
 
 ##### Set up raku user
 # Apparently it's important for the user to be 1001 for GitHub actions
-RUN ls -laF /home
 #RUN addgroup -S raku && adduser -S raku -G raku -u 1001
 RUN usermod -u 1001 raku && chown raku:raku /home/raku
 RUN rm -rf /tmp/.zef && mkdir -p /tmp/.zef && chown raku:raku /tmp/.zef
 USER raku
 WORKDIR /home/raku
 
-##### Install public raku packages
-RUN \
-	zef install -v \
-		CSV::Parser \
-		Slang::Otherwise \
-		'Hash::Ordered:ver<0.0.8>' 'Hash::Agnostic:ver<0.0.16>' \
-		'UUID' 'Text::CSV' 'IO::Glob' Test::Coverage \
-	&& rm -rf /tmp/.zef
-
 ##### Install private raku packages
 ENV LIBDIR=/home/raku/lib/raku
-RUN mkdir -p $LIBDIR
+RUN mkdir -p $LIBDIR t
 COPY lib/raku $LIBDIR/
 
 COPY META6.json META6.json
 COPY resources resources
-COPY testing/tests/* ./
-COPY testing/docker/pgpass .pgpass
-#RUN ls -laF ./
-#RUN chmod a+x *.rakutest
+#COPY t/* t/
+COPY xt/* xt/
+COPY all-tests all-tests
+
+COPY docker/pgpass .pgpass
+COPY docker/bash_login .bash_login
+
+RUN zef install .
 
 ENTRYPOINT tail -f /dev/null

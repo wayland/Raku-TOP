@@ -2,6 +2,7 @@
   "auth": "zef:wayland",
   "authors": "Tim Nelson",
   "build-depends": [
+    "Test::META"
   ],
   "depends": [
     "Text::CSV",
@@ -30,7 +31,8 @@
     "TOP::Parser::HalfHuman": "lib/raku/TOP/Parser/HalfHuman.rakumod"
   },
   "resources": [
-    "BoxDrawingCharacters.csv"
+    "BoxDrawingCharacters.csv",
+    "all-countries.csv"
   ],
   "source-url": "https://github.com/wayland/Raku-TOP.git",
   "test-depends": [

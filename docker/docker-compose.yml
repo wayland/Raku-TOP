@@ -5,7 +5,7 @@ services:
   raku:
     build:
       context: .
-      dockerfile: testing/docker/raku.dockerfile
+      dockerfile: docker/raku.dockerfile
 
   postgres:
     image: postgres

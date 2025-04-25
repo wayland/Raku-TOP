@@ -315,11 +315,12 @@ multi	MAIN('find-common') { #= Finds the methods which are the same across all d
 	}
 }
 
-my $docker_compose_command = "docker-compose -f testing/docker/docker-compose.yml --project-directory .";
+my $docker_compose_command = "docker-compose -f docker/docker-compose.yml --project-directory .";
 
 multi	MAIN('test') { #= Runs the tests for the project in a docker container.  This means we can run them as a github action, and easily change raku versions
 	do_cmd("$docker_compose_command up -d");
 	my $project-name = $*CWD.IO.basename.lc;
+	do_cmd("docker exec {$project-name}_raku_1 /bin/bash -lc 'zef test .' 2>&1");
 	do_cmd("docker exec {$project-name}_raku_1 /bin/bash -lc ./all-tests 2>&1");
 }
 
