@@ -31,7 +31,7 @@ jobs:
       - name: inspect raku
         run: docker inspect raku-top-raku-1
       - name: inspect raku
-        run: docker exec raku-top-raku-1 /bin/bash -lc 'set -o xtrace ; for i in raku postgres raku-top-raku-1 raku-top-postgres-1; do nslookup $i ; done'
+        run: docker exec raku-top-raku-1 /bin/bash -lc 'set -o xtrace ; for i in raku. postgres. raku-top-raku-1. raku-top-postgres-1.; do nslookup $i ; done'
 
       - name: Base-Tests
         run: docker exec raku-top-raku-1 /bin/bash -lc 'zef install .'
