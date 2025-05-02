@@ -1,1 +1,1 @@
-postgres:5432:pagila:postgres:postgres
+postgres.:5432:pagila:postgres:postgres
