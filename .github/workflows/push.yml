@@ -25,8 +25,10 @@ jobs:
 
       - name: Build the stack
         run: docker compose -f docker/docker-compose.yml --project-directory . up -d
-      - name: inspect
+      - name: inspect postgres
         run: docker inspect raku-top-postgres-1
+      - name: inspect raku
+        run: docker inspect raku-top-raku-1
       - name: Base-Tests
         run: docker exec raku-top-raku-1 /bin/bash -lc 'zef install .'
       - name: Build-Tests
