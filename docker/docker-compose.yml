@@ -8,9 +8,11 @@ services:
       dockerfile: docker/raku.dockerfile
 
   postgres:
-    image: postgres
+    build:
+      context: .
+      dockerfile: docker/pagila.dockerfile
     environment:
-      POSTGRES_DB: raku_top
+      POSTGRES_DB: pagila
       POSTGRES_PASSWORD: postgres
       POSTGRES_PORT: 5432
       POSTGRES_USER: postgres
