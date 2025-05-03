@@ -24,7 +24,11 @@ jobs:
 #      - run: docker compose up --build
 
       - name: Build the stack
-        run: docker compose -f docker/docker-compose.yml --project-directory . up -d ; docker logs postgres
+        run: docker compose -f docker/docker-compose.yml --project-directory . up -d
+        continue-on-error: true
+
+      - name: Log the stack
+        run: docker logs postgres
 
       - name: Add to /etc/hosts (was failing without this)
         run: docker exec -u root raku-top-raku-1 /bin/bash -lc 'getent hosts postgres. >> /etc/hosts'
