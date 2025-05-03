@@ -26,6 +26,9 @@ jobs:
       - name: Build the stack
         run: docker compose -f docker/docker-compose.yml --project-directory . up -d
 
+      - name: Add to /etc/hosts (was failing without this)
+        run: docker exec -u root pagila_raku_1 /bin/bash -lc 'getent hosts postgres. >> /etc/hosts'
+
       - name: inspect postgres
         run: docker inspect raku-top-postgres-1
       - name: inspect raku
