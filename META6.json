@@ -2,7 +2,10 @@
   "auth": "zef:wayland",
   "authors": "Tim Nelson",
   "build-depends": [
-    "Test::META"
+    "Test::META",
+    "Pod::To::HTML",
+    "Pod::To::Markdown",
+    "Pod::To::Text"
   ],
   "depends": [
     "Text::CSV",
