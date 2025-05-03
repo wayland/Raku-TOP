@@ -78,7 +78,7 @@ very useful except as output).
   SQLite                                                                              Accept   No      No         
   MySQL                                                                               Accept   No      No         
   Postgres option with not using cursors (has to support both cursor and non-cursor)  Accept   No      No         
-  Dan | Accept                                                                        ?        ?                  
+  Dan                                                                                 Accept   ?       ?          
   DataQueryWorkflows                                                                  Accept   ?       ?          
 
 

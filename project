@@ -1,4 +1,4 @@
-#!/usr/bin/raku
+#!/usr/bin/env raku
 
 # Run ./project --help for information
 

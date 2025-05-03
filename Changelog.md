@@ -1,6 +1,20 @@
 # Changelog
 
-## Unreleased: Portability++ 1
+## Unreleased:
+
+### Pagila
+
+Altered the testing procedure to incorporate the Pagila database.  This will improve future tests
+
+* Added pagila.dockerfile
+* Adjusted docker-compose and pgpass to match pagila
+* Had to tweak the GitHub action, because the Pagila files failed to load there
+
+Unrelated changes:
+* Updated #! line in project to work with environmental raku
+* Removed tabs from Dan line in README
+
+## 0.0.7
 
 ### Missing-Module-Bugfixes
 
