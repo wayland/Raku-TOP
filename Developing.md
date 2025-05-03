@@ -12,10 +12,14 @@ GitHub Issues?)
 
 # Per-PR process
 
+**Actioned by:** Developer (ie. someone who wants to make changes)
+
 The following is a list of steps that you should be doing on your branch before
-submitting a PR:
+submitting a PR.  Not all steps will be relevant to all changes (eg. a
+documentation-only change won't need the Coding stage).  
 
 ## Coding Stage
+
 *	Create and check out a new branch for coding on
 *	Write some code making the changes you want
 *	Write some tests covering the new code/cases above; use
@@ -65,10 +69,19 @@ submitting a PR:
 
 *	Check if tests pass; if not, bounce back to the Coding stage
 *	Submit PR.  PR body should be Changelog entry
-*	Repo owner will (after feedback) merge branch to main.  Merge
-	Request body should be Changelog entry.  
+*	Iterate with repo owner until resolution
+
+# Merge Process
+
+**Actioned by:** Repo Owner
+
+*	Give feedback on pull request, drawing in other parties where useful; 
+	iterate until resolution
+*	Merge to main.  Merge Request body should be Changelog entry.  
 
 # Release Process
+
+**Actioned by:** Repo Owner
 
 *	Create and check out a new branch for this release called `release-<version>`
 *	Merge any necessary branches/changes
